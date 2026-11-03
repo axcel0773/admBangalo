@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { checkbox, integer, money, optionalText, requiredText, time } from "@/lib/validation";
+import { checkbox, integer, isoDate, money, optionalText, requiredText, time } from "@/lib/validation";
 
 export const chaletSchema = z
   .object({
@@ -20,3 +20,19 @@ export const chaletSchema = z
   });
 
 export type ChaletInput = z.infer<typeof chaletSchema>;
+
+/** Temporada: datas da primeira e da última noite (inclusive), como o dono pensa. */
+export const seasonRateSchema = z
+  .object({
+    label: requiredText("Nome da temporada", 60),
+    first_night: isoDate("Primeira noite"),
+    last_night: isoDate("Última noite"),
+    nightly_rate: money("Diária").refine((value) => value > 0, "Informe a diária da temporada"),
+    min_nights: integer("Mínimo de noites", 1, 60),
+  })
+  .refine((input) => input.last_night >= input.first_night, {
+    path: ["last_night"],
+    message: "A última noite precisa ser igual ou depois da primeira",
+  });
+
+export type SeasonRateInput = z.infer<typeof seasonRateSchema>;
