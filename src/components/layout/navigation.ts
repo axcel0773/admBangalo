@@ -23,8 +23,38 @@ export const routes = {
   guests: "/hospedes",
   finance: "/financeiro",
   settings: "/configuracoes",
+  profile: "/configuracoes/perfil",
+  chalets: "/configuracoes/chales",
+  newChalet: "/configuracoes/chales/novo",
+  fees: "/configuracoes/taxas",
+  newFee: "/configuracoes/taxas/nova",
+  newGuest: "/hospedes/novo",
   login: "/login",
 } as const;
+
+/** Rotas com parâmetro. */
+export const paths = {
+  chalet: (id: string) => `${routes.chalets}/${id}`,
+  fee: (id: string) => `${routes.fees}/${id}`,
+  guest: (id: string) => `${routes.guests}/${id}`,
+  editGuest: (id: string) => `${routes.guests}/${id}/editar`,
+  reservation: (id: string) => `${routes.reservations}/${id}`,
+  newReservation: (params: { chalet?: string; checkIn?: string; guest?: string } = {}) => {
+    const search = new URLSearchParams();
+    if (params.chalet) search.set("chale", params.chalet);
+    if (params.checkIn) search.set("entrada", params.checkIn);
+    if (params.guest) search.set("hospede", params.guest);
+    const query = search.toString();
+    return query ? `${routes.newReservation}?${query}` : routes.newReservation;
+  },
+  calendar: (params: { start?: string; day?: string } = {}) => {
+    const search = new URLSearchParams();
+    if (params.start) search.set("inicio", params.start);
+    if (params.day) search.set("dia", params.day);
+    const query = search.toString();
+    return query ? `${routes.calendar}?${query}` : routes.calendar;
+  },
+};
 
 export const sidebarItems: NavItem[] = [
   { href: routes.dashboard, label: "Painel", icon: House },
