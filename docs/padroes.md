@@ -79,6 +79,27 @@ Definidos em `src/app/globals.css` (`@theme`). Use os nomes semânticos, nunca h
 - Os testes usam os mesmos números validados no Postgres (ex.: reserva de R$ 1.460,28 com saldo de R$ 860,28).
 - `npm test` roda tudo; `npm run test:watch` durante o desenvolvimento.
 
+## Formulários (padrão da parte 3)
+
+Todo formulário segue o mesmo fluxo:
+
+```
+Client Component (useActionState) → Server Action ("use server") → schema zod → repository → revalidatePath → redirect
+```
+
+- **Estado único:** toda action devolve `FormState` (`src/lib/forms.ts`): `idle`, `success` ou `error` com `fieldErrors` e `values`.
+- **Valores preservados:** passe o `formData` para `invalidFormState`/`errorFormState`, e use `valueOf(state, "campo", salvo)` e `checkedOf(...)` no `defaultValue`. O React 19 reseta o formulário depois de cada envio; sem isso o usuário perde o que digitou.
+- **Validação:** schemas em `features/<x>/schemas.ts`, com as peças de `src/lib/validation.ts` (`money`, `integer`, `phone`, `document`, `checkbox`…). Dinheiro sempre via `parseMoney`, a mesma regra no cliente e no servidor.
+- **Erros do banco:** repositories usam `assertMutation`, que lança `MutationError` com mensagem amigável (`src/lib/supabase/errors.ts`). A action captura e devolve `errorFormState`.
+- **Edição:** a página faz `updateX.bind(null, id)` e passa para o mesmo componente de formulário da criação.
+- **Gravações com várias tabelas** vão para uma função do Postgres (ex.: `create_reservation`), para não deixar dado parcial.
+- **Ações destrutivas** pedem confirmação em dois toques (`ConfirmSubmit`), sem `window.confirm`.
+- **Celular:** ações do formulário em `FormActions` (fixo acima da barra inferior); campos numéricos com `inputMode="decimal"`/`"tel"`.
+
+## Estado na URL
+
+Filtros, busca e período ficam na URL (`?q=`, `?ver=`, `?chale=`, `?inicio=&dia=`), não em estado do cliente. Assim, o voltar do navegador funciona, o link pode ser compartilhado e a página continua sendo Server Component. Rotas com parâmetros são montadas por `paths.*` em `components/layout/navigation.ts`.
+
 ## Checklist de nova feature
 
 1. Tipos de entrada/saída em `domain/types.ts`.

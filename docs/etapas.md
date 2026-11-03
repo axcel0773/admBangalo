@@ -15,7 +15,7 @@ Acompanhamento do projeto **admBangalo** (gestão de chalés · Next.js + TypeSc
 | 0 | Fundação do repositório e qualidade | 🟡 em andamento |
 | 1 | Arquitetura, banco e telas | ✅ concluída |
 | 2 | Projeto base (auth, shell, PWA, Painel) | 🟢 rodando no localhost; faltam testes de PWA e lint |
-| 3 | Chalés, taxas, hóspedes, reservas, calendário | ⬜ próxima |
+| 3 | Chalés, taxas, hóspedes, reservas, calendário | 🟡 código pronto na branch `feat/parte-3`, falta validar |
 | 4 | Cobranças, pagamentos e financeiro | ⬜ |
 | 5 | Qualidade, segurança e deploy em produção | ⬜ |
 | 6 | Extras (PDF, WhatsApp, iCal, push) | ⬜ |
@@ -26,8 +26,9 @@ Acompanhamento do projeto **admBangalo** (gestão de chalés · Next.js + TypeSc
 
 Boas práticas que valem para todas as etapas seguintes.
 
-- [ ] Iniciar o Git (`git init`) e fazer o primeiro commit
-- [ ] Criar repositório remoto (GitHub) privado
+- [x] Iniciar o Git (`git init`) e fazer o primeiro commit
+- [x] Repositório remoto no GitHub (`axcel0773/admBangalo`) com push da `main`
+- [ ] Confirmar que o repositório está **privado** (Settings → General → Danger Zone)
 - [ ] Definir fluxo de branches: `main` protegida + `feat/*`, `fix/*` via Pull Request
 - [ ] Adotar Conventional Commits (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`)
 - [ ] Hooks de pré-commit (Husky + lint-staged): lint, Prettier e typecheck nos arquivos alterados
@@ -103,47 +104,57 @@ Boas práticas que valem para todas as etapas seguintes.
 
 ---
 
-## Etapa 3 — Cadastros, reservas e calendário ⬜
+## Etapa 3 — Cadastros, reservas e calendário 🟡
+
+> Código na branch `feat/parte-3`. Falta aplicar a migração `0002` no Supabase e validar localmente.
 
 ### Chalés e taxas (Configurações)
-- [ ] Feature `chalets`: listar, criar, editar, desativar (nome, capacidade, hóspedes inclusos, diária, cor, horários)
-- [ ] Feature `fees`: taxas por chalé ou gerais, com os 5 modos de cobrança e "aplicar automático"
-- [ ] Tarifas sazonais (`chalet_rates`) com período e mínimo de noites
-- [ ] Editar perfil (nome, nome do negócio, chave Pix)
+- [x] Feature `chalets`: listar, criar, editar, desativar (nome, capacidade, hóspedes inclusos, diária, cor, horários)
+- [x] Feature `fees`: taxas por chalé ou gerais, com os 5 modos de cobrança e "aplicar automático"
+- [ ] Tarifas sazonais (`chalet_rates`) com período e mínimo de noites → movido para a etapa 4
+- [x] Editar perfil (nome, nome do negócio, telefone, chave Pix)
 
 ### Hóspedes
-- [ ] Lista com busca por nome, CPF ou telefone (índice `gin` já existe)
-- [ ] Ficha do hóspede: dados, preferências, histórico de estadias
-- [ ] Criar e editar hóspede; validar CPF e telefone (`zod`)
-- [ ] Atalho para WhatsApp (`wa.me`)
+- [x] Lista com busca por nome, CPF ou telefone (`?q=` na URL)
+- [x] Ficha do hóspede: dados, observações, histórico de estadias e total em reservas
+- [x] Criar e editar hóspede; validação de CPF (dígitos verificadores), telefone, e-mail e UF
+- [x] Atalho para WhatsApp (`wa.me`) e e-mail
 
 ### Reservas
-- [ ] Nova reserva em 3 etapas: estadia → hóspedes → valores
-- [ ] Checar disponibilidade com `chalet_is_available` antes de salvar
-- [ ] Prévia de valores com `quoteStay` (mesma regra do banco)
-- [ ] Nomes de todos os hóspedes (`reservation_guests`), um marcado como responsável
-- [ ] Tratar os erros do banco (sobreposição, capacidade) com mensagens amigáveis
-- [ ] Lista de reservas com filtros (chalé, período, status, pagamento)
-- [ ] Mudança de status: confirmar, check-in, check-out, cancelar
-- [ ] Usar transação ou RPC para gravar reserva + hóspedes de uma vez (evitar dado parcial)
+- [x] Nova reserva em 3 etapas: estadia → hóspedes → valores, com prévia de valores ao vivo
+- [x] Prévia com as mesmas regras do banco (`quoteDraft` → `quoteStay`), testada contra o valor do Postgres
+- [x] Responsável: hóspede cadastrado (com busca) ou novo; nomes dos acompanhantes e crianças
+- [x] Gravação atômica via função `create_reservation` (migração `0002`): hóspede + reserva + pessoas
+- [x] Erros do banco (sobreposição, capacidade) traduzidos em mensagens amigáveis
+- [x] Lista com filtros por situação (próximas, hospedados, pendentes, finalizadas, canceladas) e chalé
+- [x] Detalhe: resumo, pessoas, hospedagem e taxas, saldo
+- [x] Mudança de status com máquina de estados (confirmar → check-in → check-out; cancelar com confirmação)
+- [x] Pré-preenchimento pela URL (`?chale=&entrada=&hospede=`), usado pelo calendário e pela ficha do hóspede
 
 ### Calendário
-- [ ] Celular: seletor de semana + lista por chalé
-- [ ] Desktop: grade chalés × dias com barras de reserva
-- [ ] Dias livres clicáveis abrindo a nova reserva já preenchida
+- [x] Celular: semana com pontos de ocupação + agenda do dia por chalé (entrada, saída, troca, livre)
+- [x] Desktop: grade de 2 semanas, chalés × dias, reservas como barras (pendentes tracejadas)
+- [x] Dias livres clicáveis abrindo a nova reserva já preenchida
 - [ ] Bloqueios de manutenção (avaliar nova tabela `chalet_blocks`)
 
 ### Boas práticas desta etapa
-- [ ] Toda Server Action valida com `zod` e retorna erros por campo
-- [ ] `revalidatePath` após gravar, para o Painel refletir na hora
-- [ ] Testes de domínio para cada regra nova
-- [ ] Componentes de formulário reutilizáveis (Select, Stepper, DateRange) em `components/ui`
+- [x] Toda Server Action valida com `zod` e retorna erros por campo (`FormState`)
+- [x] Valores enviados voltam no erro (o React 19 reseta o formulário após cada envio)
+- [x] `revalidatePath` após gravar, para Painel, calendário e listas refletirem na hora
+- [x] Testes de domínio para cada regra nova (62 testes no total)
+- [x] Componentes reutilizáveis em `components/ui`: SelectField, TextareaField, SwitchField, NumberStepper, SubmitButton, FormAlert, FormSection, ListRow, FilterChips, SearchForm, StepIndicator, ColorSwatchField
+
+### Validar antes do merge
+- [ ] Aplicar `supabase/migrations/0002_create_reservation.sql` no SQL Editor do Supabase
+- [ ] `npm run typecheck`, `npm run lint`, `npm test` e `npm run build`
+- [ ] Testar no celular: cadastrar chalé e taxa, criar reserva, mudar status, navegar no calendário
 
 ---
 
 ## Etapa 4 — Cobranças, pagamentos e financeiro ⬜
 
-- [ ] Detalhe da reserva: hospedagem, taxas, desconto, total, pago e saldo
+- [x] Detalhe da reserva: hospedagem, taxas, desconto, total, pago e saldo (somente leitura, parte 3)
+- [ ] Tarifas sazonais (`chalet_rates`) aplicadas na prévia e na diária
 - [ ] Lançar leitura do medidor (entrada e saída) com teclado numérico
 - [ ] Adicionar e remover taxas avulsas na reserva
 - [ ] Registrar pagamento (sinal, parcela, saldo, estorno) com método e data
