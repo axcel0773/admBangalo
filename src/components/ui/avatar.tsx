@@ -1,0 +1,46 @@
+import { cva, type VariantProps } from "class-variance-authority";
+
+import { cn } from "@/lib/cn";
+import { initials } from "@/lib/format";
+
+const avatarVariants = cva(
+  "inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-on-primary select-none",
+  {
+    variants: {
+      size: {
+        sm: "size-8 text-[11px]",
+        md: "size-10 text-xs",
+        lg: "size-12 text-sm",
+        xl: "size-16 text-xl",
+      },
+    },
+    defaultVariants: { size: "md" },
+  },
+);
+
+/** Paleta quente; a cor sai do nome para ser estável entre telas. */
+const AVATAR_COLORS = ["#C0643A", "#5E7C8C", "#8B5A6B", "#7A8C52", "#6B4E36", "#4A6B3A"] as const;
+
+export function avatarColor(name: string): string {
+  let hash = 0;
+  for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return AVATAR_COLORS[hash % AVATAR_COLORS.length] ?? AVATAR_COLORS[0];
+}
+
+interface AvatarProps extends VariantProps<typeof avatarVariants> {
+  name: string;
+  color?: string;
+  className?: string;
+}
+
+export function Avatar({ name, color, size, className }: AvatarProps) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(avatarVariants({ size }), className)}
+      style={{ backgroundColor: color ?? avatarColor(name) }}
+    >
+      {initials(name)}
+    </span>
+  );
+}

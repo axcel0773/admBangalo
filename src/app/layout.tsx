@@ -1,0 +1,42 @@
+import type { Metadata, Viewport } from "next";
+import { Fraunces, Inter } from "next/font/google";
+import type { ReactNode } from "react";
+
+import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  weight: ["500", "600"],
+  display: "swap",
+});
+
+const APP_NAME = "Chalés";
+
+export const metadata: Metadata = {
+  applicationName: APP_NAME,
+  title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
+  description: "Gestão de chalés: reservas, hóspedes, calendário e financeiro.",
+  appleWebApp: { capable: true, title: APP_NAME, statusBarStyle: "black-translucent" },
+  formatDetection: { telephone: false },
+  icons: {
+    icon: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#34502A",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="pt-BR" className={`${inter.variable} ${fraunces.variable}`}>
+      <body>{children}</body>
+    </html>
+  );
+}
