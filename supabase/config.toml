@@ -1,0 +1,40 @@
+# Supabase local (CLI): `supabase start` sobe Postgres, Auth, Storage e a API
+# com as migrações de supabase/migrations. Usado nos testes de banco e E2E.
+# O projeto de produção é configurado pelo painel; veja docs/deploy.md.
+project_id = "admBangalo"
+
+[api]
+port = 54321
+schemas = ["public"]
+
+[db]
+port = 54322
+# Mesma versão do projeto na nuvem (Settings → Infrastructure).
+major_version = 17
+
+[db.seed]
+# O seed precisa de um usuário real; rode-o à mão no ambiente de desenvolvimento.
+enabled = false
+
+[studio]
+port = 54323
+
+[auth]
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/auth/callback"]
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+# Intervalo mínimo entre e-mails de login para o mesmo endereço.
+max_frequency = "60s"
+
+[auth.rate_limit]
+# Limite de tentativas (por hora, por IP): protege o login contra força bruta.
+email_sent = 4
+sign_in_sign_ups = 30
+token_verifications = 30
+
+[storage]
+file_size_limit = "5MiB"
