@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft } from "lucide-react";
-import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -90,10 +90,8 @@ export function NewReservationForm({ chalets, fees, guests, today, prefill }: Ne
 
   const draft = { chalet, checkIn, checkOut, adults, children, nightlyRate: rate, discount: discountValue };
   const issues = validateDraft(draft);
-  const quote = useMemo(
-    () => quoteDraft({ chalet, checkIn, checkOut, adults, children, nightlyRate: rate, discount: discountValue }, fees),
-    [chalet, checkIn, checkOut, adults, children, rate, discountValue, fees],
-  );
+  // Sem useMemo: o React Compiler já memoiza este cálculo puro.
+  const quote = quoteDraft(draft, fees);
 
   // Uma vaga de acompanhante por pessoa além do responsável; as últimas são as crianças.
   const companionSlots = Math.max(adults + children - 1, 0);
@@ -103,10 +101,20 @@ export function NewReservationForm({ chalets, fees, guests, today, prefill }: Ne
   );
 
   // Erro vindo do servidor: volta para a etapa do primeiro campo com problema.
+  // Ajuste de estado durante a renderização (padrão recomendado pelo React em vez de setState no efeito).
+  const [handledState, setHandledState] = useState(state);
+  if (state !== handledState) {
+    setHandledState(state);
+    if (state.status === "error") {
+      const firstField = Object.keys(state.fieldErrors ?? {})[0];
+      const target = firstField ? FIELD_STEP[firstField] : undefined;
+      if (target !== undefined) setStep(target);
+    }
+  }
+
+  // O efeito só sincroniza o DOM (rolagem), sem mexer em estado.
   useEffect(() => {
     if (state.status !== "error") return;
-    const firstField = Object.keys(state.fieldErrors ?? {})[0];
-    if (firstField && FIELD_STEP[firstField] !== undefined) setStep(FIELD_STEP[firstField]);
     topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [state]);
 
