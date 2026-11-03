@@ -21,6 +21,7 @@ import { parseMoney } from "@/lib/money";
 
 import { createReservation } from "../../actions";
 import { nightsOf, quoteDraft, validateDraft, type FeeForQuote } from "../../domain/quote";
+import { nightlyBreakdown, type SeasonRate } from "../../domain/seasons";
 import { SOURCE_LABELS } from "../../domain/status";
 import { QuoteSummary } from "../quote-summary";
 import { ChaletPicker, type ChaletOption } from "./chalet-picker";
@@ -53,11 +54,12 @@ interface NewReservationFormProps {
   chalets: ChaletForForm[];
   fees: FeeForQuote[];
   guests: GuestOption[];
+  seasons: SeasonRate[];
   today: IsoDate;
   prefill: { chaletId?: string; checkIn?: IsoDate; guestId?: string };
 }
 
-export function NewReservationForm({ chalets, fees, guests, today, prefill }: NewReservationFormProps) {
+export function NewReservationForm({ chalets, fees, guests, seasons, today, prefill }: NewReservationFormProps) {
   const [state, formAction] = useActionState(createReservation, idleFormState);
   const topRef = useRef<HTMLDivElement>(null);
 
@@ -77,7 +79,9 @@ export function NewReservationForm({ chalets, fees, guests, today, prefill }: Ne
   const [guestId, setGuestId] = useState(prefill.guestId ?? "");
   const [newGuest, setNewGuest] = useState<NewGuestDraft>({ full_name: "", phone: "", document: "" });
   const [companions, setCompanions] = useState<CompanionDraft[]>([]);
-  const [nightlyRate, setNightlyRate] = useState(formatMoneyInput(initialChalet?.base_nightly_rate ?? 0));
+  // Diária: segue a sugestão (base ou média da temporada) até o dono digitar outra.
+  const [nightlyRate, setNightlyRate] = useState("");
+  const [rateTouched, setRateTouched] = useState(false);
   const [discount, setDiscount] = useState("");
   const [notes, setNotes] = useState("");
   const [confirmed, setConfirmed] = useState(true);
@@ -85,7 +89,21 @@ export function NewReservationForm({ chalets, fees, guests, today, prefill }: Ne
 
   const chalet = chalets.find((c) => c.id === chaletId) ?? null;
   const nights = nightsOf(checkIn, checkOut);
-  const rate = parseMoney(nightlyRate) ?? 0;
+  const breakdown =
+    chalet && nights > 0
+      ? nightlyBreakdown({
+          checkIn,
+          checkOut,
+          baseRate: chalet.base_nightly_rate,
+          seasons: seasons.filter((season) => season.chalet_id === chalet.id),
+        })
+      : null;
+  const suggestedRate = breakdown?.average ?? chalet?.base_nightly_rate ?? 0;
+  const rateText = rateTouched ? nightlyRate : formatMoneyInput(suggestedRate);
+  const rate = parseMoney(rateText) ?? 0;
+  const minNightsWarning = breakdown?.minNightsIssue
+    ? `A temporada “${breakdown.minNightsIssue.label}” pede no mínimo ${pluralize(breakdown.minNightsIssue.minNights, "noite", "noites")}.`
+    : null;
   const discountValue = parseMoney(discount) ?? 0;
 
   const draft = { chalet, checkIn, checkOut, adults, children, nightlyRate: rate, discount: discountValue };
@@ -122,8 +140,7 @@ export function NewReservationForm({ chalets, fees, guests, today, prefill }: Ne
 
   function chooseChalet(id: string) {
     setChaletId(id);
-    const next = chalets.find((c) => c.id === id);
-    if (next) setNightlyRate(formatMoneyInput(next.base_nightly_rate));
+    setRateTouched(false);
   }
 
   function changeCheckIn(value: string) {
@@ -207,6 +224,12 @@ export function NewReservationForm({ chalets, fees, guests, today, prefill }: Ne
               {nights > 0 ? (
                 <p className="rounded-xl bg-primary-soft px-4 py-2.5 text-sm font-semibold text-primary-ink">
                   {pluralize(nights, "noite", "noites")}
+                  {breakdown?.seasonal ? " · com tarifa de temporada" : ""}
+                </p>
+              ) : null}
+              {minNightsWarning ? (
+                <p role="status" className="rounded-xl bg-accent-soft px-4 py-2.5 text-sm font-semibold text-accent-ink">
+                  {minNightsWarning} Você pode seguir mesmo assim.
                 </p>
               ) : null}
             </FormSection>
@@ -269,8 +292,18 @@ export function NewReservationForm({ chalets, fees, guests, today, prefill }: Ne
                   label="Diária (R$)"
                   name="nightly_rate"
                   inputMode="decimal"
-                  value={nightlyRate}
-                  onChange={(event) => setNightlyRate(event.target.value)}
+                  value={rateText}
+                  onChange={(event) => {
+                    setNightlyRate(event.target.value);
+                    setRateTouched(true);
+                  }}
+                  hint={
+                    rateTouched
+                      ? undefined
+                      : breakdown?.seasonal
+                        ? "Média das noites, com a tarifa de temporada."
+                        : "Diária base do chalé."
+                  }
                   error={error("nightly_rate")}
                 />
                 <Field
@@ -301,7 +334,7 @@ export function NewReservationForm({ chalets, fees, guests, today, prefill }: Ne
 
             {quote ? (
               <Card className="p-4 md:p-6 lg:hidden">
-                <QuoteSummary quote={quote} nights={nights} nightlyRate={rate} discount={discountValue} />
+                <QuoteSummary quote={quote} nights={nights} nightlyRate={rate} discount={discountValue} seasonGroups={breakdown?.seasonal && !rateTouched ? breakdown.groups : undefined} />
               </Card>
             ) : null}
           </div>
@@ -312,7 +345,7 @@ export function NewReservationForm({ chalets, fees, guests, today, prefill }: Ne
           <Card className="p-6">
             <p className="mb-3 font-display text-lg font-semibold">{chalet?.name ?? "Resumo"}</p>
             {quote ? (
-              <QuoteSummary quote={quote} nights={nights} nightlyRate={rate} discount={discountValue} />
+              <QuoteSummary quote={quote} nights={nights} nightlyRate={rate} discount={discountValue} seasonGroups={breakdown?.seasonal && !rateTouched ? breakdown.groups : undefined} />
             ) : (
               <p className="text-sm text-ink-muted">Escolha chalé e datas para ver os valores.</p>
             )}

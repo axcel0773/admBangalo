@@ -1,6 +1,6 @@
 import "server-only";
 
-import { listChalets } from "@/features/chalets/services";
+import { listChalets, listCurrentSeasonRates } from "@/features/chalets/services";
 import { listFees } from "@/features/fees/services";
 import { guestsRepository } from "@/features/guests/services";
 import { todayIso, type IsoDate } from "@/lib/dates";
@@ -13,6 +13,7 @@ import {
   type ReservationListItem,
 } from "./data/reservations.repository";
 import type { ChaletForQuote, FeeForQuote } from "./domain/quote";
+import type { SeasonRate } from "./domain/seasons";
 import type { ReservationStatus } from "./domain/types";
 
 export async function reservationsRepository() {
@@ -62,13 +63,16 @@ export interface NewReservationContext {
   chalets: (ChaletForQuote & { name: string; color: string })[];
   fees: FeeForQuote[];
   guests: { id: string; full_name: string; phone: string | null }[];
+  /** Temporadas que ainda não acabaram, de todos os chalés. */
+  seasons: SeasonRate[];
 }
 
 export async function getNewReservationContext(): Promise<NewReservationContext> {
-  const [chalets, fees, guests] = await Promise.all([
+  const [chalets, fees, guests, seasons] = await Promise.all([
     listChalets({ onlyActive: true }),
     listFees({ onlyActive: true }),
     guestsRepository().then((repo) => repo.search(undefined, 200)),
+    listCurrentSeasonRates(),
   ]);
 
   return {
@@ -92,6 +96,7 @@ export async function getNewReservationContext(): Promise<NewReservationContext>
     guests: guests
       .map(({ id, full_name, phone }) => ({ id, full_name, phone }))
       .sort((a, b) => a.full_name.localeCompare(b.full_name, "pt-BR")),
+    seasons,
   };
 }
 
