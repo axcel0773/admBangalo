@@ -103,6 +103,12 @@ Client Component (useActionState) → Server Action ("use server") → schema zo
 - Não use `useMemo`/`useCallback` para cálculos derivados: o compilador já memoiza.
 - Não chame `setState` dentro de `useEffect` para reagir a props ou ao resultado de uma Server Action. Ajuste durante a renderização guardando o valor anterior (ex.: `const [handled, setHandled] = useState(state); if (state !== handled) { … }`). Efeitos só sincronizam com o mundo externo (rolagem, foco).
 
+## Arquivos (Storage)
+
+- Upload vai **direto do navegador para o Storage** (`lib/supabase/storage.ts`), sem passar pela Server Action: evita o limite de corpo e deixa o servidor leve. Fotos são reduzidas antes (`lib/images.ts`).
+- Buckets são privados; a política só deixa cada dono mexer na pasta `<owner_id>/…`. O servidor confere o caminho recebido (`isOwnReceiptPath`) e o banco também (`payments_receipt_path_owner`).
+- Para exibir, gere link temporário (`createSignedUrls`), nunca torne o bucket público.
+
 ## Estado na URL
 
 Filtros, busca e período ficam na URL (`?q=`, `?ver=`, `?chale=`, `?inicio=&dia=`, `?mes=`), não em estado do cliente. Assim, o voltar do navegador funciona, o link pode ser compartilhado e a página continua sendo Server Component. Rotas com parâmetros são montadas por `paths.*` em `components/layout/navigation.ts`.

@@ -16,7 +16,7 @@ Acompanhamento do projeto **admBangalo** (gestão de chalés · Next.js + TypeSc
 | 1 | Arquitetura, banco e telas | ✅ concluída |
 | 2 | Projeto base (auth, shell, PWA, Painel) | 🟢 rodando no localhost; faltam testes de PWA e lint |
 | 3 | Chalés, taxas, hóspedes, reservas, calendário | ✅ validada; merge da `feat/parte-3` via PR |
-| 4 | Cobranças, pagamentos e financeiro | 🟡 parte 4a na branch `feat/parte-4`, falta validar |
+| 4 | Cobranças, pagamentos e financeiro | 🟡 4a e 4b prontas na branch `feat/parte-4`, falta validar |
 | 5 | Qualidade, segurança e deploy em produção | ⬜ |
 | 6 | Extras (PDF, WhatsApp, iCal, push) | ⬜ |
 
@@ -154,8 +154,8 @@ Boas práticas que valem para todas as etapas seguintes.
 
 ## Etapa 4 — Cobranças, pagamentos e financeiro 🟡
 
-> Parte 4a na branch `feat/parte-4`: energia, taxas avulsas, pagamentos, Pix e Financeiro.
-> Aplicar `supabase/migrations/0003_billing.sql` no Supabase antes de testar.
+> Branch `feat/parte-4`. 4a: energia, taxas avulsas, pagamentos, Pix e Financeiro. 4b: parcelas, comprovantes e temporadas.
+> Aplicar `0003_billing.sql` e `0004_receipts.sql` no Supabase antes de testar.
 
 ### Energia (decidido: medidor, R$ 1,00 por kWh)
 - [x] Cartão "Energia" na reserva: leitura de entrada e de saída com teclado numérico
@@ -173,9 +173,18 @@ Boas práticas que valem para todas as etapas seguintes.
 - [x] "Pix copia e cola" com o valor do saldo (BR Code com CRC16, testado contra o exemplo do Banco Central)
 - [x] Enviar a cobrança com o código Pix pelo WhatsApp do hóspede
 - [x] Cidade do recebedor no perfil (`profiles.pix_city`, exigida pelo Pix)
-- [ ] Parcelas previstas (`payment_schedule`) com vencimento → parte 4b
-- [ ] Upload de comprovante no bucket privado `receipts` → parte 4b
-- [ ] Tarifas sazonais (`chalet_rates`) aplicadas na prévia e na diária → parte 4b
+
+### Parte 4b
+- [x] Parcelas previstas (`payment_schedule`): adicionar, remover e atalho "sinal 50% hoje + saldo no check-in"
+- [x] Situação de cada parcela (paga, parcial, vencida, vence hoje, a vencer), distribuindo o pago por vencimento
+- [x] Aviso de valor sem parcela (ou parcelas acima do total) e Pix só da próxima parcela
+- [x] Painel: "A receber" vence na próxima parcela em aberto (sem parcelas, no check-in) e ordena pelo vencimento
+- [x] Comprovante no pagamento: foto (reduzida no celular) ou PDF até 5 MB, direto para o bucket privado `receipts`
+- [x] Link temporário (1 h) para abrir o comprovante; remover o lançamento apaga o arquivo
+- [x] Migração `0004`: bucket, políticas por pasta do dono e checagem do caminho no pagamento
+- [x] Tarifas por temporada no chalé (nome, período, diária, mínimo de noites; sem sobreposição)
+- [x] Nova reserva: cada noite usa a diária da temporada; a diária sugerida é a média, com o detalhe por temporada na prévia
+- [x] Aviso (sem bloquear) quando a estadia não atinge o mínimo de noites da temporada
 
 ### Financeiro
 - [x] Mês na URL (`?mes=2026-11`) com setas de mês anterior/próximo
@@ -186,13 +195,17 @@ Boas práticas que valem para todas as etapas seguintes.
 - [x] Exportar CSV do mês (`;` e vírgula decimal, abre direto no Excel)
 
 ### Testes
-- [x] Domínio: leitura do medidor, regras de pagamento (estorno, pagamento maior que o saldo, reserva cancelada), Pix, relatório do mês, tendência e CSV — 89 testes no total
+- [x] Domínio: leitura do medidor, regras de pagamento (estorno, pagamento maior que o saldo, reserva cancelada), Pix, relatório do mês, tendência e CSV
+- [x] Domínio 4b: parcelas (distribuição, vencimento, sugestão), comprovantes (caminho e tipo), temporadas (noites por período, média, mínimo) — 104 testes no total
+- [x] Migração 0004 testada no Postgres: temporada sobreposta recusada, comprovante fora da pasta do dono recusado, outro usuário não vê arquivos nem parcelas
 - [x] Migração 0003 testada no Postgres: energia 84,5 kWh × R$ 1,00, estorno acima do pago recusado, pagamento em cancelada recusado
 
 ### Validar antes do merge
-- [ ] Aplicar `supabase/migrations/0003_billing.sql` no SQL Editor do Supabase
+- [ ] Aplicar `supabase/migrations/0003_billing.sql` e `0004_receipts.sql` no SQL Editor do Supabase
+- [ ] Conferir em Storage que o bucket `receipts` existe e é privado
 - [ ] `npm run lint`, `npm run typecheck`, `npm test` e `npm run build`
 - [ ] No celular: anotar entrada e saída do medidor, adicionar taxa, registrar pagamento, copiar o Pix e colar no app do banco (sem pagar), abrir o Financeiro e exportar o CSV
+- [ ] No celular (4b): criar sinal + saldo, anexar foto de comprovante, cadastrar uma temporada e simular uma reserva que a atravesse
 
 ---
 
