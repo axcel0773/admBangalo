@@ -17,7 +17,7 @@ export function ChaletList({ chalets }: { chalets: ChaletOverview[] }) {
         icon={<House />}
         title="Cadastre seu primeiro chalé"
         description="Com os chalés cadastrados, o painel mostra ocupação, chegadas e valores."
-        action={<ButtonLink href={routes.settings}>Cadastrar chalé</ButtonLink>}
+        action={<ButtonLink href={routes.newChalet}>Cadastrar chalé</ButtonLink>}
       />
     );
   }
