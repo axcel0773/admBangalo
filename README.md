@@ -9,12 +9,13 @@ Gestão de chalés para o proprietário: hóspedes, calendário de reservas, val
 | --- | --- | --- |
 | 1 | Arquitetura, schema do banco, telas | ✅ `docs/`, `supabase/migrations/` |
 | 2 | Projeto base: login, app shell, PWA, tipos, Painel | ✅ este código |
-| 3 | Chalés e taxas, hóspedes, reservas, calendário | 🟡 branch `feat/parte-3` |
-| 4 | Cobranças, pagamentos, financeiro | — |
+| 3 | Chalés e taxas, hóspedes, reservas, calendário | ✅ |
+| 4 | Cobranças, pagamentos, parcelas, comprovantes, temporadas, financeiro | 🟡 branch `feat/parte-4` |
+| 5 | Testes (componentes, E2E, banco), segurança, CI e deploy | 🟡 branch `feat/parte-5` |
 
 ## Como rodar
 
-Pré-requisitos: Node 20.11+ e um projeto no [Supabase](https://supabase.com).
+Pré-requisitos: Node 22 (veja `.nvmrc`) e um projeto no [Supabase](https://supabase.com). Docker só para os testes de banco e E2E.
 
 ```bash
 # 1. dependências
@@ -26,7 +27,7 @@ cp .env.example .env.local      # no Windows: copy .env.example .env.local
 
 # 3. banco (uma vez)
 #    cole, em ordem, os arquivos de supabase/migrations/ no SQL Editor do Supabase
-#    (0001_init.sql, 0002_create_reservation.sql, 0003_billing.sql, 0004_receipts.sql)
+#    (0001_init.sql … 0005_hardening.sql)
 #    ou: npx supabase link --project-ref <ref> && npx supabase db push
 
 # 4. crie seu usuário
@@ -47,7 +48,10 @@ O service worker só liga em produção. Para testar a instalação do PWA, rode
 | `npm run build` / `npm start` | build de produção com webpack (exigido pelo PWA/Serwist) e servidor |
 | `npm run lint` | ESLint (inclui a regra de camadas) |
 | `npm run typecheck` | TypeScript estrito |
-| `npm test` | testes de domínio (Vitest) |
+| `npm test` | testes de domínio e de componentes (Vitest) |
+| `npm run test:coverage` | idem, com meta de 90% no domínio |
+| `npm run test:db` | testes do banco (pgTAP) no Supabase local |
+| `npm run test:e2e` | Playwright no celular (precisa de build + Supabase local) |
 | `npm run db:types` | regenera `src/types/database.ts` a partir do banco |
 
 ## Estrutura
@@ -78,3 +82,4 @@ src/
 ```
 
 Os padrões de código e de arquitetura estão em [`docs/padroes.md`](docs/padroes.md).
+Segurança e LGPD: [`docs/seguranca.md`](docs/seguranca.md). Deploy (Vercel + Supabase de produção): [`docs/deploy.md`](docs/deploy.md).

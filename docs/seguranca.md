@@ -1,0 +1,74 @@
+# Segurança e LGPD
+
+Revisão da parte 5. Vale para desenvolvimento e produção.
+
+## Chaves do Supabase
+
+| Chave | Onde pode estar | Onde **nunca** pode estar |
+| --- | --- | --- |
+| URL do projeto | `.env.local`, Vercel (`NEXT_PUBLIC_SUPABASE_URL`) | — |
+| Publishable / anon | `.env.local`, Vercel (`NEXT_PUBLIC_SUPABASE_ANON_KEY`) | — (é pública por desenho; o RLS protege os dados) |
+| Secret / service_role | só no processo dos testes E2E com Supabase **local** | código do app, `NEXT_PUBLIC_*`, Vercel, Git |
+
+O teste `src/lib/secrets-guard.test.ts` falha se `service_role`, `SERVICE_ROLE_KEY` ou `sb_secret_…` aparecer em `src/`.
+Se uma chave secreta vazar: Supabase → Project Settings → API Keys → **revogar e gerar outra**.
+
+## RLS (Row Level Security)
+
+| Objeto | Proteção |
+| --- | --- |
+| `profiles` | `id = auth.uid()` |
+| `chalets`, `chalet_rates`, `fees`, `guests`, `reservations`, `reservation_guests`, `reservation_charges`, `payments`, `payment_schedule` | RLS ligado; política única `owner_id = auth.uid()` para usuários logados; `owner_id` preenchido por padrão com `auth.uid()` |
+| Views `reservation_financials`, `monthly_summary`, `occupancy_days` | `security_invoker = true`: respeitam o RLS de quem consulta |
+| Funções `create_reservation`, `chalet_is_available`, `anonymize_guest` | `security invoker` (RLS vale), `search_path` fixo, execução só para `authenticated` |
+| `handle_new_user` (trigger) | `security definer` com `search_path` fixo; sem permissão de execução pela API |
+| Papel `anon` (visitante sem login) | sem nenhum privilégio em tabelas, views e sequências do `public` (migração 0005) |
+| Storage `receipts` | bucket privado; ler, enviar e apagar só na pasta `<owner_id>/`; links assinados de 1 h; o banco confere o caminho salvo no pagamento |
+
+Testado em `supabase/tests/database/01_rls.test.sql`: o dono B não vê nem altera nada do dono A, e o visitante sem login não acessa as tabelas.
+
+## Regras críticas no banco
+
+As regras que não podem falhar ficam no Postgres, e não só na tela:
+
+- sem reservas sobrepostas no mesmo chalé;
+- capacidade máxima do chalé;
+- taxas automáticas aplicadas na criação da reserva;
+- energia calculada a partir da leitura do medidor;
+- estorno limitado ao que foi pago;
+- reserva cancelada só aceita estorno;
+- temporadas sem sobreposição.
+
+Testadas em `supabase/tests/database/02_rules.test.sql`.
+
+## Aplicação
+
+- **Cabeçalhos** (`src/lib/security-headers.ts`, aplicados no `next.config.ts`):
+  - CSP: só o próprio site e o Supabase; sem iframes (`frame-ancestors 'none'`); sem plugins;
+  - `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` (apenas câmera, para fotografar comprovantes);
+  - HSTS quando o site é servido em HTTPS.
+- **Validação:** toda Server Action valida a entrada com zod no servidor. O RLS confere de novo no banco.
+- **Sessão:** o `proxy.ts` renova a sessão e manda para `/login` quem não está logado. O destino do login (`next`) aceita apenas caminhos internos (`safeRedirectPath`).
+- **Uploads:** o tipo e o tamanho do arquivo são conferidos no navegador, no servidor (caminho), no bucket (`allowed_mime_types` e 5 MB) e no banco.
+
+## Login
+
+- Limites de tentativa no Supabase Auth: no painel, em **Authentication → Rate Limits**. Os valores do ambiente local estão em `supabase/config.toml`, na seção `[auth.rate_limit]`.
+- Recomendado em produção:
+  - desligar o cadastro público (**Authentication → Sign In / Providers → Allow new users to sign up = off**), já que o app é só do proprietário;
+  - senha forte;
+  - **Leaked password protection** ligado.
+
+## LGPD
+
+- **Quem vê:** os dados dos hóspedes (CPF, telefone, e-mail) aparecem apenas para o proprietário dono do cadastro (RLS). Não vão para logs nem para serviços de terceiros.
+- **Finalidade:** reserva, contato e emissão de cobrança. Não há marketing nem compartilhamento.
+- **Direito de exclusão:** na ficha do hóspede, **Privacidade → Apagar dados pessoais**. Isso chama `anonymize_guest`, que:
+  - apaga nome, CPF, nascimento, telefone, e-mail, cidade e observações do hóspede e dos acompanhantes das reservas dele;
+  - mantém as reservas e os pagamentos, sem identificar a pessoa, para a contabilidade.
+- **Retenção:**
+  - dados pessoais de hóspedes sem reserva há mais de **5 anos** devem ser anonimizados;
+  - registros financeiros são guardados por 5 anos, o prazo fiscal.
+
+  Revise uma vez por ano. A automação dessa revisão está nos extras (etapa 6).
+- **Comprovantes:** ficam em um bucket privado e são apagados junto com o lançamento.
