@@ -1,4 +1,4 @@
-import { House } from "lucide-react";
+import { CalendarOff, House } from "lucide-react";
 import Link from "next/link";
 
 import { paths } from "@/components/layout/navigation";
@@ -6,7 +6,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/cn";
 import { pluralize } from "@/lib/format";
 
-import type { CalendarDay, CalendarGrid as Grid, CalendarSegment } from "../domain";
+import type { CalendarBlockSegment, CalendarDay, CalendarGrid as Grid, CalendarSegment } from "../domain";
 
 const LABEL_COLUMN = "190px";
 
@@ -49,6 +49,27 @@ function SegmentBar({ segment, color, row }: { segment: CalendarSegment; color: 
         </span>
       ) : null}
     </Link>
+  );
+}
+
+/** Bloqueio: listras cinza, sem link (manutenção ou data ocupada em outra plataforma). */
+function BlockBar({ segment, row }: { segment: CalendarBlockSegment; row: number }) {
+  const { block } = segment;
+  const label = block.source === "manual" ? `Bloqueado · ${block.reason}` : `Ocupado no ${block.reason}`;
+  return (
+    <div
+      title={label}
+      className="relative z-10 mx-1 my-5 flex items-center gap-1.5 overflow-hidden rounded-xl border border-line-strong px-2 text-[12px] font-semibold text-ink-soft"
+      style={{
+        gridRow: row,
+        gridColumn: `${segment.startIndex + 2} / span ${segment.span}`,
+        backgroundImage:
+          "repeating-linear-gradient(135deg, var(--color-muted) 0 6px, var(--color-subtle) 6px 12px)",
+      }}
+    >
+      <CalendarOff className="size-3.5 shrink-0" aria-hidden="true" />
+      {segment.span > 1 ? <span className="truncate">{label}</span> : <span className="sr-only">{label}</span>}
+    </div>
   );
 }
 
@@ -136,6 +157,9 @@ export function CalendarGrid({ grid }: { grid: Grid }) {
                   +
                 </span>
               </Link>
+            )),
+            ...row.blocks.map((segment) => (
+              <BlockBar key={`block-${segment.block.id}`} segment={segment} row={gridRow} />
             )),
             ...row.segments.map((segment) => (
               <SegmentBar key={segment.stay.reservation_id} segment={segment} color={row.chalet.color} row={gridRow} />

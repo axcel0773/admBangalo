@@ -1,4 +1,4 @@
-import { ChevronRight, House, Plus } from "lucide-react";
+import { CalendarOff, ChevronRight, House, Plus } from "lucide-react";
 import Link from "next/link";
 
 import { paths } from "@/components/layout/navigation";
@@ -13,11 +13,30 @@ const STATE_LABEL: Record<ChaletDayEntry["state"], string> = {
   leaving: "Saída",
   turnover: "Troca de hóspedes",
   staying: "Hospedado",
+  blocked: "Bloqueado",
   free: "Livre",
 };
 
 function EntryCard({ entry, day }: { entry: ChaletDayEntry; day: IsoDate }) {
-  const { chalet, state, stay, leavingStay } = entry;
+  const { chalet, state, stay, leavingStay, block } = entry;
+
+  if (state === "blocked" && block) {
+    return (
+      <div className="flex min-h-16 items-center gap-3 rounded-[20px] bg-subtle px-4 py-3 text-ink-soft">
+        <span aria-hidden="true" className="flex size-11 items-center justify-center rounded-2xl bg-muted">
+          <CalendarOff className="size-5" />
+        </span>
+        <span className="flex-1">
+          <span className="block text-sm font-bold text-ink">{chalet.name}</span>
+          <span className="block text-xs">
+            {block.source === "manual" ? `Bloqueado · ${block.reason}` : `Ocupado no ${block.reason}`} · até{" "}
+            {formatDayMonth(block.ends_on)}
+            {stay ? ` · sai ${stay.main_guest_name}` : ""}
+          </span>
+        </span>
+      </div>
+    );
+  }
 
   if (state === "free" || !stay) {
     return (
@@ -73,7 +92,7 @@ function EntryCard({ entry, day }: { entry: ChaletDayEntry; day: IsoDate }) {
 }
 
 export function DayAgenda({ entries, day }: { entries: ChaletDayEntry[]; day: IsoDate }) {
-  const occupied = entries.filter((entry) => entry.state !== "free" && entry.state !== "leaving").length;
+  const occupied = entries.filter((entry) => !["free", "leaving", "blocked"].includes(entry.state)).length;
   const title = formatLongDate(day);
 
   return (

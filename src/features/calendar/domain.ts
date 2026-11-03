@@ -20,6 +20,22 @@ export interface CalendarStay {
   balance_due: number;
 }
 
+/** Datas bloqueadas (manutenção ou calendário externo), na grade e na agenda. */
+export interface CalendarBlock {
+  id: string;
+  chalet_id: string;
+  starts_on: IsoDate;
+  ends_on: IsoDate;
+  reason: string;
+  source: Enums<"block_source">;
+}
+
+export interface CalendarBlockSegment {
+  block: CalendarBlock;
+  startIndex: number;
+  span: number;
+}
+
 export interface CalendarDay {
   date: IsoDate;
   weekday: string;
@@ -42,6 +58,7 @@ export interface CalendarSegment {
 export interface CalendarRow {
   chalet: CalendarChalet;
   segments: CalendarSegment[];
+  blocks: CalendarBlockSegment[];
   occupiedNights: number;
 }
 
@@ -85,14 +102,24 @@ export function toSegment(stay: CalendarStay, start: IsoDate, count: number): Ca
   };
 }
 
+/** Posiciona o bloqueio nas colunas visíveis; null se não cruza o período. */
+export function toBlockSegment(block: CalendarBlock, start: IsoDate, count: number): CalendarBlockSegment | null {
+  const startIndex = Math.max(daysBetween(start, block.starts_on), 0);
+  const endIndex = Math.min(daysBetween(start, block.ends_on), count);
+  if (endIndex <= startIndex) return null;
+  return { block, startIndex, span: endIndex - startIndex };
+}
+
 export function buildCalendarGrid(input: {
   chalets: CalendarChalet[];
   stays: CalendarStay[];
+  blocks?: CalendarBlock[];
   start: IsoDate;
   days: number;
   today: IsoDate;
 }): CalendarGrid {
   const active = input.stays.filter((stay) => stay.status !== "cancelled");
+  const blocks = input.blocks ?? [];
 
   const rows = input.chalets.map((chalet) => {
     const segments = active
@@ -100,7 +127,16 @@ export function buildCalendarGrid(input: {
       .map((stay) => toSegment(stay, input.start, input.days))
       .filter((segment): segment is CalendarSegment => segment !== null)
       .sort((a, b) => a.startIndex - b.startIndex);
-    return { chalet, segments, occupiedNights: segments.reduce((sum, s) => sum + s.span, 0) };
+    const blockSegments = blocks
+      .filter((block) => block.chalet_id === chalet.id)
+      .map((block) => toBlockSegment(block, input.start, input.days))
+      .filter((segment): segment is CalendarBlockSegment => segment !== null);
+    return {
+      chalet,
+      segments,
+      blocks: blockSegments,
+      occupiedNights: segments.reduce((sum, s) => sum + s.span, 0),
+    };
   });
 
   return {
@@ -113,7 +149,7 @@ export function buildCalendarGrid(input: {
 
 /* ---------- Agenda de um dia (celular) ---------- */
 
-export type ChaletDayState = "arriving" | "leaving" | "turnover" | "staying" | "free";
+export type ChaletDayState = "arriving" | "leaving" | "turnover" | "staying" | "blocked" | "free";
 
 export interface ChaletDayEntry {
   chalet: CalendarChalet;
@@ -122,9 +158,16 @@ export interface ChaletDayEntry {
   stay: CalendarStay | null;
   /** Quem sai no mesmo dia em que outro chega. */
   leavingStay: CalendarStay | null;
+  /** Bloqueio que ocupa a noite (quando não há hóspede). */
+  block: CalendarBlock | null;
 }
 
-export function buildDayAgenda(chalets: CalendarChalet[], stays: CalendarStay[], day: IsoDate): ChaletDayEntry[] {
+export function buildDayAgenda(
+  chalets: CalendarChalet[],
+  stays: CalendarStay[],
+  day: IsoDate,
+  blocks: CalendarBlock[] = [],
+): ChaletDayEntry[] {
   const active = stays.filter((stay) => stay.status !== "cancelled");
 
   return chalets.map((chalet) => {
@@ -133,11 +176,14 @@ export function buildDayAgenda(chalets: CalendarChalet[], stays: CalendarStay[],
     const leaving = own.find((stay) => stay.check_out === day) ?? null;
     const staying = own.find((stay) => stay.check_in < day && day < stay.check_out) ?? null;
 
-    if (arriving && leaving) return { chalet, state: "turnover", stay: arriving, leavingStay: leaving };
-    if (arriving) return { chalet, state: "arriving", stay: arriving, leavingStay: null };
-    if (staying) return { chalet, state: "staying", stay: staying, leavingStay: null };
-    if (leaving) return { chalet, state: "leaving", stay: leaving, leavingStay: null };
-    return { chalet, state: "free", stay: null, leavingStay: null };
+    const block = blocks.find((b) => b.chalet_id === chalet.id && b.starts_on <= day && day < b.ends_on) ?? null;
+
+    if (arriving && leaving) return { chalet, state: "turnover", stay: arriving, leavingStay: leaving, block: null };
+    if (arriving) return { chalet, state: "arriving", stay: arriving, leavingStay: null, block: null };
+    if (staying) return { chalet, state: "staying", stay: staying, leavingStay: null, block: null };
+    if (block) return { chalet, state: "blocked", stay: leaving, leavingStay: null, block };
+    if (leaving) return { chalet, state: "leaving", stay: leaving, leavingStay: null, block: null };
+    return { chalet, state: "free", stay: null, leavingStay: null, block: null };
   });
 }
 
