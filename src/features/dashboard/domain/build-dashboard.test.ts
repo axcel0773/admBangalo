@@ -119,6 +119,30 @@ describe("buildDashboard", () => {
     expect(late.summary.dueNowCount).toBe(1);
   });
 
+  it("usa o vencimento da próxima parcela em aberto", () => {
+    const open = stay({ check_in: "2026-12-20" });
+    const withSchedule = buildDashboard({
+      today: TODAY,
+      chalets,
+      monthStays: [],
+      openBalances: [open],
+      monthPayments: [],
+      upcoming: [],
+      schedules: new Map([
+        [
+          open.reservation_id,
+          [
+            // pago 600: o sinal de 800 ficou com 200 em aberto e venceu dia 1º
+            { id: "p1", description: "Sinal", amount: 800, due_date: "2026-11-01" },
+            { id: "p2", description: "Saldo", amount: 660.28, due_date: "2026-12-20" },
+          ],
+        ],
+      ]),
+    });
+    expect(withSchedule.receivables[0]?.dueDate).toBe("2026-11-01");
+    expect(withSchedule.receivables[0]?.dueStatus).toBe("overdue");
+  });
+
   it("conta hóspedes que dormem hoje", () => {
     expect(data.summary.guestsToday).toBe(3);
   });

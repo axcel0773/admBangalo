@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
+import { ConfirmSubmit } from "@/components/ui/confirm-submit";
 import { SubmitButton } from "@/components/ui/submit-button";
 
 import { changeReservationStatus } from "../actions";
 import { availableTransitions } from "../domain/status";
 import type { ReservationStatus } from "../domain/types";
-import { ConfirmSubmit } from "./confirm-submit";
 
 /** Botões das próximas etapas da reserva (confirmar, check-in, check-out, cancelar). */
 export function StatusActions({ reservationId, status }: { reservationId: string; status: ReservationStatus }) {

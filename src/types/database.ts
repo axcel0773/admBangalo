@@ -21,6 +21,7 @@ export type Database = {
           phone: string | null;
           business_name: string | null;
           pix_key: string | null;
+          pix_city: string | null;
         } & Timestamps;
         Insert: {
           id: string;
@@ -28,6 +29,7 @@ export type Database = {
           phone?: string | null;
           business_name?: string | null;
           pix_key?: string | null;
+          pix_city?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
         Relationships: [];

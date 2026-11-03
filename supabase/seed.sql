@@ -40,7 +40,7 @@ begin
   -- Taxas gerais (valem para todos os chalés) ----------------------------
   insert into fees (owner_id, name, kind, mode, amount) values
     (v_owner, 'Limpeza',          'cleaning',    'per_stay',        150),
-    (v_owner, 'Energia elétrica', 'energy',      'metered',         0.95),
+    (v_owner, 'Energia elétrica', 'energy',      'metered',         1.00),
     (v_owner, 'Pessoa extra',     'extra_guest', 'per_guest_night', 60);
 
   -- Hóspedes ---------------------------------------------------------------

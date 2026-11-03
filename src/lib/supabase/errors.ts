@@ -12,6 +12,7 @@ const MESSAGES_BY_CONSTRAINT: Record<string, string> = {
   reservations_no_overlap: "Já existe uma reserva neste chalé para essas datas.",
   guests_owner_document_uq: "Já existe um hóspede com esse documento.",
   reservation_guests_one_main: "A reserva só pode ter um hóspede responsável.",
+  chalet_rates_chalet_id_period_excl: "Já existe uma temporada neste chalé que cruza essas datas.",
 };
 
 export function friendlyDbMessage(error: PostgresLikeError, fallback: string): string {

@@ -4,7 +4,7 @@ import type { IsoDate } from "@/lib/dates";
 import { unwrapList } from "@/lib/supabase/result";
 import type { DbClient } from "@/lib/supabase/server";
 
-import type { ChaletRow, PaymentRow, StayRow } from "../domain/types";
+import type { ChaletRow, PaymentRow, ScheduleRow, StayRow } from "../domain/types";
 
 /**
  * Acesso a dados do Painel. Só consultas — nenhuma regra de negócio.
@@ -68,6 +68,16 @@ export function createDashboardRepository(db: DbClient) {
         .order("check_in")
         .limit(limit);
       return unwrapList(result, "Listar próximas chegadas");
+    },
+
+    /** Parcelas previstas das reservas com saldo (para o vencimento do "A receber"). */
+    async listSchedulesFor(reservationIds: string[]): Promise<ScheduleRow[]> {
+      if (reservationIds.length === 0) return [];
+      const result = await db
+        .from("payment_schedule")
+        .select("id, reservation_id, description, amount, due_date")
+        .in("reservation_id", reservationIds);
+      return unwrapList(result, "Listar parcelas");
     },
   };
 }

@@ -1,5 +1,6 @@
-import { addDays, daysBetween, daysInMonth, startOfMonth, type IsoDate } from "@/lib/dates";
+import { balanceDueDate, type Installment } from "@/features/billing/domain/schedule";
 import { paidAmount, roundMoney } from "@/features/reservations/domain";
+import { addDays, daysBetween, daysInMonth, startOfMonth, type IsoDate } from "@/lib/dates";
 
 import type {
   AgendaEvent,
@@ -99,16 +100,33 @@ export function buildChaletOverview(
   });
 }
 
-export function buildReceivables(open: StayRow[], today: IsoDate): Receivable[] {
-  return open.map((stay) => ({
-    reservationId: stay.reservation_id,
-    guestName: stay.main_guest_name,
-    chaletName: stay.chalet_name,
-    amount: stay.balance_due,
-    // Sem parcela agendada, o saldo vence no check-in.
-    dueDate: stay.check_in,
-    dueStatus: stay.check_in < today ? "overdue" : stay.check_in === today ? "today" : "upcoming",
-  }));
+/** Parcelas previstas por reserva (tabela payment_schedule). */
+export type SchedulesByReservation = Map<string, Installment[]>;
+
+export function buildReceivables(
+  open: StayRow[],
+  today: IsoDate,
+  schedules: SchedulesByReservation = new Map(),
+): Receivable[] {
+  return open
+    .map((stay): Receivable => {
+      // Vence na próxima parcela em aberto; sem parcelas, no check-in.
+      const dueDate = balanceDueDate({
+        items: schedules.get(stay.reservation_id) ?? [],
+        paid: stay.paid_total,
+        checkIn: stay.check_in,
+        today,
+      });
+      return {
+        reservationId: stay.reservation_id,
+        guestName: stay.main_guest_name,
+        chaletName: stay.chalet_name,
+        amount: stay.balance_due,
+        dueDate,
+        dueStatus: dueDate < today ? "overdue" : dueDate === today ? "today" : "upcoming",
+      };
+    })
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
 }
 
 export function buildUpcoming(stays: StayRow[]): UpcomingArrival[] {
@@ -131,12 +149,13 @@ export function buildSummary(input: {
   openBalances: StayRow[];
   monthPayments: PaymentRow[];
   today: IsoDate;
+  schedules?: SchedulesByReservation;
 }): DashboardSummary {
   const { chalets, monthStays, openBalances, monthPayments, today } = input;
 
   const nightsAvailable = chalets.length * daysInMonth(today);
   const nightsSold = [...nightsInMonth(monthStays, today).values()].reduce((a, b) => a + b, 0);
-  const receivables = buildReceivables(openBalances, today);
+  const receivables = buildReceivables(openBalances, today, input.schedules);
 
   return {
     occupancyRate: nightsAvailable > 0 ? nightsSold / nightsAvailable : 0,
@@ -163,16 +182,17 @@ export function buildDashboard(input: {
   openBalances: StayRow[];
   monthPayments: PaymentRow[];
   upcoming: StayRow[];
+  schedules?: SchedulesByReservation;
   receivablesLimit?: number;
 }): DashboardData {
-  const { today, chalets, monthStays, openBalances, monthPayments, upcoming } = input;
+  const { today, chalets, monthStays, openBalances, monthPayments, upcoming, schedules } = input;
 
   return {
     today,
-    summary: buildSummary({ chalets, monthStays, openBalances, monthPayments, today }),
+    summary: buildSummary({ chalets, monthStays, openBalances, monthPayments, today, schedules }),
     agenda: buildAgenda(monthStays, chalets, today),
     chalets: buildChaletOverview(chalets, monthStays, today),
-    receivables: buildReceivables(openBalances, today).slice(0, input.receivablesLimit ?? 4),
+    receivables: buildReceivables(openBalances, today, schedules).slice(0, input.receivablesLimit ?? 4),
     upcoming: buildUpcoming(upcoming),
   };
 }

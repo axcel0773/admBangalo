@@ -16,7 +16,7 @@ Acompanhamento do projeto **admBangalo** (gestão de chalés · Next.js + TypeSc
 | 1 | Arquitetura, banco e telas | ✅ concluída |
 | 2 | Projeto base (auth, shell, PWA, Painel) | 🟢 rodando no localhost; faltam testes de PWA e lint |
 | 3 | Chalés, taxas, hóspedes, reservas, calendário | ✅ validada; merge da `feat/parte-3` via PR |
-| 4 | Cobranças, pagamentos e financeiro | ⬜ |
+| 4 | Cobranças, pagamentos e financeiro | 🟡 4a e 4b prontas na branch `feat/parte-4`, falta validar |
 | 5 | Qualidade, segurança e deploy em produção | ⬜ |
 | 6 | Extras (PDF, WhatsApp, iCal, push) | ⬜ |
 
@@ -152,20 +152,60 @@ Boas práticas que valem para todas as etapas seguintes.
 
 ---
 
-## Etapa 4 — Cobranças, pagamentos e financeiro ⬜
+## Etapa 4 — Cobranças, pagamentos e financeiro 🟡
 
-- [x] Detalhe da reserva: hospedagem, taxas, desconto, total, pago e saldo (somente leitura, parte 3)
-- [ ] Tarifas sazonais (`chalet_rates`) aplicadas na prévia e na diária
-- [ ] Lançar leitura do medidor (entrada e saída) com teclado numérico
-- [ ] Adicionar e remover taxas avulsas na reserva
-- [ ] Registrar pagamento (sinal, parcela, saldo, estorno) com método e data
-- [ ] Parcelas previstas (`payment_schedule`) com vencimento
-- [ ] Upload de comprovante no bucket privado `receipts` (descomentar a política na migração)
-- [ ] "Copiar Pix com valor" (chave do perfil + saldo)
-- [ ] Tela Financeiro: previsto × recebido × a receber por mês, limpeza e energia
-- [ ] Gráfico dos últimos 6 meses
-- [ ] Exportar CSV do mês
-- [ ] Testes cobrindo estorno, pagamento maior que o total e reserva cancelada
+> Branch `feat/parte-4`. 4a: energia, taxas avulsas, pagamentos, Pix e Financeiro. 4b: parcelas, comprovantes e temporadas.
+> Aplicar `0003_billing.sql` e `0004_receipts.sql` no Supabase antes de testar.
+
+### Energia (decidido: medidor, R$ 1,00 por kWh)
+- [x] Cartão "Energia" na reserva: leitura de entrada e de saída com teclado numérico
+- [x] Prévia ao vivo: consumo × tarifa; o total entra na reserva pela cobrança `metered`
+- [x] Aviso do que falta anotar (entrada antes do check-in, saída no check-out)
+- [x] Reserva sem cobrança de energia ganha uma ao salvar a leitura (usa a taxa por medidor do chalé ou a geral)
+- [x] Seed com a tarifa de R$ 1,00/kWh
+- [ ] Cadastrar/ajustar no app a taxa "Energia elétrica": modo **Leitura do medidor**, R$ 1,00
+
+### Taxas e pagamentos
+- [x] Adicionar e remover taxas avulsas na reserva (remoção com confirmação em dois toques)
+- [x] Registrar pagamento (sinal, parcela, saldo, estorno) com forma, data e observação
+- [x] Remover lançamento errado (confirmação em dois toques)
+- [x] Regras: pagamento até o saldo; estorno até o que foi pago; cancelada só aceita estorno — no app e no banco (trigger `check_payment_rules`)
+- [x] "Pix copia e cola" com o valor do saldo (BR Code com CRC16, testado contra o exemplo do Banco Central)
+- [x] Enviar a cobrança com o código Pix pelo WhatsApp do hóspede
+- [x] Cidade do recebedor no perfil (`profiles.pix_city`, exigida pelo Pix)
+
+### Parte 4b
+- [x] Parcelas previstas (`payment_schedule`): adicionar, remover e atalho "sinal 50% hoje + saldo no check-in"
+- [x] Situação de cada parcela (paga, parcial, vencida, vence hoje, a vencer), distribuindo o pago por vencimento
+- [x] Aviso de valor sem parcela (ou parcelas acima do total) e Pix só da próxima parcela
+- [x] Painel: "A receber" vence na próxima parcela em aberto (sem parcelas, no check-in) e ordena pelo vencimento
+- [x] Comprovante no pagamento: foto (reduzida no celular) ou PDF até 5 MB, direto para o bucket privado `receipts`
+- [x] Link temporário (1 h) para abrir o comprovante; remover o lançamento apaga o arquivo
+- [x] Migração `0004`: bucket, políticas por pasta do dono e checagem do caminho no pagamento
+- [x] Tarifas por temporada no chalé (nome, período, diária, mínimo de noites; sem sobreposição)
+- [x] Nova reserva: cada noite usa a diária da temporada; a diária sugerida é a média, com o detalhe por temporada na prévia
+- [x] Aviso (sem bloquear) quando a estadia não atinge o mínimo de noites da temporada
+
+### Financeiro
+- [x] Mês na URL (`?mes=2026-11`) com setas de mês anterior/próximo
+- [x] Indicadores: previsto, recebido, a receber e ocupação do mês
+- [x] Composição: hospedagem, limpeza, energia e outras taxas; entradas de caixa por forma de pagamento
+- [x] Gráfico previsto × recebido dos últimos 6 meses (com tabela para leitor de tela)
+- [x] Reservas do mês com total e saldo
+- [x] Exportar CSV do mês (`;` e vírgula decimal, abre direto no Excel)
+
+### Testes
+- [x] Domínio: leitura do medidor, regras de pagamento (estorno, pagamento maior que o saldo, reserva cancelada), Pix, relatório do mês, tendência e CSV
+- [x] Domínio 4b: parcelas (distribuição, vencimento, sugestão), comprovantes (caminho e tipo), temporadas (noites por período, média, mínimo) — 104 testes no total
+- [x] Migração 0004 testada no Postgres: temporada sobreposta recusada, comprovante fora da pasta do dono recusado, outro usuário não vê arquivos nem parcelas
+- [x] Migração 0003 testada no Postgres: energia 84,5 kWh × R$ 1,00, estorno acima do pago recusado, pagamento em cancelada recusado
+
+### Validar antes do merge
+- [ ] Aplicar `supabase/migrations/0003_billing.sql` e `0004_receipts.sql` no SQL Editor do Supabase
+- [ ] Conferir em Storage que o bucket `receipts` existe e é privado
+- [ ] `npm run lint`, `npm run typecheck`, `npm test` e `npm run build`
+- [ ] No celular: anotar entrada e saída do medidor, adicionar taxa, registrar pagamento, copiar o Pix e colar no app do banco (sem pagar), abrir o Financeiro e exportar o CSV
+- [ ] No celular (4b): criar sinal + saldo, anexar foto de comprovante, cadastrar uma temporada e simular uma reserva que a atravesse
 
 ---
 
@@ -213,11 +253,14 @@ Boas práticas que valem para todas as etapas seguintes.
 
 ---
 
+## Decisões tomadas
+
+- **Energia:** leitura do medidor na entrada e na saída, R$ 1,00 por kWh (taxa `metered`).
+
 ## Decisões em aberto
 
 | Tema | Opções | Impacto |
 | --- | --- | --- |
-| Cobrança de energia | medidor (kWh) × fixo por diária | campos na reserva e no check-out |
 | Bloqueio de datas | tabela nova × reserva com status especial | calendário e disponibilidade |
 | Integração de pagamento | manual (atual) × Pix automático (Mercado Pago, Asaas) | etapa 4 e custos |
 | Acesso de equipe | só o dono × funcionário com acesso limitado | RLS e telas |

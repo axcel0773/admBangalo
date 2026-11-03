@@ -1,18 +1,17 @@
-import { MessageCircle, Phone, Zap } from "lucide-react";
+import { MessageCircle, Phone } from "lucide-react";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import { paths } from "@/components/layout/navigation";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardSection } from "@/components/ui/card";
-import { ProgressBar } from "@/components/ui/progress-bar";
 import { whatsappUrl } from "@/features/guests/domain";
 import { formatLongDate } from "@/lib/dates";
-import { formatCurrency, formatDecimal, pluralize } from "@/lib/format";
+import { pluralize } from "@/lib/format";
 
 import type { ReservationDetailRecord } from "../data/reservations.repository";
-import { paidRatio } from "../domain/payments";
 import { SOURCE_LABELS } from "../domain/status";
 import { PaymentStatusBadge } from "./payment-status-badge";
 import { ReservationStatusBadge } from "./reservation-status-badge";
@@ -22,8 +21,16 @@ function capitalize(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-export function ReservationDetail({ detail }: { detail: ReservationDetailRecord }) {
-  const { reservation, financials, chalet, mainGuest, guests, charges } = detail;
+interface ReservationDetailProps {
+  detail: ReservationDetailRecord;
+  /** Cartões de cobrança (taxas, energia), montados pela página. */
+  billing?: ReactNode;
+  /** Coluna lateral (saldo e pagamentos). */
+  aside?: ReactNode;
+}
+
+export function ReservationDetail({ detail, billing, aside }: ReservationDetailProps) {
+  const { reservation, financials, chalet, mainGuest, guests } = detail;
   const whatsapp = whatsappUrl(mainGuest.phone, `Olá, ${mainGuest.full_name.split(" ")[0]}! Sobre sua reserva no ${chalet.name}:`);
   const people = reservation.adults + reservation.children;
 
@@ -104,44 +111,7 @@ export function ReservationDetail({ detail }: { detail: ReservationDetailRecord 
           ) : null}
         </CardSection>
 
-        {/* Valores */}
-        <CardSection title="Hospedagem e taxas" titleId="reservation-charges">
-          <dl className="divide-y divide-line text-sm">
-            <div className="flex justify-between gap-4 py-3">
-              <dt>
-                <span className="font-semibold">Hospedagem</span>
-                <span className="block text-xs text-ink-muted">
-                  {pluralize(reservation.nights, "noite", "noites")} × {formatCurrency(reservation.nightly_rate)}
-                  {reservation.discount > 0 ? ` − ${formatCurrency(reservation.discount)}` : ""}
-                </span>
-              </dt>
-              <dd className="font-semibold">{formatCurrency(reservation.lodging_total)}</dd>
-            </div>
-            {charges.map((charge) => (
-              <div key={charge.id} className="flex justify-between gap-4 py-3">
-                <dt>
-                  <span className="flex items-center gap-1.5 font-semibold">
-                    {charge.kind === "energy" ? <Zap className="size-4 text-energy-ink" aria-hidden="true" /> : null}
-                    {charge.description}
-                  </span>
-                  <span className="block text-xs text-ink-muted">
-                    {charge.mode === "metered"
-                      ? charge.meter_end === null
-                        ? `leitura de entrada ${charge.meter_start === null ? "pendente" : formatDecimal(charge.meter_start) + " kWh"} · saída pendente`
-                        : `${formatDecimal(charge.quantity)} kWh × ${formatCurrency(charge.unit_amount)}`
-                      : `${formatDecimal(charge.quantity)} × ${formatCurrency(charge.unit_amount)}`}
-                  </span>
-                </dt>
-                <dd className="font-semibold">{formatCurrency(charge.total)}</dd>
-              </div>
-            ))}
-          </dl>
-          <div className="mt-1 flex items-baseline justify-between border-t-2 border-ink pt-3">
-            <span className="font-display text-lg font-semibold">Total</span>
-            <span className="font-display text-2xl font-semibold">{formatCurrency(financials.grand_total)}</span>
-          </div>
-          <p className="mt-3 text-xs text-ink-muted">Leitura do medidor e taxas avulsas entram na parte 4.</p>
-        </CardSection>
+        {billing}
 
         {reservation.notes ? (
           <Card className="bg-[#f9ede3] p-4 shadow-none md:p-6">
@@ -151,28 +121,12 @@ export function ReservationDetail({ detail }: { detail: ReservationDetailRecord 
         ) : null}
       </div>
 
-      {/* Saldo */}
-      <aside aria-label="Pagamento" className="flex flex-col gap-4 lg:sticky lg:top-6">
-        <Card className="flex flex-col gap-3 bg-primary-strong p-5 text-[#f5efe6] shadow-[0_12px_26px_rgb(52_80_42/0.25)]">
-          <p className="text-sm text-[#cfdcc2]">Saldo a receber</p>
-          <p className="font-display text-4xl leading-none font-semibold text-on-primary">
-            {formatCurrency(Math.max(financials.balance_due, 0))}
-          </p>
-          <ProgressBar
-            value={paidRatio(financials.grand_total, financials.paid_total)}
-            label="Quanto já foi pago"
-            trackClassName="bg-white/20"
-            barClassName="bg-[#e8b98f]"
-          />
-          <div className="flex justify-between text-xs text-[#cfdcc2]">
-            <span>Pago {formatCurrency(financials.paid_total)}</span>
-            <span>de {formatCurrency(financials.grand_total)}</span>
-          </div>
-          <p className="rounded-xl bg-white/10 px-3 py-2 text-xs text-[#cfdcc2]">
-            Registro de pagamentos entra na parte 4.
-          </p>
-        </Card>
-      </aside>
+      {/* Saldo e pagamentos */}
+      {aside ? (
+        <aside aria-label="Pagamento" className="flex flex-col gap-4 lg:sticky lg:top-6">
+          {aside}
+        </aside>
+      ) : null}
     </div>
   );
 }

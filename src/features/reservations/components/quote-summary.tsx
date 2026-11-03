@@ -4,6 +4,7 @@ import { cn } from "@/lib/cn";
 import { formatCurrency, formatDecimal, pluralize } from "@/lib/format";
 
 import type { StayQuote } from "../domain/pricing";
+import type { NightlyBreakdownGroup } from "../domain/seasons";
 import type { ChargeMode } from "../domain/types";
 
 const QUANTITY_LABEL: Record<ChargeMode, (quantity: number) => string> = {
@@ -19,11 +20,13 @@ interface QuoteSummaryProps {
   nights: number;
   nightlyRate: number;
   discount: number;
+  /** Noites por temporada (quando a diária é a média sugerida). */
+  seasonGroups?: NightlyBreakdownGroup[];
   className?: string;
 }
 
 /** Prévia dos valores: hospedagem, taxas automáticas e total. */
-export function QuoteSummary({ quote, nights, nightlyRate, discount, className }: QuoteSummaryProps) {
+export function QuoteSummary({ quote, nights, nightlyRate, discount, seasonGroups, className }: QuoteSummaryProps) {
   const hasMetered = quote.charges.some((charge) => charge.mode === "metered");
 
   return (
@@ -36,6 +39,13 @@ export function QuoteSummary({ quote, nights, nightlyRate, discount, className }
               {pluralize(nights, "noite", "noites")} × {formatCurrency(nightlyRate)}
               {discount > 0 ? ` − ${formatCurrency(discount)} de desconto` : ""}
             </span>
+            {seasonGroups ? (
+              <span className="mt-1 block text-xs text-ink-muted">
+                {seasonGroups
+                  .map((group) => `${pluralize(group.nights, "noite", "noites")} ${group.label ?? "fora de temporada"} a ${formatCurrency(group.rate)}`)
+                  .join(" · ")}
+              </span>
+            ) : null}
           </dt>
           <dd className="font-semibold">{formatCurrency(quote.lodging)}</dd>
         </div>

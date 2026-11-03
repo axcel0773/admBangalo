@@ -27,6 +27,8 @@ export type StayRow = Pick<
 
 export type PaymentRow = Pick<Tables<"payments">, "amount" | "kind" | "method">;
 
+export type ScheduleRow = Pick<Tables<"payment_schedule">, "id" | "reservation_id" | "description" | "amount" | "due_date">;
+
 /* ---------- Saída (o que as telas recebem) ---------- */
 
 export type AgendaEventType = "check-in" | "check-out";
