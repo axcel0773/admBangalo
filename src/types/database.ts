@@ -335,6 +335,10 @@ export type Database = {
       };
     };
     Functions: {
+      create_reservation: {
+        Args: { payload: Json };
+        Returns: string;
+      };
       chalet_is_available: {
         Args: {
           p_chalet_id: string;

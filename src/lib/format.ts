@@ -19,6 +19,12 @@ export function formatCurrencyRounded(value: number): string {
   return compactCurrencyFormatter.format(Math.round(value));
 }
 
+/** 350 → "350,00" (valor inicial de campos de dinheiro). */
+export function formatMoneyInput(value: number | null | undefined): string {
+  if (value === null || value === undefined) return "";
+  return value.toFixed(2).replace(".", ",");
+}
+
 /** 0.62 → 62% */
 export function formatPercent(ratio: number): string {
   return percentFormatter.format(ratio);

@@ -9,7 +9,7 @@ Gestão de chalés para o proprietário: hóspedes, calendário de reservas, val
 | --- | --- | --- |
 | 1 | Arquitetura, schema do banco, telas | ✅ `docs/`, `supabase/migrations/` |
 | 2 | Projeto base: login, app shell, PWA, tipos, Painel | ✅ este código |
-| 3 | Chalés e taxas, hóspedes, reservas, calendário | próxima |
+| 3 | Chalés e taxas, hóspedes, reservas, calendário | 🟡 branch `feat/parte-3` |
 | 4 | Cobranças, pagamentos, financeiro | — |
 
 ## Como rodar
@@ -25,7 +25,8 @@ cp .env.example .env.local      # no Windows: copy .env.example .env.local
 # preencha NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 # 3. banco (uma vez)
-#    cole supabase/migrations/0001_init.sql no SQL Editor do Supabase
+#    cole, em ordem, os arquivos de supabase/migrations/ no SQL Editor do Supabase
+#    (0001_init.sql, 0002_create_reservation.sql)
 #    ou: npx supabase link --project-ref <ref> && npx supabase db push
 
 # 4. crie seu usuário
@@ -66,7 +67,10 @@ src/
 ├─ features/            # uma pasta por domínio do negócio
 │  ├─ auth/
 │  ├─ dashboard/        # data/ → domain/ → services/ → components/
-│  └─ reservations/     # domain/ (regras de preço e pagamento)
+│  ├─ chalets/ fees/ profile/   # configurações
+│  ├─ guests/           # hóspedes
+│  ├─ reservations/     # nova reserva, lista, detalhe, status
+│  └─ calendar/         # semana (celular) e grade (desktop)
 ├─ lib/                 # infraestrutura: supabase, env, datas, formatação
 └─ types/database.ts    # tipos do banco
 ```

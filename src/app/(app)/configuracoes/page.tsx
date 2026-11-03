@@ -1,17 +1,24 @@
-import { LogOut } from "lucide-react";
+import { House, LogOut, Receipt, UserRound } from "lucide-react";
 import type { Metadata } from "next";
 
+import { routes } from "@/components/layout/navigation";
 import { PageBody, PageHeader } from "@/components/layout/page-header";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { IconTile } from "@/components/ui/icon-tile";
+import { ListCard, ListRow } from "@/components/ui/list-row";
 import { signOut } from "@/features/auth/actions";
 import { requireOwner } from "@/features/auth/session";
+import { listChalets } from "@/features/chalets";
+import { listFees } from "@/features/fees";
+import { pluralize } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Configurações" };
 
 export default async function SettingsPage() {
-  const owner = await requireOwner();
+  const [owner, chalets, fees] = await Promise.all([requireOwner(), listChalets(), listFees()]);
+  const activeFees = fees.filter((fee) => fee.active).length;
 
   return (
     <>
@@ -25,10 +32,26 @@ export default async function SettingsPage() {
           </div>
         </Card>
 
-        <Card className="p-5 text-sm text-ink-muted">
-          Cadastro de chalés, taxas (limpeza, energia, pessoa extra) e tarifas sazonais entra na
-          parte 3.
-        </Card>
+        <ListCard>
+          <ListRow
+            href={routes.chalets}
+            leading={<IconTile><House /></IconTile>}
+            title="Chalés"
+            subtitle={`${pluralize(chalets.length, "chalé cadastrado", "chalés cadastrados")} · capacidade, diária, horários`}
+          />
+          <ListRow
+            href={routes.fees}
+            leading={<IconTile tone="energy"><Receipt /></IconTile>}
+            title="Taxas"
+            subtitle={`${pluralize(activeFees, "taxa ativa", "taxas ativas")} · limpeza, energia, pessoa extra`}
+          />
+          <ListRow
+            href={routes.profile}
+            leading={<IconTile tone="neutral"><UserRound /></IconTile>}
+            title="Perfil"
+            subtitle="Seu nome, nome do negócio e chave Pix"
+          />
+        </ListCard>
 
         <form action={signOut}>
           <Button type="submit" variant="secondary" block size="lg">
