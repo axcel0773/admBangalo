@@ -40,6 +40,8 @@ Regras de negócio críticas (conflito de datas, capacidade, taxas automáticas,
 - **`features/*/components`** são peças do domínio (ChaletCard, TodayAgenda). Recebem dados já prontos do domínio, nunca linhas cruas do banco.
 - Uma página monta componentes; ela não deve ter mais que alguns blocos de JSX.
 - Componente reaproveitado por duas features sobe para `components/ui` (genérico) ou fica na feature dona do conceito e é importado de lá (ex.: `PaymentStatusBadge` em `reservations`).
+- **Composição por slots:** quando uma tela junta várias features, a página monta e passa os blocos como props (`<ReservationDetail billing={…} aside={…} />`). Assim `reservations` não depende de `billing`.
+- Ações difíceis de desfazer (cancelar, remover) usam `ConfirmSubmit` de `components/ui`: dois toques, sem `window.confirm`.
 - Server Component por padrão. `"use client"` só quando há estado, efeito ou evento, e o mais folha possível (ex.: só a `BottomNav` é cliente, não o layout).
 
 ## Mobile first
@@ -96,9 +98,14 @@ Client Component (useActionState) → Server Action ("use server") → schema zo
 - **Ações destrutivas** pedem confirmação em dois toques (`ConfirmSubmit`), sem `window.confirm`.
 - **Celular:** ações do formulário em `FormActions` (fixo acima da barra inferior); campos numéricos com `inputMode="decimal"`/`"tel"`.
 
+## React Compiler (lint do Next 16)
+
+- Não use `useMemo`/`useCallback` para cálculos derivados: o compilador já memoiza.
+- Não chame `setState` dentro de `useEffect` para reagir a props ou ao resultado de uma Server Action. Ajuste durante a renderização guardando o valor anterior (ex.: `const [handled, setHandled] = useState(state); if (state !== handled) { … }`). Efeitos só sincronizam com o mundo externo (rolagem, foco).
+
 ## Estado na URL
 
-Filtros, busca e período ficam na URL (`?q=`, `?ver=`, `?chale=`, `?inicio=&dia=`), não em estado do cliente. Assim, o voltar do navegador funciona, o link pode ser compartilhado e a página continua sendo Server Component. Rotas com parâmetros são montadas por `paths.*` em `components/layout/navigation.ts`.
+Filtros, busca e período ficam na URL (`?q=`, `?ver=`, `?chale=`, `?inicio=&dia=`, `?mes=`), não em estado do cliente. Assim, o voltar do navegador funciona, o link pode ser compartilhado e a página continua sendo Server Component. Rotas com parâmetros são montadas por `paths.*` em `components/layout/navigation.ts`.
 
 ## Checklist de nova feature
 

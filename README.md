@@ -26,7 +26,7 @@ cp .env.example .env.local      # no Windows: copy .env.example .env.local
 
 # 3. banco (uma vez)
 #    cole, em ordem, os arquivos de supabase/migrations/ no SQL Editor do Supabase
-#    (0001_init.sql, 0002_create_reservation.sql)
+#    (0001_init.sql, 0002_create_reservation.sql, 0003_billing.sql)
 #    ou: npx supabase link --project-ref <ref> && npx supabase db push
 
 # 4. crie seu usuário
@@ -70,6 +70,8 @@ src/
 │  ├─ chalets/ fees/ profile/   # configurações
 │  ├─ guests/           # hóspedes
 │  ├─ reservations/     # nova reserva, lista, detalhe, status
+│  ├─ billing/          # energia, taxas avulsas, pagamentos, Pix
+│  ├─ finance/          # tela Financeiro, gráfico e CSV
 │  └─ calendar/         # semana (celular) e grade (desktop)
 ├─ lib/                 # infraestrutura: supabase, env, datas, formatação
 └─ types/database.ts    # tipos do banco
