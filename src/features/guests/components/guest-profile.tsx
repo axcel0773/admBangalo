@@ -10,6 +10,7 @@ import { formatShortDate, formatStayRange } from "@/lib/dates";
 import { formatCurrency, pluralize } from "@/lib/format";
 
 import { formatCityState, whatsappUrl, type Guest, type GuestStay } from "../domain";
+import { GuestPrivacyCard } from "./guest-privacy-card";
 
 function InfoItem({ label, value }: { label: string; value: string | null }) {
   return (
@@ -76,6 +77,7 @@ export function GuestProfile({ guest, stays }: { guest: Guest; stays: GuestStay[
             </div>
           </div>
         </Card>
+        <GuestPrivacyCard guestId={guest.id} fullName={guest.full_name} />
       </div>
 
       <CardSection title="Estadias" titleId="guest-stays">

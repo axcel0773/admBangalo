@@ -27,6 +27,9 @@ export function formatCityState(guest: Pick<Guest, "city" | "state">): string | 
 }
 
 /** Link do WhatsApp (assume Brasil quando o número vem sem DDI). */
+/** Nome gravado pela função anonymize_guest (LGPD). */
+export const ANONYMIZED_GUEST_NAME = "Hóspede removido";
+
 export function whatsappUrl(phone: string | null, text?: string): string | null {
   if (!phone) return null;
   const digits = phone.replace(/\D/g, "");
