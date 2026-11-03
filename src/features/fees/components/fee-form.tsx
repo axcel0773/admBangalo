@@ -63,7 +63,7 @@ export function FeeForm({ action, chaletOptions, fee }: FeeFormProps) {
           name="amount"
           inputMode="decimal"
           defaultValue={v("amount", formatMoneyInput(fee?.amount))}
-          placeholder={mode === "metered" ? "0,95" : "150,00"}
+          placeholder={mode === "metered" ? "1,00" : "150,00"}
           hint={
             mode === "metered"
               ? "O valor é calculado no check-out: (leitura final − inicial) × tarifa."

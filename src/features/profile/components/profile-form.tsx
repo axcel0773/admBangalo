@@ -44,13 +44,24 @@ export function ProfileForm({ profile }: { profile: Tables<"profiles"> | null })
         />
       </FormSection>
 
-      <FormSection title="Recebimentos" description="Usada no botão “Copiar Pix” das reservas.">
+      <FormSection
+        title="Recebimentos"
+        description="Usados no “Pix copia e cola” das reservas: o hóspede cola no banco e o valor do saldo já vem preenchido."
+      >
         <Field
           label="Chave Pix"
           name="pix_key"
           defaultValue={v("pix_key", profile?.pix_key)}
           placeholder="e-mail, telefone, CPF/CNPJ ou chave aleatória"
           error={error("pix_key")}
+        />
+        <Field
+          label="Cidade do recebedor"
+          name="pix_city"
+          defaultValue={v("pix_city", profile?.pix_city)}
+          placeholder="Gonçalves"
+          hint="Aparece para o hóspede no app do banco. O nome do recebedor é o nome do negócio."
+          error={error("pix_city")}
         />
       </FormSection>
 

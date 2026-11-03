@@ -7,6 +7,7 @@ export const profileSchema = z.object({
   business_name: optionalText(80),
   phone,
   pix_key: optionalText(120),
+  pix_city: optionalText(40),
 });
 
 export type ProfileInput = z.infer<typeof profileSchema>;
