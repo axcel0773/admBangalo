@@ -5,7 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { createDashboardRepository, type DashboardRepository } from "../data/dashboard.repository";
 import { buildDashboard } from "../domain/build-dashboard";
-import type { DashboardData } from "../domain/types";
+import type { DashboardData, ScheduleRow } from "../domain/types";
 
 const UPCOMING_LIMIT = 5;
 
@@ -31,5 +31,11 @@ export async function getDashboard(
     repository.listUpcomingArrivals(today, UPCOMING_LIMIT),
   ]);
 
-  return buildDashboard({ today, chalets, monthStays, openBalances, monthPayments, upcoming });
+  const scheduleRows = await repository.listSchedulesFor(openBalances.map((stay) => stay.reservation_id));
+  const schedules = new Map<string, ScheduleRow[]>();
+  for (const row of scheduleRows) {
+    schedules.set(row.reservation_id, [...(schedules.get(row.reservation_id) ?? []), row]);
+  }
+
+  return buildDashboard({ today, chalets, monthStays, openBalances, monthPayments, upcoming, schedules });
 }
