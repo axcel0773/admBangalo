@@ -21,6 +21,8 @@ Se uma chave secreta vazar: Supabase → Project Settings → API Keys → **rev
 | `chalets`, `chalet_rates`, `fees`, `guests`, `reservations`, `reservation_guests`, `reservation_charges`, `payments`, `payment_schedule` | RLS ligado; política única `owner_id = auth.uid()` para usuários logados; `owner_id` preenchido por padrão com `auth.uid()` |
 | Views `reservation_financials`, `monthly_summary`, `occupancy_days` | `security_invoker = true`: respeitam o RLS de quem consulta |
 | Funções `create_reservation`, `chalet_is_available`, `anonymize_guest` | `security invoker` (RLS vale), `search_path` fixo, execução só para `authenticated` |
+| `chalet_blocks`, `chalet_ical_sources` | RLS `owner_id = auth.uid()`; `anon` sem acesso |
+| Função `ical_feed(token)` (link iCal público) | `security definer` liberada para `anon` **de propósito**: o Airbnb/Booking lê sem login. Devolve só datas ocupadas e o nome do chalé, nunca hóspedes; o token (UUID aleatório) limita a um chalé e pode ser trocado |
 | `handle_new_user` (trigger) | `security definer` com `search_path` fixo; sem permissão de execução pela API |
 | Papel `anon` (visitante sem login) | sem nenhum privilégio em tabelas, views e sequências do `public` (migração 0005) |
 | Storage `receipts` | bucket privado; ler, enviar e apagar só na pasta `<owner_id>/`; links assinados de 1 h; o banco confere o caminho salvo no pagamento |
@@ -49,6 +51,7 @@ Testadas em `supabase/tests/database/02_rules.test.sql`.
   - HSTS quando o site é servido em HTTPS.
 - **Validação:** toda Server Action valida a entrada com zod no servidor. O RLS confere de novo no banco.
 - **Sessão:** o `proxy.ts` renova a sessão e manda para `/login` quem não está logado. O destino do login (`next`) aceita apenas caminhos internos (`safeRedirectPath`).
+- **Importação de iCal:** o servidor só busca links `https://` com nome público (sem IP, `localhost` ou rede interna), com prazo de 10 s e até 2 MB, e grava com a sessão do dono (RLS), sem chave secreta.
 - **Uploads:** o tipo e o tamanho do arquivo são conferidos no navegador, no servidor (caminho), no bucket (`allowed_mime_types` e 5 MB) e no banco.
 
 ## Login

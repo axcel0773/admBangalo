@@ -13,6 +13,7 @@ import {
   saveMeterReading,
   ScheduleCard,
 } from "@/features/billing";
+import { requireOwner } from "@/features/auth/session";
 import { getReservationDetail, ReservationDetail } from "@/features/reservations";
 import { todayIso } from "@/lib/dates";
 
@@ -20,7 +21,7 @@ export const metadata: Metadata = { title: "Reserva" };
 
 export default async function ReservationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const detail = await getReservationDetail(id);
+  const [detail, owner] = await Promise.all([getReservationDetail(id), requireOwner()]);
   if (!detail) notFound();
 
   const { reservation, financials, charges, mainGuest } = detail;
@@ -45,6 +46,7 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
       <PageBody>
         <ReservationDetail
           detail={detail}
+          businessName={owner.businessName}
           billing={
             <>
               {!cancelled ? (

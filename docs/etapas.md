@@ -18,7 +18,7 @@ Acompanhamento do projeto **admBangalo** (gestão de chalés · Next.js + TypeSc
 | 3 | Chalés, taxas, hóspedes, reservas, calendário | ✅ validada; merge da `feat/parte-3` via PR |
 | 4 | Cobranças, pagamentos e financeiro | 🟡 4a e 4b prontas na branch `feat/parte-4`, falta validar |
 | 5 | Qualidade, segurança e deploy em produção | 🟡 código e CI na branch `feat/parte-5`; deploy é feito por você (docs/deploy.md) |
-| 6 | Extras (PDF, WhatsApp, iCal, push) | ⬜ |
+| 6 | Extras (bloqueios, iCal Airbnb/Booking, WhatsApp, recibo) | 🟡 branch `feat/parte-6` |
 
 ---
 
@@ -136,7 +136,7 @@ Boas práticas que valem para todas as etapas seguintes.
 - [x] Celular: semana com pontos de ocupação + agenda do dia por chalé (entrada, saída, troca, livre)
 - [x] Desktop: grade de 2 semanas, chalés × dias, reservas como barras (pendentes tracejadas)
 - [x] Dias livres clicáveis abrindo a nova reserva já preenchida
-- [ ] Bloqueios de manutenção (avaliar nova tabela `chalet_blocks`)
+- [x] Bloqueios de manutenção (`chalet_blocks`, feito na etapa 6)
 
 ### Boas práticas desta etapa
 - [x] Toda Server Action valida com `zod` e retorna erros por campo (`FormState`)
@@ -240,7 +240,7 @@ Boas práticas que valem para todas as etapas seguintes.
 - [ ] Testar em celular real com 3G lento
 
 ### Deploy e operação (passo a passo em `docs/deploy.md`)
-- [ ] Projeto Supabase de produção separado, migrações via `supabase db push`
+- [x] Projeto Supabase de produção separado (`admbangalo-prod`, São Paulo, plano Free) com as migrações aplicadas
 - [ ] Vercel ligada ao GitHub: produção na `main`, preview por PR
 - [ ] Variáveis por ambiente na Vercel (sem chave secreta)
 - [ ] URLs de redirecionamento do Auth para o domínio e os previews
@@ -250,15 +250,24 @@ Boas práticas que valem para todas as etapas seguintes.
 
 ---
 
-## Etapa 6 — Extras ⬜
+## Etapa 6 — Extras 🟡
 
-- [ ] Recibo ou contrato da reserva em PDF
-- [ ] Mensagem de confirmação pronta para o WhatsApp
-- [ ] Importar e exportar calendário iCal (Airbnb e Booking) para evitar reserva dupla
-- [ ] Notificação push do check-in do dia (Web Push + Edge Function agendada)
-- [ ] Modo offline com fila de lançamentos (avaliar conflitos antes)
-- [ ] Fotos reais dos chalés no lugar das ilustrações
-- [ ] Multiproprietário ou equipe (o schema já tem `owner_id` em tudo)
+> Branch `feat/parte-6`. Aplicar `supabase/migrations/0006_availability.sql`.
+> Tudo funciona nos planos gratuitos: sem cron pago, sem serviço externo e sem chave secreta no servidor.
+
+- [x] **Bloqueios de datas** (manutenção, uso próprio) por chalé; aparecem no calendário e o banco recusa reserva por cima
+- [x] **Importar iCal** do Airbnb/Booking/Google: cada chalé guarda os links; as datas ocupadas viram bloqueio "Ocupado no Airbnb"
+  - sincroniza ao abrir o calendário (se faz mais de 6 h) e no botão "Sincronizar agora" — sem cron, roda com a sessão do dono (RLS)
+  - bloqueio importado só **avisa** na nova reserva (o dono pode lançar aqui a mesma reserva vinda de lá)
+  - proteção contra SSRF: só https, sem IP, sem rede interna, prazo de 10 s, até 2 MB
+- [x] **Exportar iCal**: link `/ical/<token>.ics` por chalé para colar no Airbnb/Booking; só datas ocupadas, sem dados de hóspedes; "Gerar novo link" invalida o antigo
+- [x] **Mensagem de confirmação** pronta para o WhatsApp (datas, horários, pessoas, total, pago e saldo)
+- [x] **Recibo** em página própria, pronto para imprimir ou "Salvar como PDF" no celular
+- [x] Testes: leitura/geração de iCal, segurança do link, bloqueios, mensagem (125 de domínio) e 9 asserções de banco para bloqueios e o link público
+- [ ] Notificação push do check-in do dia — fica para depois: precisa de agendador; a Vercel gratuita só roda cron 1×/dia e exigiria chave secreta no servidor
+- [ ] Modo offline com fila de lançamentos — fica para depois: conflitos de reserva (sobreposição) só se resolvem online; o PWA já abre a página offline
+- [ ] Fotos reais dos chalés — conteúdo do dono (pode usar o Storage gratuito, 1 GB)
+- [ ] Multiproprietário ou equipe — o schema já separa tudo por `owner_id`; falta convite e papéis
 
 ---
 

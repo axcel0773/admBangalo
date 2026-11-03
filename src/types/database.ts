@@ -47,6 +47,7 @@ export type Database = {
           check_out_time: string;
           color: string;
           active: boolean;
+          ical_token: string;
         } & Timestamps;
         Insert: {
           id?: string;
@@ -60,6 +61,7 @@ export type Database = {
           check_out_time?: string;
           color?: string;
           active?: boolean;
+          ical_token?: string;
         };
         Update: Partial<Database["public"]["Tables"]["chalets"]["Insert"]>;
         Relationships: [];
@@ -238,6 +240,56 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["reservation_charges"]["Insert"]>;
         Relationships: [];
       };
+      chalet_ical_sources: {
+        Row: {
+          id: string;
+          owner_id: string;
+          chalet_id: string;
+          label: string;
+          url: string;
+          last_synced_at: string | null;
+          last_error: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          owner_id?: string;
+          chalet_id: string;
+          label: string;
+          url: string;
+          last_synced_at?: string | null;
+          last_error?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["chalet_ical_sources"]["Insert"]>;
+        Relationships: [];
+      };
+      chalet_blocks: {
+        Row: {
+          id: string;
+          owner_id: string;
+          chalet_id: string;
+          starts_on: string;
+          ends_on: string;
+          reason: string;
+          source: Database["public"]["Enums"]["block_source"];
+          ical_source_id: string | null;
+          external_uid: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          owner_id?: string;
+          chalet_id: string;
+          starts_on: string;
+          ends_on: string;
+          reason: string;
+          source?: Database["public"]["Enums"]["block_source"];
+          ical_source_id?: string | null;
+          external_uid?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["chalet_blocks"]["Insert"]>;
+        Relationships: [];
+      };
       payments: {
         Row: {
           id: string;
@@ -341,6 +393,10 @@ export type Database = {
         Args: { p_guest_id: string };
         Returns: undefined;
       };
+      ical_feed: {
+        Args: { p_token: string };
+        Returns: { uid: string; starts_on: string; ends_on: string; summary: string; chalet_name: string }[];
+      };
       create_reservation: {
         Args: { payload: Json };
         Returns: string;
@@ -359,6 +415,7 @@ export type Database = {
       reservation_status: "pending" | "confirmed" | "checked_in" | "checked_out" | "cancelled";
       reservation_source: "direct" | "whatsapp" | "airbnb" | "booking" | "other";
       fee_kind: "energy" | "cleaning" | "extra_guest" | "pet" | "other";
+      block_source: "manual" | "ical";
       charge_mode: "per_stay" | "per_night" | "per_guest" | "per_guest_night" | "metered";
       payment_method:
         | "pix"

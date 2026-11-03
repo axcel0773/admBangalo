@@ -1,3 +1,4 @@
+export * from "./messages";
 export * from "./payments";
 export * from "./pricing";
 export * from "./quote";

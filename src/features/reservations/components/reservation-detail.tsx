@@ -1,17 +1,18 @@
-import { MessageCircle, Phone } from "lucide-react";
+import { FileText, MessageCircle, Phone } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { paths } from "@/components/layout/navigation";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { ButtonLink, buttonVariants } from "@/components/ui/button";
 import { Card, CardSection } from "@/components/ui/card";
 import { whatsappUrl } from "@/features/guests/domain";
 import { formatLongDate } from "@/lib/dates";
 import { pluralize } from "@/lib/format";
 
 import type { ReservationDetailRecord } from "../data/reservations.repository";
+import { confirmationMessage } from "../domain/messages";
 import { SOURCE_LABELS } from "../domain/status";
 import { PaymentStatusBadge } from "./payment-status-badge";
 import { ReservationStatusBadge } from "./reservation-status-badge";
@@ -27,12 +28,28 @@ interface ReservationDetailProps {
   billing?: ReactNode;
   /** Coluna lateral (saldo e pagamentos). */
   aside?: ReactNode;
+  /** Assinatura da mensagem de confirmação. */
+  businessName: string;
 }
 
-export function ReservationDetail({ detail, billing, aside }: ReservationDetailProps) {
+export function ReservationDetail({ detail, billing, aside, businessName }: ReservationDetailProps) {
   const { reservation, financials, chalet, mainGuest, guests } = detail;
-  const whatsapp = whatsappUrl(mainGuest.phone, `Olá, ${mainGuest.full_name.split(" ")[0]}! Sobre sua reserva no ${chalet.name}:`);
   const people = reservation.adults + reservation.children;
+  const confirmation = confirmationMessage({
+    guestName: mainGuest.full_name,
+    chaletName: chalet.name,
+    businessName,
+    status: reservation.status,
+    checkIn: reservation.check_in,
+    checkOut: reservation.check_out,
+    checkInTime: chalet.check_in_time,
+    checkOutTime: chalet.check_out_time,
+    guests: people,
+    nights: reservation.nights,
+    total: financials.grand_total,
+    paid: financials.paid_total,
+  });
+  const whatsapp = reservation.status === "cancelled" ? null : whatsappUrl(mainGuest.phone, confirmation);
 
   return (
     <div className="grid gap-4 md:gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
@@ -70,22 +87,29 @@ export function ReservationDetail({ detail, billing, aside }: ReservationDetailP
 
           <StatusActions reservationId={reservation.id} status={reservation.status} />
 
-          {whatsapp || mainGuest.phone ? (
-            <div className="grid grid-cols-2 gap-2.5">
-              {whatsapp ? (
-                <a href={whatsapp} target="_blank" rel="noreferrer" className={buttonVariants({ variant: "soft" })}>
-                  <MessageCircle aria-hidden="true" />
-                  WhatsApp
-                </a>
-              ) : null}
-              {mainGuest.phone ? (
-                <a href={`tel:${mainGuest.phone.replace(/\D/g, "")}`} className={buttonVariants({ variant: "secondary" })}>
-                  <Phone aria-hidden="true" />
-                  Ligar
-                </a>
-              ) : null}
-            </div>
-          ) : null}
+          <div className="grid grid-cols-2 gap-2.5">
+            {whatsapp ? (
+              <a
+                href={whatsapp}
+                target="_blank"
+                rel="noreferrer"
+                className={buttonVariants({ variant: "soft", className: "col-span-2 sm:col-span-1" })}
+              >
+                <MessageCircle aria-hidden="true" />
+                Enviar confirmação
+              </a>
+            ) : null}
+            {mainGuest.phone ? (
+              <a href={`tel:${mainGuest.phone.replace(/\D/g, "")}`} className={buttonVariants({ variant: "secondary" })}>
+                <Phone aria-hidden="true" />
+                Ligar
+              </a>
+            ) : null}
+            <ButtonLink href={paths.receipt(reservation.id)} variant="secondary">
+              <FileText aria-hidden="true" />
+              Recibo
+            </ButtonLink>
+          </div>
         </Card>
 
         {/* Pessoas */}

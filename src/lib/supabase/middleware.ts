@@ -5,7 +5,8 @@ import { env } from "@/lib/env";
 import type { Database } from "@/types/database";
 
 /** Rotas abertas sem login. */
-const PUBLIC_PATHS = ["/login", "/auth", "/offline"];
+// /ical: link de calendário lido pelo Airbnb/Booking, sem login (só datas ocupadas).
+const PUBLIC_PATHS = ["/login", "/auth", "/offline", "/ical"];
 
 function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));

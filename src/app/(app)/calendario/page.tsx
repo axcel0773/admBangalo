@@ -42,10 +42,10 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
         ? today
         : start;
 
-  const { chalets, stays } = await getCalendarData(start, GRID_DAYS);
-  const grid = buildCalendarGrid({ chalets, stays, start, days: GRID_DAYS, today });
+  const { chalets, stays, blocks } = await getCalendarData(start, GRID_DAYS);
+  const grid = buildCalendarGrid({ chalets, stays, blocks, start, days: GRID_DAYS, today });
   const week = buildDays(start, WEEK_DAYS, today);
-  const agenda = buildDayAgenda(chalets, stays, selectedDay);
+  const agenda = buildDayAgenda(chalets, stays, selectedDay, blocks);
   const monthLabel = monthFormatter.format(new Date(`${start}T00:00:00Z`));
 
   return (

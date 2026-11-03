@@ -14,6 +14,7 @@ import { StepIndicator } from "@/components/ui/step-indicator";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { SwitchField } from "@/components/ui/switch-field";
 import { TextareaField } from "@/components/ui/textarea-field";
+import { blockWarning, overlappingBlocks, type ChaletBlock } from "@/features/availability/domain/blocks";
 import { addDays, type IsoDate } from "@/lib/dates";
 import { fieldError, idleFormState } from "@/lib/forms";
 import { formatCurrency, formatMoneyInput, pluralize } from "@/lib/format";
@@ -55,11 +56,12 @@ interface NewReservationFormProps {
   fees: FeeForQuote[];
   guests: GuestOption[];
   seasons: SeasonRate[];
+  blocks: ChaletBlock[];
   today: IsoDate;
   prefill: { chaletId?: string; checkIn?: IsoDate; guestId?: string };
 }
 
-export function NewReservationForm({ chalets, fees, guests, seasons, today, prefill }: NewReservationFormProps) {
+export function NewReservationForm({ chalets, fees, guests, seasons, blocks, today, prefill }: NewReservationFormProps) {
   const [state, formAction] = useActionState(createReservation, idleFormState);
   const topRef = useRef<HTMLDivElement>(null);
 
@@ -101,6 +103,7 @@ export function NewReservationForm({ chalets, fees, guests, seasons, today, pref
   const suggestedRate = breakdown?.average ?? chalet?.base_nightly_rate ?? 0;
   const rateText = rateTouched ? nightlyRate : formatMoneyInput(suggestedRate);
   const rate = parseMoney(rateText) ?? 0;
+  const blocked = chalet && nights > 0 ? blockWarning(overlappingBlocks(blocks, chalet.id, checkIn, checkOut)) : null;
   const minNightsWarning = breakdown?.minNightsIssue
     ? `A temporada “${breakdown.minNightsIssue.label}” pede no mínimo ${pluralize(breakdown.minNightsIssue.minNights, "noite", "noites")}.`
     : null;
@@ -153,7 +156,7 @@ export function NewReservationForm({ chalets, fees, guests, seasons, today, pref
     if (index === 0) {
       if (!chalet) return "Escolha o chalé.";
       if (!checkIn || !checkOut) return "Informe as datas de entrada e saída.";
-      return issues.dates ?? issues.capacity ?? null;
+      return issues.dates ?? issues.capacity ?? (blocked?.blocking ? blocked.message : null);
     }
     if (index === 1) {
       if (guestMode === "existing" && !guestId) return "Escolha o hóspede responsável.";
@@ -225,6 +228,18 @@ export function NewReservationForm({ chalets, fees, guests, seasons, today, pref
                 <p className="rounded-xl bg-primary-soft px-4 py-2.5 text-sm font-semibold text-primary-ink">
                   {pluralize(nights, "noite", "noites")}
                   {breakdown?.seasonal ? " · com tarifa de temporada" : ""}
+                </p>
+              ) : null}
+              {blocked ? (
+                <p
+                  role="status"
+                  className={
+                    blocked.blocking
+                      ? "rounded-xl bg-danger-soft px-4 py-2.5 text-sm font-semibold text-danger-ink"
+                      : "rounded-xl bg-accent-soft px-4 py-2.5 text-sm font-semibold text-accent-ink"
+                  }
+                >
+                  {blocked.message}
                 </p>
               ) : null}
               {minNightsWarning ? (

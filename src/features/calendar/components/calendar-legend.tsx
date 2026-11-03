@@ -11,6 +11,14 @@ export function CalendarLegend() {
         Pendente
       </span>
       <span className="inline-flex items-center gap-2">
+        <span
+          aria-hidden="true"
+          className="h-3.5 w-7 rounded-md border border-line-strong"
+          style={{ backgroundImage: "repeating-linear-gradient(135deg, var(--color-muted) 0 4px, var(--color-subtle) 4px 8px)" }}
+        />
+        Bloqueado / outra plataforma
+      </span>
+      <span className="inline-flex items-center gap-2">
         <span aria-hidden="true" className="h-4 border-l-2 border-dashed border-[#9db28a]" />
         Hoje
       </span>

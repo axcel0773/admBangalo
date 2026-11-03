@@ -25,6 +25,17 @@ test("respostas trazem os cabeçalhos de segurança", async ({ request }) => {
   expect(headers["x-powered-by"]).toBeUndefined();
 });
 
+test("link iCal é público, só aceita token válido e responde calendário", async ({ request }) => {
+  expect((await request.get("/ical/nao-e-token")).status()).toBe(404);
+  const response = await request.get(`/ical/${crypto.randomUUID()}.ics`);
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]).toContain("text/calendar");
+  const body = await response.text();
+  expect(body.startsWith("BEGIN:VCALENDAR")).toBe(true);
+  // token que não existe: calendário vazio, sem vazar nada
+  expect(body).not.toContain("BEGIN:VEVENT");
+});
+
 test("manifest do PWA está publicado", async ({ request }) => {
   const response = await request.get("/manifest.webmanifest");
   expect(response.ok()).toBe(true);

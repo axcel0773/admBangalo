@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { buildCalendarGrid, buildDayAgenda, buildDays, occupiedChaletIds, toSegment, type CalendarStay } from "./domain";
+import {
+  buildCalendarGrid,
+  buildDayAgenda,
+  buildDays,
+  occupiedChaletIds,
+  toBlockSegment,
+  toSegment,
+  type CalendarBlock,
+  type CalendarStay,
+} from "./domain";
 
 const chalets = [
   { id: "ipe", name: "Chalé Ipê", color: "#4A6B3A", max_guests: 4 },
@@ -87,6 +96,28 @@ describe("buildDayAgenda", () => {
     ]);
     expect(buildDayAgenda(chalets, stays, "2026-11-04").map((e) => e.state)).toEqual(["staying", "staying"]);
     expect(buildDayAgenda(chalets, stays, "2026-11-06").map((e) => e.state)).toEqual(["leaving", "free"]);
+  });
+
+  it("mostra o chalé bloqueado quando não há hóspede", () => {
+    const block: CalendarBlock = {
+      id: "b1",
+      chalet_id: "jabu",
+      starts_on: "2026-11-05",
+      ends_on: "2026-11-08",
+      reason: "Pintura",
+      source: "manual",
+    };
+    const agenda = buildDayAgenda(chalets, stays, "2026-11-06", [block]);
+    expect(agenda.map((e) => [e.chalet.id, e.state, e.block?.reason])).toEqual([
+      ["ipe", "leaving", undefined],
+      ["jabu", "blocked", "Pintura"],
+    ]);
+    // hóspede na casa vence o bloqueio
+    expect(buildDayAgenda(chalets, stays, "2026-11-04", [{ ...block, starts_on: "2026-11-04" }])[1]?.state).toBe("staying");
+    expect(toBlockSegment(block, "2026-11-01", 5)).toEqual({ block, startIndex: 4, span: 1 });
+    expect(toBlockSegment(block, "2026-11-10", 5)).toBeNull();
+    const grid = buildCalendarGrid({ chalets, stays, blocks: [block], start: "2026-11-01", days: 14, today: "2026-11-03" });
+    expect(grid.rows.find((row) => row.chalet.id === "jabu")?.blocks).toEqual([{ block, startIndex: 4, span: 3 }]);
   });
 
   it("lista chalés ocupados na noite", () => {
