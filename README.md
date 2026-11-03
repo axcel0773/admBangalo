@@ -12,6 +12,7 @@ Gestão de chalés para o proprietário: hóspedes, calendário de reservas, val
 | 3 | Chalés e taxas, hóspedes, reservas, calendário | ✅ |
 | 4 | Cobranças, pagamentos, parcelas, comprovantes, temporadas, financeiro | 🟡 branch `feat/parte-4` |
 | 5 | Testes (componentes, E2E, banco), segurança, CI e deploy | 🟡 branch `feat/parte-5` |
+| 6 | Bloqueios, iCal Airbnb/Booking, confirmação no WhatsApp, recibo | 🟡 branch `feat/parte-6` |
 
 ## Como rodar
 
@@ -27,7 +28,7 @@ cp .env.example .env.local      # no Windows: copy .env.example .env.local
 
 # 3. banco (uma vez)
 #    cole, em ordem, os arquivos de supabase/migrations/ no SQL Editor do Supabase
-#    (0001_init.sql … 0005_hardening.sql)
+#    (0001_init.sql … 0006_availability.sql)
 #    ou: npx supabase link --project-ref <ref> && npx supabase db push
 
 # 4. crie seu usuário
@@ -76,6 +77,7 @@ src/
 │  ├─ reservations/     # nova reserva, lista, detalhe, status
 │  ├─ billing/          # energia, taxas, pagamentos, parcelas, comprovantes, Pix
 │  ├─ finance/          # tela Financeiro, gráfico e CSV
+│  ├─ availability/     # bloqueios de datas e iCal (Airbnb/Booking)
 │  └─ calendar/         # semana (celular) e grade (desktop)
 ├─ lib/                 # infraestrutura: supabase, env, datas, formatação
 └─ types/database.ts    # tipos do banco
