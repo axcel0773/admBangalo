@@ -337,6 +337,10 @@ export type Database = {
       };
     };
     Functions: {
+      anonymize_guest: {
+        Args: { p_guest_id: string };
+        Returns: undefined;
+      };
       create_reservation: {
         Args: { payload: Json };
         Returns: string;

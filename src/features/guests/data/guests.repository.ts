@@ -52,5 +52,10 @@ export function createGuestsRepository(db: DbClient) {
     async update(id: string, input: GuestInput): Promise<void> {
       assertMutation(await db.from("guests").update(input).eq("id", id), "Não foi possível salvar o hóspede.");
     },
+
+    /** LGPD: apaga dados pessoais e mantém reservas e pagamentos (função anonymize_guest). */
+    async anonymize(id: string): Promise<void> {
+      assertMutation(await db.rpc("anonymize_guest", { p_guest_id: id }), "Não foi possível apagar os dados.");
+    },
   };
 }

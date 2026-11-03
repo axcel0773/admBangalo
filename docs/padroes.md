@@ -80,6 +80,9 @@ Definidos em `src/app/globals.css` (`@theme`). Use os nomes semânticos, nunca h
 - Todo arquivo de `domain/` tem um `*.test.ts` ao lado.
 - Os testes usam os mesmos números validados no Postgres (ex.: reserva de R$ 1.460,28 com saldo de R$ 860,28).
 - `npm test` roda tudo; `npm run test:watch` durante o desenvolvimento.
+- Componentes: `*.test.tsx` com `// @vitest-environment jsdom` no topo e Testing Library. Busque por papel e rótulo (`getByRole`, `getByLabelText`), como o usuário enxerga; chame `cleanup` no `afterEach`.
+- Banco: regra nova no Postgres ganha asserção em `supabase/tests/database/*.test.sql` (pgTAP).
+- Fluxos de ponta a ponta em `e2e/`, sempre no projeto "celular" (mobile first). O teste cria um dono descartável no Supabase local e apaga no fim.
 
 ## Formulários (padrão da parte 3)
 

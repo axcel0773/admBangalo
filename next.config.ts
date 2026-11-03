@@ -2,10 +2,27 @@ import withSerwistInit from "@serwist/next";
 import type { NextConfig } from "next";
 import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
-const nextConfig: NextConfig = {
-  reactStrictMode: true,
-  poweredByHeader: false,
-};
+import { securityHeaders } from "./src/lib/security-headers";
+
+function baseConfig(development: boolean): NextConfig {
+  return {
+    reactStrictMode: true,
+    poweredByHeader: false,
+    async headers() {
+      return [
+        {
+          source: "/:path*",
+          headers: securityHeaders({
+            supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
+            development,
+            // Vercel sempre serve em HTTPS; localmente vale o NEXT_PUBLIC_SITE_URL.
+            https: process.env.VERCEL === "1" || (process.env.NEXT_PUBLIC_SITE_URL ?? "").startsWith("https://"),
+          }),
+        },
+      ];
+    },
+  };
+}
 
 /**
  * PWA (Serwist) só entra fora do servidor de desenvolvimento.
@@ -15,7 +32,7 @@ const nextConfig: NextConfig = {
  * não está definido quando este arquivo é carregado).
  */
 export default function config(phase: string): NextConfig {
-  if (phase === PHASE_DEVELOPMENT_SERVER) return nextConfig;
+  if (phase === PHASE_DEVELOPMENT_SERVER) return baseConfig(true);
 
   const withSerwist = withSerwistInit({
     swSrc: "src/app/sw.ts",
@@ -24,5 +41,5 @@ export default function config(phase: string): NextConfig {
     additionalPrecacheEntries: [{ url: "/offline", revision: crypto.randomUUID() }],
   });
 
-  return withSerwist(nextConfig);
+  return withSerwist(baseConfig(false));
 }

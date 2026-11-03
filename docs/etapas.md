@@ -17,7 +17,7 @@ Acompanhamento do projeto **admBangalo** (gestão de chalés · Next.js + TypeSc
 | 2 | Projeto base (auth, shell, PWA, Painel) | 🟢 rodando no localhost; faltam testes de PWA e lint |
 | 3 | Chalés, taxas, hóspedes, reservas, calendário | ✅ validada; merge da `feat/parte-3` via PR |
 | 4 | Cobranças, pagamentos e financeiro | 🟡 4a e 4b prontas na branch `feat/parte-4`, falta validar |
-| 5 | Qualidade, segurança e deploy em produção | ⬜ |
+| 5 | Qualidade, segurança e deploy em produção | 🟡 código e CI na branch `feat/parte-5`; deploy é feito por você (docs/deploy.md) |
 | 6 | Extras (PDF, WhatsApp, iCal, push) | ⬜ |
 
 ---
@@ -29,12 +29,13 @@ Boas práticas que valem para todas as etapas seguintes.
 - [x] Iniciar o Git (`git init`) e fazer o primeiro commit
 - [x] Repositório remoto no GitHub (`axcel0773/admBangalo`) com push da `main`
 - [ ] Confirmar que o repositório está **privado** (Settings → General → Danger Zone)
-- [ ] Definir fluxo de branches: `main` protegida + `feat/*`, `fix/*` via Pull Request
-- [ ] Adotar Conventional Commits (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`)
-- [ ] Hooks de pré-commit (Husky + lint-staged): lint, Prettier e typecheck nos arquivos alterados
-- [ ] CI no GitHub Actions: `npm ci` → `lint` → `typecheck` → `test` → `build` em todo PR
-- [ ] Dependabot (ou Renovate) para atualizar dependências
-- [ ] Arquivo `.nvmrc` fixando a versão do Node
+- [ ] Proteger a `main` no GitHub exigindo PR e os checks do CI (passo a passo em `docs/deploy.md`)
+- [x] Adotar Conventional Commits (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`)
+- [x] Hooks (Husky + lint-staged): ESLint e Prettier no pre-commit; typecheck e testes no pre-push
+- [x] CI no GitHub Actions (`.github/workflows/ci.yml`): qualidade, banco (pgTAP) e E2E em todo PR
+- [x] Dependabot semanal (npm agrupado) e mensal (Actions)
+- [x] Arquivo `.nvmrc` fixando o Node 22 (usado pelo CI)
+- [x] Modelo de Pull Request com checklist
 - [x] `.gitignore` sem segredos nem artefatos de build
 - [x] `.env.example` documentando as variáveis
 - [x] ESLint, Prettier e TypeScript estrito configurados
@@ -209,34 +210,42 @@ Boas práticas que valem para todas as etapas seguintes.
 
 ---
 
-## Etapa 5 — Qualidade, segurança e produção ⬜
+## Etapa 5 — Qualidade, segurança e produção 🟡
+
+> Código, testes e CI na branch `feat/parte-5`. O que depende de contas (Vercel, Supabase de produção, domínio) está no passo a passo de `docs/deploy.md`.
+> Aplicar `supabase/migrations/0005_hardening.sql` no Supabase.
 
 ### Testes
-- [ ] Testes de componentes (Testing Library) nas peças críticas: formulários e saldo
-- [ ] Testes de ponta a ponta (Playwright) no fluxo principal: login → nova reserva → pagamento
-- [ ] Testes do banco: RLS (usuário A não vê dados de B) e triggers, rodando no CI com Supabase local
-- [ ] Meta de cobertura do domínio ≥ 90%
+- [x] Componentes (Testing Library + jsdom): `ConfirmSubmit`, `EnergyCard`, `QuoteSummary`
+- [x] Ponta a ponta (Playwright, celular): login → chalé → nova reserva → pagamento; fumaça com acessibilidade (axe), cabeçalhos e manifest
+- [x] Banco (pgTAP em `supabase/tests`): RLS entre dois donos e visitante, triggers, constraints, pagamentos, temporadas e LGPD — 25 asserções, no CI com Supabase local
+- [x] Cobertura do domínio com meta de 90% de linhas (`npm run test:coverage`, quebra o CI se cair)
+- [x] Guarda contra segredo no código (`src/lib/secrets-guard.test.ts`)
+- [ ] Rodar o E2E no seu PC uma vez (Docker + `supabase start`) e acompanhar o primeiro CI verde
 
 ### Segurança
-- [ ] Revisar RLS de todas as tabelas e do Storage
-- [ ] Garantir que a chave `service_role` nunca vá para o cliente
-- [ ] Cabeçalhos de segurança (CSP, `X-Frame-Options`, `Referrer-Policy`) no `next.config.ts`
-- [ ] Limite de tentativas de login (configuração do Supabase Auth)
-- [ ] LGPD: os dados dos hóspedes (CPF, telefone) só aparecem para o dono; definir política de retenção
+- [x] RLS revisado em todas as tabelas, views e no Storage (tabela em `docs/seguranca.md`)
+- [x] Migração 0005: `search_path` fixo nas funções, execução só para logados, papel `anon` sem acesso
+- [x] `service_role` fora do app, com teste de guarda
+- [x] Cabeçalhos: CSP, `X-Frame-Options`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS em HTTPS
+- [x] Limites de tentativa de login no `supabase/config.toml` (local); produção no painel (ver `docs/seguranca.md`)
+- [x] LGPD: dados só para o dono, "Apagar dados pessoais" na ficha do hóspede (`anonymize_guest`), política de retenção
+- [x] Callback de login aceita `token_hash` (modelo de e-mail recomendado para SSR)
+- [ ] No painel de produção: desligar cadastro público e conferir o Security Advisor
 
 ### Acessibilidade e desempenho
-- [ ] Auditoria Lighthouse (PWA, desempenho, acessibilidade ≥ 90)
+- [x] Verificação automática (axe, WCAG A/AA) na tela de login, no E2E
+- [ ] Lighthouse no celular (PWA, desempenho, acessibilidade ≥ 90) depois do deploy
 - [ ] Navegação por teclado e leitor de tela nas telas principais
-- [ ] Contraste de cores validado (WCAG AA)
 - [ ] Testar em celular real com 3G lento
 
-### Deploy e operação
-- [ ] Ambientes separados: desenvolvimento, preview (PR) e produção
-- [ ] Deploy na Vercel ligado ao GitHub
-- [ ] Projeto Supabase de produção separado do de desenvolvimento
-- [ ] Migrações aplicadas via CLI (`supabase db push`), nunca editando o banco à mão
-- [ ] Backups automáticos do banco (verificar o plano do Supabase) e teste de restauração
-- [ ] Monitoramento de erros (Sentry ou similar) e logs
+### Deploy e operação (passo a passo em `docs/deploy.md`)
+- [ ] Projeto Supabase de produção separado, migrações via `supabase db push`
+- [ ] Vercel ligada ao GitHub: produção na `main`, preview por PR
+- [ ] Variáveis por ambiente na Vercel (sem chave secreta)
+- [ ] URLs de redirecionamento do Auth para o domínio e os previews
+- [ ] Backups (plano Pro ou dump semanal) e um teste de restauração
+- [ ] Monitoramento: logs da Vercel/Supabase; Sentry opcional
 - [ ] Domínio próprio + HTTPS
 
 ---

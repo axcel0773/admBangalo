@@ -17,6 +17,11 @@ public/swe-worker-*.js
 .env.local
 .env.*.local
 
+# testes
+coverage/
+playwright-report/
+test-results/
+
 # supabase local
 supabase/.temp/
 supabase/.branches/

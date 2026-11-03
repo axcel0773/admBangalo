@@ -11,6 +11,9 @@ export default defineConfig([
     "public/sw.js",
     "next-env.d.ts",
     "src/types/database.ts",
+    "coverage/**",
+    "playwright-report/**",
+    "test-results/**",
   ]),
   {
     rules: {
@@ -29,7 +32,8 @@ export default defineConfig([
     },
   },
   {
-    files: ["src/lib/supabase/**", "src/middleware.ts", "src/proxy.ts"],
+    // e2e usa a API admin do Supabase local para criar a sessão de teste.
+    files: ["src/lib/supabase/**", "src/middleware.ts", "src/proxy.ts", "e2e/**"],
     rules: { "no-restricted-imports": "off" },
   },
 ]);
