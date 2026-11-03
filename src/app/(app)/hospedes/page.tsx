@@ -1,17 +1,39 @@
-import { Users } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import type { Metadata } from "next";
 
-import { ComingSoon } from "@/components/layout/coming-soon";
+import { routes } from "@/components/layout/navigation";
+import { PageBody, PageHeader } from "@/components/layout/page-header";
+import { ButtonLink } from "@/components/ui/button";
+import { SearchForm } from "@/components/ui/search-form";
+import { GuestList, searchGuests } from "@/features/guests";
+import { pluralize } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Hóspedes" };
 
-export default function GuestsPage() {
+interface GuestsPageProps {
+  searchParams: Promise<{ q?: string }>;
+}
+
+export default async function GuestsPage({ searchParams }: GuestsPageProps) {
+  const { q } = await searchParams;
+  const guests = await searchGuests(q);
+
   return (
-    <ComingSoon
-      title="Hóspedes"
-      icon={<Users />}
-      description="Cadastro com busca por nome, CPF ou telefone e histórico de estadias."
-      milestone="parte 3"
-    />
+    <>
+      <PageHeader
+        title="Hóspedes"
+        eyebrow={q ? `${pluralize(guests.length, "resultado", "resultados")} para “${q}”` : undefined}
+        actions={
+          <ButtonLink href={routes.newGuest} size="sm" aria-label="Novo hóspede">
+            <UserPlus aria-hidden="true" />
+            <span className="hidden sm:inline">Novo hóspede</span>
+          </ButtonLink>
+        }
+      />
+      <PageBody className="max-w-3xl">
+        <SearchForm label="Buscar hóspede" placeholder="Nome, CPF ou telefone" defaultValue={q} />
+        <GuestList guests={guests} searched={Boolean(q)} />
+      </PageBody>
+    </>
   );
 }
