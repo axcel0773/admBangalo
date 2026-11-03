@@ -14,7 +14,7 @@ Acompanhamento do projeto **admBangalo** (gestão de chalés · Next.js + TypeSc
 | --- | --- | --- |
 | 0 | Fundação do repositório e qualidade | 🟡 em andamento |
 | 1 | Arquitetura, banco e telas | ✅ concluída |
-| 2 | Projeto base (auth, shell, PWA, Painel) | 🟡 código pronto, falta validar o build |
+| 2 | Projeto base (auth, shell, PWA, Painel) | 🟢 rodando no localhost; faltam testes de PWA e lint |
 | 3 | Chalés, taxas, hóspedes, reservas, calendário | ⬜ próxima |
 | 4 | Cobranças, pagamentos e financeiro | ⬜ |
 | 5 | Qualidade, segurança e deploy em produção | ⬜ |
@@ -84,11 +84,15 @@ Boas práticas que valem para todas as etapas seguintes.
 
 ### Falta
 
-- [ ] ⚠️ Rodar `npm install` e `npm run build` na máquina local (não foi possível no ambiente de criação)
-- [ ] ⚠️ Rodar `npm run lint` e `npm run typecheck` e corrigir o que aparecer
-- [ ] Criar projeto no Supabase, aplicar a migração e criar o usuário
+- [x] `npm install` e `npm run dev` funcionando na máquina local (Next 16)
+- [ ] Rodar `npm run build` (com `--webpack`) e `npm start` para validar o PWA de produção
+- [x] `npm run typecheck` passando
+- [ ] Rodar `npm run lint` e `npm test` e corrigir o que aparecer
+- [x] Projeto no Supabase criado, `.env.local` configurado (URL base + Publishable key)
 - [ ] Gerar os tipos reais com `npm run db:types` e comparar com os manuais
-- [ ] Testar o login (senha e link mágico) e o Painel com dados de exemplo
+- [x] Login com senha e navegação por todas as telas testados no localhost
+- [ ] Testar o link mágico (configurar Site URL e Redirect URLs no Supabase)
+- [ ] Conferir o Painel com o `seed.sql` (agenda, chalés, a receber)
 - [ ] Instalar o PWA no celular (Android e iPhone) e validar ícone, tela cheia e área segura
 - [x] `src/middleware.ts` → `src/proxy.ts` (convenção do Next 16, via codemod)
 - [x] Removido o `export const instant = false` que o codemod inseriu (exige `cacheComponents`, que não usamos)
