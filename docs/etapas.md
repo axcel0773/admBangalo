@@ -15,7 +15,7 @@ Acompanhamento do projeto **admBangalo** (gestão de chalés · Next.js + TypeSc
 | 0 | Fundação do repositório e qualidade | 🟡 em andamento |
 | 1 | Arquitetura, banco e telas | ✅ concluída |
 | 2 | Projeto base (auth, shell, PWA, Painel) | 🟢 rodando no localhost; faltam testes de PWA e lint |
-| 3 | Chalés, taxas, hóspedes, reservas, calendário | 🟡 código pronto na branch `feat/parte-3`, falta validar |
+| 3 | Chalés, taxas, hóspedes, reservas, calendário | ✅ validada; merge da `feat/parte-3` via PR |
 | 4 | Cobranças, pagamentos e financeiro | ⬜ |
 | 5 | Qualidade, segurança e deploy em produção | ⬜ |
 | 6 | Extras (PDF, WhatsApp, iCal, push) | ⬜ |
@@ -104,9 +104,9 @@ Boas práticas que valem para todas as etapas seguintes.
 
 ---
 
-## Etapa 3 — Cadastros, reservas e calendário 🟡
+## Etapa 3 — Cadastros, reservas e calendário ✅
 
-> Código na branch `feat/parte-3`. Falta aplicar a migração `0002` no Supabase e validar localmente.
+> Código na branch `feat/parte-3`, migração `0002` aplicada e fluxo testado no localhost e no celular. Tarifas sazonais foram para a etapa 4; bloqueios de manutenção seguem em avaliação.
 
 ### Chalés e taxas (Configurações)
 - [x] Feature `chalets`: listar, criar, editar, desativar (nome, capacidade, hóspedes inclusos, diária, cor, horários)
@@ -145,9 +145,10 @@ Boas práticas que valem para todas as etapas seguintes.
 - [x] Componentes reutilizáveis em `components/ui`: SelectField, TextareaField, SwitchField, NumberStepper, SubmitButton, FormAlert, FormSection, ListRow, FilterChips, SearchForm, StepIndicator, ColorSwatchField
 
 ### Validar antes do merge
-- [ ] Aplicar `supabase/migrations/0002_create_reservation.sql` no SQL Editor do Supabase
-- [ ] `npm run typecheck`, `npm run lint`, `npm test` e `npm run build`
-- [ ] Testar no celular: cadastrar chalé e taxa, criar reserva, mudar status, navegar no calendário
+- [x] Aplicar `supabase/migrations/0002_create_reservation.sql` no SQL Editor do Supabase
+- [x] `npm run typecheck`, `npm run lint`, `npm test` e `npm run build` (lint pediu ajuste ao React Compiler no formulário de reserva)
+- [x] Testar no celular: cadastrar chalé e taxa, criar reserva, mudar status, navegar no calendário
+- [ ] Abrir o PR `feat/parte-3` → `main`, revisar e fazer o merge
 
 ---
 
