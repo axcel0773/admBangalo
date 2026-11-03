@@ -39,6 +39,8 @@ export const paths = {
   guest: (id: string) => `${routes.guests}/${id}`,
   editGuest: (id: string) => `${routes.guests}/${id}/editar`,
   reservation: (id: string) => `${routes.reservations}/${id}`,
+  /** Recibo para imprimir/salvar em PDF (fora do app shell). */
+  receipt: (id: string) => `/recibo/${id}`,
   newReservation: (params: { chalet?: string; checkIn?: string; guest?: string } = {}) => {
     const search = new URLSearchParams();
     if (params.chalet) search.set("chale", params.chalet);

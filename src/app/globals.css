@@ -76,3 +76,13 @@
 @utility pb-safe {
   padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }
+
+/* Recibo: papel branco, sem sombras nem cor de fundo do app. */
+@media print {
+  body {
+    background: #fff;
+  }
+  @page {
+    margin: 16mm;
+  }
+}

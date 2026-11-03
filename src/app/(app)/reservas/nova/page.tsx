@@ -34,6 +34,7 @@ export default async function NewReservationPage({ searchParams }: NewReservatio
             fees={context.fees}
             guests={context.guests}
             seasons={context.seasons}
+            blocks={context.blocks}
             today={todayIso()}
             prefill={{
               chaletId: chale,
