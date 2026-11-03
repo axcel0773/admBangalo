@@ -1,17 +1,47 @@
-import { CalendarPlus } from "lucide-react";
+import { House } from "lucide-react";
 import type { Metadata } from "next";
 
-import { ComingSoon } from "@/components/layout/coming-soon";
+import { routes } from "@/components/layout/navigation";
+import { PageBody, PageHeader } from "@/components/layout/page-header";
+import { ButtonLink } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { getNewReservationContext, NewReservationForm } from "@/features/reservations";
+import { isIsoDate, todayIso } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "Nova reserva" };
 
-export default function NewReservationPage() {
+interface NewReservationPageProps {
+  searchParams: Promise<{ chale?: string; entrada?: string; hospede?: string }>;
+}
+
+export default async function NewReservationPage({ searchParams }: NewReservationPageProps) {
+  const [{ chale, entrada, hospede }, context] = await Promise.all([searchParams, getNewReservationContext()]);
+
   return (
-    <ComingSoon
-      title="Nova reserva"
-      icon={<CalendarPlus />}
-      description="Formulário em 3 etapas (estadia, hóspedes, valores) com prévia calculada pelas regras de preço."
-      milestone="parte 3"
-    />
+    <>
+      <PageHeader title="Nova reserva" back={{ href: routes.reservations, label: "Reservas" }} />
+      <PageBody className="max-w-5xl">
+        {context.chalets.length === 0 ? (
+          <EmptyState
+            icon={<House />}
+            title="Cadastre um chalé primeiro"
+            description="As reservas precisam de um chalé ativo com capacidade e diária."
+            action={<ButtonLink href={routes.newChalet}>Cadastrar chalé</ButtonLink>}
+          />
+        ) : (
+          <NewReservationForm
+            chalets={context.chalets}
+            fees={context.fees}
+            guests={context.guests}
+            today={todayIso()}
+            prefill={{
+              chaletId: chale,
+              checkIn: entrada && isIsoDate(entrada) ? entrada : undefined,
+              guestId: hospede,
+            }}
+          />
+        )}
+      </PageBody>
+    </>
   );
 }
