@@ -1,0 +1,39 @@
+# Temporário: instala as dependências de teste da parte 5 e grava o package-lock.json.
+# Roda uma vez no push deste arquivo e é removido no commit seguinte.
+name: Dependências da parte 5 (temporário)
+
+on:
+  push:
+    branches: [feat/parte-5]
+    paths: [.github/workflows/deps-parte5.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: npm ci --ignore-scripts
+      - name: Dependências de teste
+        run: |
+          npm install -D --ignore-scripts @vitejs/plugin-react jsdom @testing-library/react @testing-library/dom @playwright/test @axe-core/playwright husky lint-staged dotenv-cli
+          npm install -D --ignore-scripts "@vitest/coverage-v8@$(node -p "require('vitest/package.json').version")"
+      - name: Scripts
+        run: |
+          npm pkg set scripts.test:coverage="vitest run --coverage"
+          npm pkg set scripts.test:e2e="playwright test"
+          npm pkg set scripts.test:db="npx supabase test db"
+          npm pkg set scripts.db:lint="npx supabase db lint"
+          npm pkg set scripts.prepare="husky"
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git commit -m "chore(deps): dependências de teste da parte 5 (Testing Library, Playwright, cobertura, Husky)"
+          git push
