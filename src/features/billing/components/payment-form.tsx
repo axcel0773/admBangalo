@@ -14,6 +14,7 @@ import { fieldError, idleFormState, valueOf, type FormState } from "@/lib/forms"
 import { formatMoneyInput } from "@/lib/format";
 
 import { PAYMENT_KIND_LABELS, PAYMENT_METHOD_LABELS, type PaymentKind } from "../domain/payments";
+import { ReceiptField } from "./receipt-field";
 
 const toOptions = (labels: Record<string, string>) =>
   Object.entries(labels).map(([value, label]) => ({ value, label }));
@@ -23,12 +24,15 @@ interface PaymentFormProps {
   suggestedKind: PaymentKind;
   suggestedAmount: number;
   today: string;
+  ownerId: string;
+  reservationId: string;
 }
 
 /** Registrar pagamento ou estorno. Abre num toque e fecha sozinho depois de salvar. */
-export function PaymentForm({ action, suggestedKind, suggestedAmount, today }: PaymentFormProps) {
+export function PaymentForm({ action, suggestedKind, suggestedAmount, today, ownerId, reservationId }: PaymentFormProps) {
   const [state, formAction] = useActionState(action, idleFormState);
   const [open, setOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const [handled, setHandled] = useState(state);
   if (state !== handled) {
@@ -82,11 +86,12 @@ export function PaymentForm({ action, suggestedKind, suggestedAmount, today }: P
         <Field label="Data" name="paid_at" type="date" defaultValue={v("paid_at", today)} max={today} required error={error("paid_at")} />
       </FieldRow>
       <TextareaField label="Observação" name="notes" rows={2} placeholder="Opcional" defaultValue={v("notes")} error={error("notes")} />
+      <ReceiptField ownerId={ownerId} reservationId={reservationId} onUploadingChange={setUploading} />
       <div className="flex gap-2">
         <Button variant="secondary" className="flex-1" onClick={() => setOpen(false)}>
           Cancelar
         </Button>
-        <SubmitButton className="flex-1" pendingLabel="Registrando…">
+        <SubmitButton className="flex-1" pendingLabel="Registrando…" disabled={uploading}>
           Registrar
         </SubmitButton>
       </div>

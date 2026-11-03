@@ -1,4 +1,4 @@
-import { Trash2 } from "lucide-react";
+import { Paperclip, Trash2 } from "lucide-react";
 
 import { CardSection } from "@/components/ui/card";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
@@ -7,7 +7,6 @@ import { formatShortDate, todayIso } from "@/lib/dates";
 import { formatCurrency } from "@/lib/format";
 
 import { registerPayment, removePayment } from "../actions";
-import type { Payment } from "../data/billing.repository";
 import {
   PAYMENT_KIND_LABELS,
   PAYMENT_METHOD_LABELS,
@@ -16,16 +15,18 @@ import {
   suggestedPaymentKind,
   type PaymentContext,
 } from "../domain/payments";
+import type { PaymentWithReceipt } from "../services";
 import { PaymentForm } from "./payment-form";
 
 interface PaymentsCardProps {
   reservationId: string;
-  payments: Payment[];
+  ownerId: string;
+  payments: PaymentWithReceipt[];
   context: PaymentContext;
 }
 
 /** Lançamentos de pagamento e estorno da reserva. */
-export function PaymentsCard({ reservationId, payments, context }: PaymentsCardProps) {
+export function PaymentsCard({ reservationId, ownerId, payments, context }: PaymentsCardProps) {
   const settled = context.reservationStatus !== "cancelled" && context.balance <= 0;
   const canAdd = context.balance > 0 || context.paid > 0;
 
@@ -47,6 +48,17 @@ export function PaymentsCard({ reservationId, payments, context }: PaymentsCardP
                     {formatShortDate(payment.paid_at)}
                     {payment.notes ? ` · ${payment.notes}` : ""}
                   </span>
+                  {payment.receiptUrl ? (
+                    <a
+                      href={payment.receiptUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-primary-ink underline-offset-2 hover:underline"
+                    >
+                      <Paperclip className="size-3.5" aria-hidden="true" />
+                      Ver comprovante
+                    </a>
+                  ) : null}
                 </span>
                 <Money
                   value={signedAmount(payment)}
@@ -82,6 +94,8 @@ export function PaymentsCard({ reservationId, payments, context }: PaymentsCardP
           suggestedKind={suggestedPaymentKind(context)}
           suggestedAmount={suggestedPaymentAmount(context)}
           today={todayIso()}
+          ownerId={ownerId}
+          reservationId={reservationId}
         />
       ) : null}
     </CardSection>

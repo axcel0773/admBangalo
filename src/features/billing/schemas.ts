@@ -54,6 +54,16 @@ export const paymentSchema = z.object({
   amount: money("Valor"),
   paid_at: isoDate("Data"),
   notes: optionalText(200),
+  /** Caminho do comprovante já enviado ao Storage pelo navegador (opcional). */
+  receipt_path: optionalText(300),
 });
 
 export type PaymentInput = z.infer<typeof paymentSchema>;
+
+export const installmentSchema = z.object({
+  description: requiredText("Descrição", 60),
+  amount: money("Valor").refine((value) => value > 0, "Informe um valor maior que zero"),
+  due_date: isoDate("Vencimento"),
+});
+
+export type InstallmentInput = z.infer<typeof installmentSchema>;

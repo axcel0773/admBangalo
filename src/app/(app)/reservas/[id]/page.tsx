@@ -11,8 +11,10 @@ import {
   getReservationBilling,
   PaymentsCard,
   saveMeterReading,
+  ScheduleCard,
 } from "@/features/billing";
 import { getReservationDetail, ReservationDetail } from "@/features/reservations";
+import { todayIso } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "Reserva" };
 
@@ -26,6 +28,7 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
     reservationId: id,
     chaletId: reservation.chalet_id,
     balance: financials.balance_due,
+    paid: financials.paid_total,
   });
 
   const energy = findEnergyCharge(charges);
@@ -67,7 +70,21 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
                 guestName={mainGuest.full_name}
                 guestPhone={mainGuest.phone}
               />
-              <PaymentsCard reservationId={id} payments={billing.payments} context={paymentContext} />
+              <ScheduleCard
+                reservationId={id}
+                schedule={billing.schedule}
+                total={financials.grand_total}
+                checkIn={reservation.check_in}
+                today={todayIso()}
+                cancelled={cancelled}
+                nextPix={billing.nextInstallmentPix}
+              />
+              <PaymentsCard
+                reservationId={id}
+                ownerId={billing.ownerId}
+                payments={billing.payments}
+                context={paymentContext}
+              />
             </>
           }
         />
