@@ -2,6 +2,7 @@ import {
   CalendarDays,
   House,
   NotebookTabs,
+  Receipt,
   Settings,
   Users,
   Wallet,
@@ -64,6 +65,7 @@ export const sidebarItems: NavItem[] = [
   { href: routes.reservations, label: "Reservas", icon: NotebookTabs },
   { href: routes.guests, label: "Hóspedes", icon: Users },
   { href: routes.finance, label: "Financeiro", icon: Wallet },
+  { href: routes.fees, label: "Taxas", icon: Receipt },
   { href: routes.settings, label: "Configurações", icon: Settings },
 ];
 
@@ -81,5 +83,7 @@ export const bottomNavItems: { left: NavItem[]; right: NavItem[] } = {
 
 export function isActivePath(pathname: string, href: string): boolean {
   if (href === routes.dashboard) return pathname === href;
+  // Taxas moram em /configuracoes/taxas mas têm item próprio no menu.
+  if (href === routes.settings && isActivePath(pathname, routes.fees)) return false;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
