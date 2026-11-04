@@ -10,9 +10,9 @@ Gestão de chalés para o proprietário: hóspedes, calendário de reservas, val
 | 1 | Arquitetura, schema do banco, telas | ✅ `docs/`, `supabase/migrations/` |
 | 2 | Projeto base: login, app shell, PWA, tipos, Painel | ✅ este código |
 | 3 | Chalés e taxas, hóspedes, reservas, calendário | ✅ |
-| 4 | Cobranças, pagamentos, parcelas, comprovantes, temporadas, financeiro | 🟡 branch `feat/parte-4` |
-| 5 | Testes (componentes, E2E, banco), segurança, CI e deploy | 🟡 branch `feat/parte-5` |
-| 6 | Bloqueios, iCal Airbnb/Booking, confirmação no WhatsApp, recibo | 🟡 branch `feat/parte-6` |
+| 4 | Cobranças, pagamentos, parcelas, comprovantes, temporadas, financeiro | ✅ |
+| 5 | Testes (componentes, E2E, banco), segurança, CI e deploy | ✅ produção em https://admbangalo.vercel.app |
+| 6 | Bloqueios, iCal Airbnb/Booking, confirmação no WhatsApp, recibo | ✅ |
 
 ## Como rodar
 

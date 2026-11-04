@@ -17,8 +17,8 @@ Acompanhamento do projeto **admBangalo** (gestão de chalés · Next.js + TypeSc
 | 2 | Projeto base (auth, shell, PWA, Painel) | 🟢 rodando no localhost; faltam testes de PWA e lint |
 | 3 | Chalés, taxas, hóspedes, reservas, calendário | ✅ validada; merge da `feat/parte-3` via PR |
 | 4 | Cobranças, pagamentos e financeiro | 🟡 4a e 4b prontas na branch `feat/parte-4`, falta validar |
-| 5 | Qualidade, segurança e deploy em produção | 🟡 código e CI na branch `feat/parte-5`; deploy é feito por você (docs/deploy.md) |
-| 6 | Extras (bloqueios, iCal Airbnb/Booking, WhatsApp, recibo) | 🟡 branch `feat/parte-6` |
+| 5 | Qualidade, segurança e deploy em produção | ✅ em produção: https://admbangalo.vercel.app (faltam: URLs de login no Supabase e seu usuário) |
+| 6 | Extras (bloqueios, iCal Airbnb/Booking, WhatsApp, recibo) | ✅ na `main` e em produção (push, offline, fotos e equipe ficaram para depois) |
 
 ---
 
@@ -28,8 +28,9 @@ Boas práticas que valem para todas as etapas seguintes.
 
 - [x] Iniciar o Git (`git init`) e fazer o primeiro commit
 - [x] Repositório remoto no GitHub (`axcel0773/admBangalo`) com push da `main`
-- [ ] Confirmar que o repositório está **privado** (Settings → General → Danger Zone)
-- [ ] Proteger a `main` no GitHub exigindo PR e os checks do CI (passo a passo em `docs/deploy.md`)
+- [x] Repositório **público** (decisão para ter proteção de branch grátis); histórico verificado sem segredos, chave secreta nunca no código
+- [x] `main` protegida no GitHub (repositório público): exige PR e o check "Lint, tipos, testes e build"
+- [x] Dependabot só com atualizações minor/patch no npm; majors à mão
 - [x] Adotar Conventional Commits (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`)
 - [x] Hooks (Husky + lint-staged): ESLint e Prettier no pre-commit; typecheck e testes no pre-push
 - [x] CI no GitHub Actions (`.github/workflows/ci.yml`): qualidade, banco (pgTAP) e E2E em todo PR
@@ -235,15 +236,15 @@ Boas práticas que valem para todas as etapas seguintes.
 
 ### Acessibilidade e desempenho
 - [x] Verificação automática (axe, WCAG A/AA) na tela de login, no E2E
-- [ ] Lighthouse no celular (PWA, desempenho, acessibilidade ≥ 90) depois do deploy
+- [x] Lighthouse no celular, em produção (4G lento): Desempenho 100 · Acessibilidade 100 · Práticas recomendadas 100 · SEO 91 → 100 com o `robots.txt` (PR #13); LCP 0,9 s
 - [ ] Navegação por teclado e leitor de tela nas telas principais
 - [ ] Testar em celular real com 3G lento
 
 ### Deploy e operação (passo a passo em `docs/deploy.md`)
 - [x] Projeto Supabase de produção separado (`admbangalo-prod`, São Paulo, plano Free) com as migrações aplicadas
-- [ ] Vercel ligada ao GitHub: produção na `main`, preview por PR
-- [ ] Variáveis por ambiente na Vercel (sem chave secreta)
-- [ ] URLs de redirecionamento do Auth para o domínio e os previews
+- [x] Vercel (Hobby, gratuito) ligada ao GitHub: produção na `main`, preview por PR; funções em São Paulo (`gru1`), perto do banco
+- [x] Variáveis por ambiente na Vercel: produção → `admbangalo-prod`; preview/desenvolvimento → Supabase de desenvolvimento; só chaves publishable
+- [ ] URLs de redirecionamento do Auth no Supabase de produção (Site URL `https://admbangalo.vercel.app`, Redirect `https://admbangalo.vercel.app/auth/callback`) e cadastro público desligado
 - [ ] Backups (plano Pro ou dump semanal) e um teste de restauração
 - [ ] Monitoramento: logs da Vercel/Supabase; Sentry opcional
 - [ ] Domínio próprio + HTTPS

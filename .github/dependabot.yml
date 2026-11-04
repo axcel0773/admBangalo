@@ -8,6 +8,10 @@ updates:
       time: "06:00"
       timezone: America/Sao_Paulo
     open-pull-requests-limit: 5
+    # Versões grandes (ex.: zod 4, TypeScript 7) quebram código: atualizar à mão, com tempo.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       # Menos PRs: atualizações menores e de correção vêm juntas.
       dependencias:
