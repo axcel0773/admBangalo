@@ -18,22 +18,55 @@ export async function availabilityRepository() {
   return createAvailabilityRepository(await createSupabaseServerClient());
 }
 
-/** Baixa o .ics com prazo e tamanho máximos. */
-async function fetchIcs(url: string): Promise<string> {
-  const problem = icalUrlProblem(url);
-  if (problem) throw new Error(problem);
+const MAX_REDIRECTS = 3;
 
+/** Lê o corpo aos pedaços e para ao passar do limite, sem carregar tudo na memória. */
+async function readLimited(response: Response): Promise<string> {
+  const reader = response.body?.getReader();
+  if (!reader) return "";
+  const decoder = new TextDecoder();
+  let text = "";
+  let bytes = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    bytes += value.byteLength;
+    if (bytes > MAX_ICS_BYTES) {
+      await reader.cancel();
+      throw new Error("O calendário é grande demais.");
+    }
+    text += decoder.decode(value, { stream: true });
+  }
+  return text + decoder.decode();
+}
+
+/**
+ * Baixa o .ics com prazo e tamanho máximos. Os redirecionamentos são seguidos à mão,
+ * conferindo cada destino: um site público não pode mandar o servidor para a rede interna.
+ */
+async function fetchIcs(startUrl: string): Promise<string> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
-    const response = await fetch(url, {
-      signal: controller.signal,
-      cache: "no-store",
-      headers: { accept: "text/calendar, text/plain;q=0.9, */*;q=0.1", "user-agent": "admBangalo-ical/1.0" },
-    });
+    let url = startUrl;
+    let response: Response | null = null;
+    for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+      const problem = icalUrlProblem(url);
+      if (problem) throw new Error(problem);
+      response = await fetch(url, {
+        signal: controller.signal,
+        cache: "no-store",
+        redirect: "manual",
+        headers: { accept: "text/calendar, text/plain;q=0.9, */*;q=0.1", "user-agent": "admBangalo-ical/1.0" },
+      });
+      const location = response.headers.get("location");
+      if (response.status < 300 || response.status >= 400 || !location) break;
+      url = new URL(location, url).toString();
+      response = null;
+    }
+    if (!response) throw new Error("O calendário redirecionou vezes demais.");
     if (!response.ok) throw new Error(`O calendário respondeu com erro ${response.status}.`);
-    const text = await response.text();
-    if (text.length > MAX_ICS_BYTES) throw new Error("O calendário é grande demais.");
+    const text = await readLimited(response);
     if (!text.includes("BEGIN:VCALENDAR")) throw new Error("O link não é de um calendário .ics.");
     return text;
   } catch (error) {
