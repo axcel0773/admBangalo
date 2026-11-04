@@ -25,7 +25,7 @@ export default async function SettingsPage() {
       <PageHeader title="Configurações" />
       <PageBody>
         <Card className="flex items-center gap-4 p-5">
-          <Avatar name={owner.fullName} color="#C0643A" size="lg" />
+          <Avatar name={owner.fullName} src={owner.avatarUrl} color="#C0643A" size="lg" />
           <div className="min-w-0 flex-1">
             <p className="font-display text-lg font-semibold">{owner.fullName}</p>
             <p className="truncate text-sm text-ink-muted">{owner.email}</p>
@@ -49,7 +49,7 @@ export default async function SettingsPage() {
             href={routes.profile}
             leading={<IconTile tone="neutral"><UserRound /></IconTile>}
             title="Perfil"
-            subtitle="Seu nome, nome do negócio e chave Pix"
+            subtitle="Foto, nome, nome do negócio e chave Pix"
           />
         </ListCard>
 

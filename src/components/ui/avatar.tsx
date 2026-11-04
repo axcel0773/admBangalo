@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 import { initials } from "@/lib/format";
 
 const avatarVariants = cva(
-  "inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-on-primary select-none",
+  "inline-flex shrink-0 items-center overflow-hidden justify-center rounded-full font-semibold text-on-primary select-none",
   {
     variants: {
       size: {
@@ -30,17 +30,24 @@ export function avatarColor(name: string): string {
 interface AvatarProps extends VariantProps<typeof avatarVariants> {
   name: string;
   color?: string;
+  /** Foto; sem ela (ou se falhar), aparecem as iniciais. */
+  src?: string | null;
   className?: string;
 }
 
-export function Avatar({ name, color, size, className }: AvatarProps) {
+export function Avatar({ name, color, size, src, className }: AvatarProps) {
   return (
     <span
       aria-hidden="true"
       className={cn(avatarVariants({ size }), className)}
       style={{ backgroundColor: color ?? avatarColor(name) }}
     >
-      {initials(name)}
+      {src ? (
+        // eslint-disable-next-line @next/next/no-img-element -- URL assinada do Storage, já reduzida no envio
+        <img src={src} alt="" className="size-full rounded-full object-cover" />
+      ) : (
+        initials(name)
+      )}
     </span>
   );
 }

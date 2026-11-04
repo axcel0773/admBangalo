@@ -13,6 +13,7 @@ import type { AgendaEvent } from "../domain/types";
 interface DashboardHeaderProps {
   greeting: string;
   ownerName: string;
+  avatarUrl?: string | null;
   today: IsoDate;
   agenda: AgendaEvent[];
 }
@@ -32,7 +33,7 @@ function agendaSentence(agenda: AgendaEvent[]): string {
  * Celular: faixa verde com paisagem e saudação.
  * Desktop: cabeçalho de página com ações.
  */
-export function DashboardHeader({ greeting, ownerName, today, agenda }: DashboardHeaderProps) {
+export function DashboardHeader({ greeting, ownerName, avatarUrl, today, agenda }: DashboardHeaderProps) {
   const firstName = ownerName.split(" ")[0] ?? ownerName;
   const dateLabel = formatLongDate(today);
 
@@ -60,7 +61,7 @@ export function DashboardHeader({ greeting, ownerName, today, agenda }: Dashboar
             </h1>
           </div>
           <Link href={routes.settings} aria-label="Configurações da conta">
-            <Avatar name={ownerName} color="#C0643A" size="md" className="ring-3 ring-white/35" />
+            <Avatar name={ownerName} src={avatarUrl} color="#C0643A" size="md" className="ring-3 ring-white/35" />
           </Link>
         </div>
       </header>

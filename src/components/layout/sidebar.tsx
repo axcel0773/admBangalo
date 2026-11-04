@@ -8,14 +8,16 @@ import { cn } from "@/lib/cn";
 
 import { Brand } from "./brand";
 import { isActivePath, sidebarItems } from "./navigation";
+import { SignOutButton } from "./sign-out-button";
 
 interface SidebarProps {
   businessName: string;
   ownerName: string;
+  avatarUrl?: string | null;
 }
 
 /** Navegação lateral — só aparece a partir de md (tablet/desktop). */
-export function Sidebar({ businessName, ownerName }: SidebarProps) {
+export function Sidebar({ businessName, ownerName, avatarUrl }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -42,12 +44,13 @@ export function Sidebar({ businessName, ownerName }: SidebarProps) {
         })}
       </nav>
 
-      <div className="mt-auto flex items-center gap-3 rounded-[18px] bg-subtle p-4">
-        <Avatar name={ownerName} color="#C0643A" />
-        <div className="min-w-0">
+      <div className="mt-auto flex items-center gap-3 rounded-[18px] bg-subtle p-3.5">
+        <Avatar name={ownerName} src={avatarUrl} color="#C0643A" />
+        <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold">{ownerName}</p>
           <p className="text-xs text-ink-muted">Proprietário</p>
         </div>
+        <SignOutButton />
       </div>
     </aside>
   );

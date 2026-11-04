@@ -8,7 +8,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const owner = await requireOwner();
 
   return (
-    <AppShell businessName={owner.businessName} ownerName={owner.fullName}>
+    <AppShell businessName={owner.businessName} ownerName={owner.fullName} avatarUrl={owner.avatarUrl}>
       {children}
     </AppShell>
   );

@@ -18,5 +18,19 @@ export function createProfileRepository(db: DbClient) {
     async update(id: string, input: ProfileInput): Promise<void> {
       assertMutation(await db.from("profiles").update(input).eq("id", id), "Não foi possível salvar o perfil.");
     },
+
+    /** Grava o caminho da foto (ou null para remover) e devolve o caminho anterior. */
+    async setAvatarPath(id: string, path: string | null): Promise<string | null> {
+      const { data: before } = await db.from("profiles").select("avatar_path").eq("id", id).maybeSingle();
+      assertMutation(
+        await db.from("profiles").update({ avatar_path: path }).eq("id", id),
+        "Não foi possível salvar a foto.",
+      );
+      return before?.avatar_path ?? null;
+    },
+
+    async removeAvatarFile(path: string): Promise<void> {
+      await db.storage.from("avatars").remove([path]);
+    },
   };
 }

@@ -24,6 +24,7 @@ export default async function DashboardPage() {
       <DashboardHeader
         greeting={greetingFor()}
         ownerName={owner.fullName}
+        avatarUrl={owner.avatarUrl}
         today={dashboard.today}
         agenda={dashboard.agenda}
       />
