@@ -306,7 +306,7 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
                 <Field
                   label="Diária (R$)"
                   name="nightly_rate"
-                  inputMode="decimal"
+                  inputMode="decimal" mask="money"
                   value={rateText}
                   onChange={(event) => {
                     setNightlyRate(event.target.value);
@@ -324,7 +324,7 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
                 <Field
                   label="Desconto total (R$)"
                   name="discount"
-                  inputMode="decimal"
+                  inputMode="decimal" mask="money"
                   placeholder="0,00"
                   value={discount}
                   onChange={(event) => setDiscount(event.target.value)}

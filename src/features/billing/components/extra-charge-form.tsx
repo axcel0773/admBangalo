@@ -10,6 +10,7 @@ import { FieldRow } from "@/components/ui/form-layout";
 import { SelectField } from "@/components/ui/select-field";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { fieldError, idleFormState, valueOf, type FormState } from "@/lib/forms";
+import { moneyProblem } from "@/lib/masks";
 
 const KIND_OPTIONS = [
   { value: "other", label: "Outra" },
@@ -55,9 +56,9 @@ export function ExtraChargeForm({ action }: ExtraChargeFormProps) {
       <Field label="Descrição" name="description" placeholder="Lenha, louça quebrada…" defaultValue={v("description")} required error={error("description")} />
       <FieldRow>
         <SelectField label="Tipo" name="kind" options={KIND_OPTIONS} defaultValue={v("kind", "other")} error={error("kind")} />
-        <Field label="Quantidade" name="quantity" inputMode="numeric" defaultValue={v("quantity", "1")} error={error("quantity")} />
+        <Field label="Quantidade" name="quantity" inputMode="numeric" mask="integer" defaultValue={v("quantity", "1")} error={error("quantity")} />
       </FieldRow>
-      <Field label="Valor unitário (R$)" name="unit_amount" inputMode="decimal" placeholder="50,00" defaultValue={v("unit_amount")} required error={error("unit_amount")} />
+      <Field label="Valor unitário (R$)" name="unit_amount" inputMode="decimal" mask="money" validate={(value) => moneyProblem(value, { required: true, positive: true })} placeholder="50,00" defaultValue={v("unit_amount")} required error={error("unit_amount")} />
       <div className="flex gap-2">
         <Button variant="secondary" className="flex-1" onClick={() => setOpen(false)}>
           Cancelar

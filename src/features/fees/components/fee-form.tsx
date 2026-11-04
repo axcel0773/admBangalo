@@ -12,6 +12,7 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { SwitchField } from "@/components/ui/switch-field";
 import { checkedOf, fieldError, idleFormState, valueOf, type FormState } from "@/lib/forms";
 import { formatMoneyInput } from "@/lib/format";
+import { moneyProblem } from "@/lib/masks";
 
 import { CHARGE_MODE_LABELS, FEE_KIND_LABELS, toOptions, type ChargeMode, type Fee } from "../domain";
 
@@ -61,7 +62,8 @@ export function FeeForm({ action, chaletOptions, fee }: FeeFormProps) {
         <Field
           label={AMOUNT_LABEL[mode]}
           name="amount"
-          inputMode="decimal"
+          inputMode="decimal" mask="money"
+          validate={(value) => moneyProblem(value, { required: true })}
           defaultValue={v("amount", formatMoneyInput(fee?.amount))}
           placeholder={mode === "metered" ? "1,00" : "150,00"}
           hint={

@@ -10,6 +10,7 @@ import { FieldRow } from "@/components/ui/form-layout";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { fieldError, idleFormState, valueOf, type FormState } from "@/lib/forms";
 import { formatMoneyInput } from "@/lib/format";
+import { moneyProblem } from "@/lib/masks";
 
 interface SeasonRateFormProps {
   action: (state: FormState, formData: FormData) => Promise<FormState>;
@@ -62,12 +63,13 @@ export function SeasonRateForm({ action, baseRate }: SeasonRateFormProps) {
         <Field
           label="Diária (R$)"
           name="nightly_rate"
-          inputMode="decimal"
+          inputMode="decimal" mask="money"
+          validate={(value) => moneyProblem(value, { required: true, positive: true })}
           defaultValue={v("nightly_rate", formatMoneyInput(baseRate))}
           required
           error={error("nightly_rate")}
         />
-        <Field label="Mínimo de noites" name="min_nights" inputMode="numeric" defaultValue={v("min_nights", "1")} error={error("min_nights")} />
+        <Field label="Mínimo de noites" name="min_nights" inputMode="numeric" mask="integer" defaultValue={v("min_nights", "1")} error={error("min_nights")} />
       </FieldRow>
       <div className="flex gap-2">
         <Button variant="secondary" className="flex-1" onClick={() => setOpen(false)}>

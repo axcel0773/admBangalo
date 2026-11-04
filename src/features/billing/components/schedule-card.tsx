@@ -77,7 +77,7 @@ export function ScheduleCard({ reservationId, schedule, total, checkIn, today, c
                     triggerSize="icon"
                     triggerLabel={`Remover ${item.description}`}
                     block={false}
-                    className="size-9 text-ink-muted"
+                    className="size-11 text-ink-muted md:size-9"
                   >
                     <X aria-hidden="true" />
                   </ConfirmSubmit>

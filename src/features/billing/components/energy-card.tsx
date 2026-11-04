@@ -64,7 +64,7 @@ export function EnergyCard({ action, status, reading, tariff }: EnergyCardProps)
             <Field
               label="Entrada (kWh)"
               name="meter_start"
-              inputMode="decimal"
+              inputMode="decimal" mask="decimal"
               placeholder="12345,6"
               value={start}
               onChange={(event) => setStart(event.target.value)}
@@ -73,7 +73,7 @@ export function EnergyCard({ action, status, reading, tariff }: EnergyCardProps)
             <Field
               label="Saída (kWh)"
               name="meter_end"
-              inputMode="decimal"
+              inputMode="decimal" mask="decimal"
               placeholder="12430,1"
               value={end}
               onChange={(event) => setEnd(event.target.value)}

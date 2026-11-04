@@ -9,6 +9,7 @@ import { FormAlert } from "@/components/ui/form-alert";
 import { FormActions, FormSection } from "@/components/ui/form-layout";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { fieldError, idleFormState, valueOf } from "@/lib/forms";
+import { phoneProblem } from "@/lib/masks";
 import type { Tables } from "@/types/database";
 
 import { updateProfile } from "../actions";
@@ -23,7 +24,7 @@ export function ProfileForm({ profile }: { profile: Tables<"profiles"> | null })
       <FormAlert state={state} />
 
       <FormSection title="Seus dados">
-        <Field label="Seu nome" name="full_name" defaultValue={v("full_name", profile?.full_name)} autoComplete="name" required error={error("full_name")} />
+        <Field label="Seu nome" name="full_name" defaultValue={v("full_name", profile?.full_name)} autoComplete="name" maxLength={80} required error={error("full_name")} />
         <Field
           label="Nome do negócio"
           name="business_name"
@@ -40,6 +41,8 @@ export function ProfileForm({ profile }: { profile: Tables<"profiles"> | null })
           autoComplete="tel"
           defaultValue={v("phone", profile?.phone)}
           placeholder="(11) 98765-4321"
+          mask="phone"
+          validate={phoneProblem}
           error={error("phone")}
         />
       </FormSection>
@@ -52,6 +55,8 @@ export function ProfileForm({ profile }: { profile: Tables<"profiles"> | null })
           label="Chave Pix"
           name="pix_key"
           defaultValue={v("pix_key", profile?.pix_key)}
+          maxLength={120}
+          autoCapitalize="none"
           placeholder="e-mail, telefone, CPF/CNPJ ou chave aleatória"
           error={error("pix_key")}
         />
