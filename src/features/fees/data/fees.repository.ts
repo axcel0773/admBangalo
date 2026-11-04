@@ -1,6 +1,6 @@
 import "server-only";
 
-import { assertMutation } from "@/lib/supabase/errors";
+import { MutationError, assertMutation } from "@/lib/supabase/errors";
 import { unwrap, unwrapList } from "@/lib/supabase/result";
 import type { DbClient } from "@/lib/supabase/server";
 
@@ -27,6 +27,13 @@ export function createFeesRepository(db: DbClient) {
 
     async update(id: string, input: FeeInput): Promise<void> {
       assertMutation(await db.from("fees").update(input).eq("id", id), "Não foi possível salvar a taxa.");
+    },
+
+    /** Reservas já criadas guardam uma cópia da taxa (fee_id vira nulo), então seguem iguais. */
+    async remove(id: string): Promise<void> {
+      const result = await db.from("fees").delete().eq("id", id).select("id");
+      assertMutation(result, "Não foi possível excluir a taxa.");
+      if (!result.data || result.data.length === 0) throw new MutationError("Taxa não encontrada.");
     },
   };
 }

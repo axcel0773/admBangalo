@@ -11,12 +11,14 @@ interface ListRowProps {
   subtitle?: ReactNode;
   trailing?: ReactNode;
   className?: string;
+  /** Classes do <li> (ex.: esconder em telas grandes). */
+  itemClassName?: string;
 }
 
 /** Linha de lista clicável (avatar/ícone · título e subtítulo · valor ou badge). */
-export function ListRow({ href, leading, title, subtitle, trailing, className }: ListRowProps) {
+export function ListRow({ href, leading, title, subtitle, trailing, className, itemClassName }: ListRowProps) {
   return (
-    <li>
+    <li className={itemClassName}>
       <Link href={href} className={cn("flex min-h-16 items-center gap-3 py-3 text-ink", className)}>
         {leading}
         <span className="min-w-0 flex-1">

@@ -41,6 +41,7 @@ export default async function SettingsPage() {
           />
           <ListRow
             href={routes.fees}
+            itemClassName="md:hidden"
             leading={<IconTile tone="energy"><Receipt /></IconTile>}
             title="Taxas"
             subtitle={`${pluralize(activeFees, "taxa ativa", "taxas ativas")} · limpeza, energia e outras`}
