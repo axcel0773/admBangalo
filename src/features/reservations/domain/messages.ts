@@ -21,7 +21,11 @@ export interface ConfirmationInput {
   paid: number;
 }
 
-/** Mensagem pronta para o WhatsApp: dados da estadia e situação do pagamento. */
+/**
+ * Mensagem pronta para o WhatsApp: dados da estadia e situação do pagamento.
+ * Sem emojis: o link wa.me estraga emojis em vários aparelhos (chegam como "�").
+ * Os rótulos usam o negrito do WhatsApp (*texto*).
+ */
 export function confirmationMessage(input: ConfirmationInput): string {
   const firstName = input.guestName.trim().split(/\s+/)[0] || input.guestName;
   const balance = Math.max(Math.round((input.total - input.paid) * 100) / 100, 0);
@@ -30,21 +34,21 @@ export function confirmationMessage(input: ConfirmationInput): string {
   const opening =
     input.status === "pending"
       ? `Olá, ${firstName}! Recebemos seu pedido de reserva no ${input.chaletName}. Ela fica confirmada após o sinal.`
-      : `Olá, ${firstName}! Sua reserva no ${input.chaletName} está confirmada ✅`;
+      : `Olá, ${firstName}! Sua reserva no ${input.chaletName} está confirmada!`;
 
   const payment =
     input.paid <= 0
-      ? `💰 Total: ${brl(input.total)}`
+      ? `*Total:* ${brl(input.total)}`
       : balance > 0
-        ? `💰 Total: ${brl(input.total)} · pago ${brl(input.paid)} · falta ${brl(balance)}`
-        : `💰 Total: ${brl(input.total)} · tudo pago, obrigado!`;
+        ? `*Total:* ${brl(input.total)} (pago ${brl(input.paid)}, falta ${brl(balance)})`
+        : `*Total:* ${brl(input.total)} (tudo pago, obrigado!)`;
 
   return [
     opening,
     "",
-    `📅 Entrada: ${day(input.checkIn)}, a partir das ${input.checkInTime.slice(0, 5)}`,
-    `📅 Saída: ${day(input.checkOut)}, até ${input.checkOutTime.slice(0, 5)}`,
-    `👥 ${plural(input.guests, "pessoa", "pessoas")} · ${plural(input.nights, "noite", "noites")}`,
+    `*Entrada:* ${day(input.checkIn)}, a partir das ${input.checkInTime.slice(0, 5)}`,
+    `*Saída:* ${day(input.checkOut)}, até ${input.checkOutTime.slice(0, 5)}`,
+    `*Hóspedes:* ${plural(input.guests, "pessoa", "pessoas")}, ${plural(input.nights, "noite", "noites")}`,
     payment,
     "",
     `Qualquer dúvida, é só chamar. ${input.businessName}`,
