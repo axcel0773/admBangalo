@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { routes } from "@/components/layout/navigation";
 import { errorFormState, formDataToObject, invalidFormState, type FormState } from "@/lib/forms";
+import { INVALID_ID_MESSAGE, isUuid } from "@/lib/ids";
 import { MutationError } from "@/lib/supabase/errors";
 
 import { feeSchema } from "./schemas";
@@ -33,5 +34,6 @@ export async function createFee(_prev: FormState, formData: FormData): Promise<F
 
 /** Use com `.bind(null, id)` na página de edição. */
 export async function updateFee(id: string, _prev: FormState, formData: FormData): Promise<FormState> {
+  if (!isUuid(id)) return errorFormState(INVALID_ID_MESSAGE, formData);
   return save(id, formData);
 }

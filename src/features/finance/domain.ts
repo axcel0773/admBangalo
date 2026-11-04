@@ -1,4 +1,5 @@
 import { roundMoney } from "@/features/reservations/domain";
+import { csvDate, csvNumber, toCsv } from "@/lib/csv";
 import { addDays, daysBetween, daysInMonth, startOfMonth, type IsoDate } from "@/lib/dates";
 import type { Enums, Views } from "@/types/database";
 
@@ -152,6 +153,64 @@ export function buildMonthReport(input: {
   };
 }
 
+// ---- Por bangalô -------------------------------------------------------------
+
+export interface ChaletRef {
+  name: string;
+  color: string;
+}
+
+export interface ChaletMonthRow {
+  name: string;
+  color: string;
+  /** Reservas com check-in no mês. */
+  reservations: number;
+  /** Receita prevista das reservas com check-in no mês. */
+  revenue: number;
+  /** Noites ocupadas dentro do mês (inclui estadias que começaram antes). */
+  nights: number;
+  occupancy: number;
+}
+
+/**
+ * Desempenho de cada bangalô no mês, do que mais fatura para o que menos.
+ * Bangalôs ativos sem reserva aparecem com zero, para o dono ver quem está parado.
+ */
+export function buildChaletBreakdown(input: {
+  month: IsoDate;
+  stays: FinanceStay[];
+  chalets: ChaletRef[];
+}): ChaletMonthRow[] {
+  const { month } = input;
+  const nextMonth = shiftMonth(month, 1);
+  const days = daysInMonth(month);
+  const rows = new Map<string, ChaletMonthRow>();
+  const row = (name: string) => {
+    let current = rows.get(name);
+    if (!current) {
+      const color = input.chalets.find((chalet) => chalet.name === name)?.color ?? "#6B4E36";
+      current = { name, color, reservations: 0, revenue: 0, nights: 0, occupancy: 0 };
+      rows.set(name, current);
+    }
+    return current;
+  };
+
+  for (const chalet of input.chalets) row(chalet.name);
+  for (const stay of input.stays) {
+    if (stay.status === "cancelled") continue;
+    const current = row(stay.chalet_name);
+    current.nights += nightsInMonth(stay, month);
+    if (stay.check_in >= month && stay.check_in < nextMonth) {
+      current.reservations += 1;
+      current.revenue = roundMoney(current.revenue + stay.grand_total);
+    }
+  }
+
+  return [...rows.values()]
+    .map((current) => ({ ...current, occupancy: Math.min(current.nights / days, 1) }))
+    .sort((a, b) => b.revenue - a.revenue || b.nights - a.nights || a.name.localeCompare(b.name, "pt-BR"));
+}
+
 // ---- Tendência ---------------------------------------------------------------
 
 export interface TrendPoint {
@@ -194,36 +253,22 @@ const CSV_HEADER = [
   "Saldo",
 ];
 
-/** Número no formato do Excel brasileiro (vírgula decimal, sem milhar). */
-const csvNumber = (value: number) => value.toFixed(2).replace(".", ",");
-
-function csvCell(value: string | number): string {
-  const text = String(value);
-  return /[";\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
-}
-
-const brDate = (iso: IsoDate) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}`;
-
 /** CSV do mês com `;` (abre direto no Excel em português). */
 export function financeCsv(report: Pick<MonthReport, "stays">): string {
-  const lines = report.stays.map((stay) =>
-    [
-      brDate(stay.check_in),
-      brDate(stay.check_out),
-      stay.nights,
-      stay.guests_count,
-      stay.chalet_name,
-      stay.main_guest_name,
-      csvNumber(stay.lodging_total),
-      csvNumber(stay.cleaning_total),
-      csvNumber(stay.energy_total),
-      csvNumber(roundMoney(stay.charges_total - stay.energy_total - stay.cleaning_total)),
-      csvNumber(stay.grand_total),
-      csvNumber(stay.paid_total),
-      csvNumber(stay.balance_due),
-    ]
-      .map(csvCell)
-      .join(";"),
-  );
-  return [CSV_HEADER.join(";"), ...lines].join("\r\n");
+  const rows = report.stays.map((stay) => [
+    csvDate(stay.check_in),
+    csvDate(stay.check_out),
+    stay.nights,
+    stay.guests_count,
+    stay.chalet_name,
+    stay.main_guest_name,
+    csvNumber(stay.lodging_total),
+    csvNumber(stay.cleaning_total),
+    csvNumber(stay.energy_total),
+    csvNumber(roundMoney(stay.charges_total - stay.energy_total - stay.cleaning_total)),
+    csvNumber(stay.grand_total),
+    csvNumber(stay.paid_total),
+    csvNumber(stay.balance_due),
+  ]);
+  return toCsv(CSV_HEADER, rows);
 }

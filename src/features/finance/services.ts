@@ -4,7 +4,17 @@ import type { IsoDate } from "@/lib/dates";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { createFinanceRepository } from "./data/finance.repository";
-import { buildMonthReport, buildTrend, endOfMonth, financeCsv, shiftMonth, type MonthReport, type TrendPoint } from "./domain";
+import {
+  buildChaletBreakdown,
+  buildMonthReport,
+  buildTrend,
+  endOfMonth,
+  financeCsv,
+  shiftMonth,
+  type ChaletMonthRow,
+  type MonthReport,
+  type TrendPoint,
+} from "./domain";
 
 const TREND_MONTHS = 6;
 
@@ -12,26 +22,31 @@ async function financeRepository() {
   return createFinanceRepository(await createSupabaseServerClient());
 }
 
-async function loadMonthReport(month: IsoDate): Promise<MonthReport> {
+async function loadMonth(month: IsoDate): Promise<{ report: MonthReport; chalets: ChaletMonthRow[] }> {
   const repo = await financeRepository();
   const last = endOfMonth(month);
-  const [stays, payments, activeChalets] = await Promise.all([
+  const [stays, payments, chalets] = await Promise.all([
     repo.listStaysTouching(month, last),
     repo.listPaymentsBetween(month, last),
-    repo.countActiveChalets(),
+    repo.listActiveChalets(),
   ]);
-  return buildMonthReport({ month, stays, payments, activeChalets });
+  return {
+    report: buildMonthReport({ month, stays, payments, activeChalets: chalets.length }),
+    chalets: buildChaletBreakdown({ month, stays, chalets }),
+  };
 }
 
-export async function getFinanceOverview(month: IsoDate): Promise<{ report: MonthReport; trend: TrendPoint[] }> {
+export async function getFinanceOverview(
+  month: IsoDate,
+): Promise<{ report: MonthReport; chalets: ChaletMonthRow[]; trend: TrendPoint[] }> {
   const repo = await financeRepository();
-  const [report, summary] = await Promise.all([
-    loadMonthReport(month),
+  const [{ report, chalets }, summary] = await Promise.all([
+    loadMonth(month),
     repo.listMonthlySummary(shiftMonth(month, -(TREND_MONTHS - 1)), month),
   ]);
-  return { report, trend: buildTrend(summary, month, TREND_MONTHS) };
+  return { report, chalets, trend: buildTrend(summary, month, TREND_MONTHS) };
 }
 
 export async function getMonthCsv(month: IsoDate): Promise<string> {
-  return financeCsv(await loadMonthReport(month));
+  return financeCsv((await loadMonth(month)).report);
 }

@@ -265,6 +265,10 @@ Boas práticas que valem para todas as etapas seguintes.
 - [x] **Mensagem de confirmação** pronta para o WhatsApp (datas, horários, pessoas, total, pago e saldo)
 - [x] **Recibo** em página própria, pronto para imprimir ou "Salvar como PDF" no celular
 - [x] Testes: leitura/geração de iCal, segurança do link, bloqueios, mensagem (125 de domínio) e 9 asserções de banco para bloqueios e o link público
+- [x] **Excluir hóspede** (`remove_guest`, migração `0007`): sem reservas apaga o cadastro; com reservas anonimiza e tira das listas
+- [x] **Limite de 6 pessoas por bangalô** (regra do condomínio) no banco, no servidor e nos formulários; sem taxa de pessoa extra
+- [x] **Financeiro por bangalô**: receita, noites, entradas e ocupação de cada bangalô no mês
+- [x] **Exportar hóspedes (CSV)** em Hóspedes → Exportar: backup do cadastro e portabilidade (LGPD)
 - [ ] Notificação push do check-in do dia — fica para depois: precisa de agendador; a Vercel gratuita só roda cron 1×/dia e exigiria chave secreta no servidor
 - [ ] Modo offline com fila de lançamentos — fica para depois: conflitos de reserva (sobreposição) só se resolvem online; o PWA já abre a página offline
 - [ ] Fotos reais dos chalés — conteúdo do dono (pode usar o Storage gratuito, 1 GB)

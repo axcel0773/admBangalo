@@ -33,4 +33,13 @@ describe("friendlyDbMessage", () => {
     ).toBe("Algum valor está fora do permitido.");
     expect(friendlyDbMessage({ code: "XX000", message: "boom" }, "Falhou")).toBe("Falhou");
   });
+
+  it("explica o limite de 6 pessoas do condomínio", () => {
+    expect(
+      friendlyDbMessage(
+        { code: "23514", message: 'new row for relation "reservations" violates check constraint "reservations_guests_limit"' },
+        "x",
+      ),
+    ).toBe("Regra do condomínio: no máximo 6 pessoas por bangalô.");
+  });
 });

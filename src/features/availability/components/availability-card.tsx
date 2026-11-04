@@ -1,5 +1,6 @@
 import { AlertTriangle, CalendarOff, RefreshCw, X } from "lucide-react";
 
+import { ActionForm } from "@/components/ui/action-form";
 import { CardSection } from "@/components/ui/card";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
 import { CopyField } from "@/components/ui/copy-field";
@@ -50,7 +51,7 @@ export function AvailabilityCard({ chaletId, availability }: { chaletId: string;
                 <span className="font-semibold">{block.reason}</span>
                 <span className="block text-xs text-ink-muted">noites de {nightsLabel(block.starts_on, block.ends_on)}</span>
               </span>
-              <form action={deleteBlock.bind(null, chaletId, block.id)} className="contents">
+              <ActionForm action={deleteBlock.bind(null, chaletId, block.id)} className="contents">
                 <ConfirmSubmit
                   message={`Liberar as datas de “${block.reason}”?`}
                   confirmLabel="Liberar"
@@ -62,7 +63,7 @@ export function AvailabilityCard({ chaletId, availability }: { chaletId: string;
                 >
                   <X aria-hidden="true" />
                 </ConfirmSubmit>
-              </form>
+              </ActionForm>
             </li>
           ))}
         </ul>
@@ -94,7 +95,7 @@ export function AvailabilityCard({ chaletId, availability }: { chaletId: string;
                     </span>
                   ) : null}
                 </span>
-                <form action={removeIcalSource.bind(null, chaletId, source.id)} className="contents">
+                <ActionForm action={removeIcalSource.bind(null, chaletId, source.id)} className="contents">
                   <ConfirmSubmit
                     message={`Desligar “${source.label}”? As datas importadas dele somem do calendário.`}
                     confirmLabel="Desligar"
@@ -106,19 +107,19 @@ export function AvailabilityCard({ chaletId, availability }: { chaletId: string;
                   >
                     <X aria-hidden="true" />
                   </ConfirmSubmit>
-                </form>
+                </ActionForm>
               </li>
             ))}
           </ul>
         ) : null}
         <div className="flex flex-col gap-2">
           {availability.sources.length > 0 ? (
-            <form action={syncChaletCalendars.bind(null, chaletId)}>
+            <ActionForm action={syncChaletCalendars.bind(null, chaletId)}>
               <SubmitButton variant="secondary" block pendingLabel="Sincronizando…">
                 <RefreshCw aria-hidden="true" />
                 Sincronizar agora
               </SubmitButton>
-            </form>
+            </ActionForm>
           ) : null}
           <IcalSourceForm action={addIcalSource.bind(null, chaletId)} />
         </div>
@@ -133,7 +134,7 @@ export function AvailabilityCard({ chaletId, availability }: { chaletId: string;
             value={availability.feedUrl}
             hint="Cole em “Importar calendário” na outra plataforma. Só mostra datas ocupadas, sem dados de hóspedes."
           />
-          <form action={regenerateIcalLink.bind(null, chaletId)}>
+          <ActionForm action={regenerateIcalLink.bind(null, chaletId)}>
             <ConfirmSubmit
               message="Gerar um novo link? O antigo para de funcionar e você precisa colar o novo nas plataformas."
               confirmLabel="Gerar novo"
@@ -145,7 +146,7 @@ export function AvailabilityCard({ chaletId, availability }: { chaletId: string;
             >
               Gerar novo link
             </ConfirmSubmit>
-          </form>
+          </ActionForm>
         </div>
       ) : null}
     </CardSection>

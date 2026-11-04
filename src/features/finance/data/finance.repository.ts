@@ -4,7 +4,7 @@ import type { IsoDate } from "@/lib/dates";
 import { unwrapList } from "@/lib/supabase/result";
 import type { DbClient } from "@/lib/supabase/server";
 
-import type { CashPayment, FinanceStay, MonthSummaryRow } from "../domain";
+import type { CashPayment, ChaletRef, FinanceStay, MonthSummaryRow } from "../domain";
 
 const STAY_COLUMNS =
   "reservation_id, chalet_name, main_guest_name, check_in, check_out, nights, guests_count, status, lodging_total, charges_total, energy_total, cleaning_total, grand_total, paid_total, balance_due, payment_status";
@@ -43,9 +43,9 @@ export function createFinanceRepository(db: DbClient) {
       return unwrapList(result, "Resumo mensal");
     },
 
-    async countActiveChalets(): Promise<number> {
-      const { count } = await db.from("chalets").select("id", { count: "exact", head: true }).eq("active", true);
-      return count ?? 0;
+    async listActiveChalets(): Promise<ChaletRef[]> {
+      const result = await db.from("chalets").select("name, color").eq("active", true).order("name");
+      return unwrapList(result, "Listar chalés");
     },
   };
 }

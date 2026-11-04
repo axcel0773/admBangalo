@@ -1,5 +1,6 @@
 import { ShieldCheck, Trash2 } from "lucide-react";
 
+import { ActionForm } from "@/components/ui/action-form";
 import { CardSection } from "@/components/ui/card";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
 
@@ -33,7 +34,7 @@ export function GuestRemoveCard({ guestId, hasStays, removed }: GuestRemoveCardP
           : "O cadastro é apagado de vez."}{" "}
         Não dá para desfazer.
       </p>
-      <form action={removeGuest.bind(null, guestId)}>
+      <ActionForm action={removeGuest.bind(null, guestId)}>
         <ConfirmSubmit
           message="Excluir este hóspede? Não dá para desfazer."
           confirmLabel="Sim, excluir"
@@ -43,7 +44,7 @@ export function GuestRemoveCard({ guestId, hasStays, removed }: GuestRemoveCardP
           <Trash2 aria-hidden="true" />
           Excluir hóspede
         </ConfirmSubmit>
-      </form>
+      </ActionForm>
     </CardSection>
   );
 }

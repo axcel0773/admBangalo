@@ -99,6 +99,8 @@ Client Component (useActionState) → Server Action ("use server") → schema zo
 - **Edição:** a página faz `updateX.bind(null, id)` e passa para o mesmo componente de formulário da criação.
 - **Gravações com várias tabelas** vão para uma função do Postgres (ex.: `create_reservation`), para não deixar dado parcial.
 - **Ações destrutivas** pedem confirmação em dois toques (`ConfirmSubmit`), sem `window.confirm`.
+- **Ações de um botão** (remover, sincronizar, mudar status): a action devolve `FormState` via `attempt(async () => { … })` e o componente usa `<ActionForm action={x.bind(null, id)}>` no lugar de `<form>`. Erro previsto aparece ao lado do botão em vez da tela de erro.
+- **IDs ligados com `.bind`** são validados no começo da action: `assertIds(id)` (ações de um botão) ou `if (!isUuid(id)) return errorFormState(INVALID_ID_MESSAGE, formData)` (formulários).
 - **Celular:** ações do formulário em `FormActions` (fixo acima da barra inferior); campos numéricos com `inputMode="decimal"`/`"tel"`.
 
 ## React Compiler (lint do Next 16)

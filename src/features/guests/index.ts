@@ -3,4 +3,4 @@ export { GuestForm } from "./components/guest-form";
 export { GuestList } from "./components/guest-list";
 export { GuestProfile } from "./components/guest-profile";
 export type { Guest } from "./domain";
-export { getGuest, getGuestWithStays, searchGuests } from "./services";
+export { getGuest, getGuestsCsv, getGuestWithStays, searchGuests } from "./services";

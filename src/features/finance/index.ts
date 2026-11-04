@@ -1,3 +1,4 @@
+export { ChaletBreakdown } from "./components/chalet-breakdown";
 export { FinanceSummary } from "./components/finance-summary";
 export { financeHref, MonthNav } from "./components/month-nav";
 export { MonthReservations } from "./components/month-reservations";

@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 
+import { ActionForm } from "@/components/ui/action-form";
 import { Badge } from "@/components/ui/badge";
 import { CardSection } from "@/components/ui/card";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
@@ -43,7 +44,7 @@ export function SeasonRatesCard({ chaletId, baseRate, seasons, today }: SeasonRa
                   </span>
                 </span>
                 <span className="text-[15px] font-bold tabular-nums">{formatCurrency(season.nightly_rate)}</span>
-                <form action={deleteSeasonRate.bind(null, chaletId, season.id)} className="contents">
+                <ActionForm action={deleteSeasonRate.bind(null, chaletId, season.id)} className="contents">
                   <ConfirmSubmit
                     message={`Remover a temporada “${season.label}”? Reservas já feitas não mudam.`}
                     confirmLabel="Remover"
@@ -55,7 +56,7 @@ export function SeasonRatesCard({ chaletId, baseRate, seasons, today }: SeasonRa
                   >
                     <X aria-hidden="true" />
                   </ConfirmSubmit>
-                </form>
+                </ActionForm>
               </li>
             );
           })}

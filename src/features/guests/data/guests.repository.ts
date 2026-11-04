@@ -26,6 +26,12 @@ export function createGuestsRepository(db: DbClient) {
       return unwrapList(await query, "Buscar hóspedes");
     },
 
+    /** Todos os hóspedes ativos, para exportar. */
+    async listAll(): Promise<Guest[]> {
+      const result = await db.from("guests").select("*").is("deleted_at", null).order("full_name").limit(5000);
+      return unwrapList(result, "Exportar hóspedes");
+    },
+
     async findById(id: string): Promise<Guest | null> {
       const result = await db.from("guests").select("*").eq("id", id).maybeSingle();
       if (result.error) return unwrap(result, "Buscar hóspede");

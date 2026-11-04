@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 
 import { paths, routes } from "@/components/layout/navigation";
+import { attempt } from "@/lib/actions";
 import { errorFormState, formDataToObject, invalidFormState, type FormState } from "@/lib/forms";
+import { assertIds, INVALID_ID_MESSAGE, isUuid } from "@/lib/ids";
 import { MutationError } from "@/lib/supabase/errors";
 
 import { blockSchema, icalSourceSchema } from "./schemas";
@@ -17,6 +19,7 @@ function refresh(chaletId: string) {
 
 /** Bloqueio manual (manutenção, uso próprio). Use com `.bind(null, chaletId)`. */
 export async function createBlock(chaletId: string, _prev: FormState, formData: FormData): Promise<FormState> {
+  if (!isUuid(chaletId)) return errorFormState(INVALID_ID_MESSAGE, formData);
   const parsed = blockSchema.safeParse(formDataToObject(formData));
   if (!parsed.success) return invalidFormState(parsed.error, formData);
   try {
@@ -30,13 +33,17 @@ export async function createBlock(chaletId: string, _prev: FormState, formData: 
 }
 
 /** Use com `.bind(null, chaletId, blockId)`. */
-export async function deleteBlock(chaletId: string, blockId: string): Promise<void> {
-  await (await availabilityRepository()).deleteManualBlock(chaletId, blockId);
-  refresh(chaletId);
+export async function deleteBlock(chaletId: string, blockId: string): Promise<FormState> {
+  return attempt(async () => {
+    assertIds(chaletId, blockId);
+    await (await availabilityRepository()).deleteManualBlock(chaletId, blockId);
+    refresh(chaletId);
+  });
 }
 
 /** Link .ics do Airbnb/Booking. Já sincroniza ao salvar. Use com `.bind(null, chaletId)`. */
 export async function addIcalSource(chaletId: string, _prev: FormState, formData: FormData): Promise<FormState> {
+  if (!isUuid(chaletId)) return errorFormState(INVALID_ID_MESSAGE, formData);
   const parsed = icalSourceSchema.safeParse(formDataToObject(formData));
   if (!parsed.success) return invalidFormState(parsed.error, formData);
 
@@ -56,19 +63,28 @@ export async function addIcalSource(chaletId: string, _prev: FormState, formData
 }
 
 /** Use com `.bind(null, chaletId, sourceId)`. */
-export async function removeIcalSource(chaletId: string, sourceId: string): Promise<void> {
-  await (await availabilityRepository()).deleteSource(chaletId, sourceId);
-  refresh(chaletId);
+export async function removeIcalSource(chaletId: string, sourceId: string): Promise<FormState> {
+  return attempt(async () => {
+    assertIds(chaletId, sourceId);
+    await (await availabilityRepository()).deleteSource(chaletId, sourceId);
+    refresh(chaletId);
+  });
 }
 
 /** Botão "Sincronizar agora". Use com `.bind(null, chaletId)`. */
-export async function syncChaletCalendars(chaletId: string): Promise<void> {
-  await syncChaletSources(chaletId);
-  refresh(chaletId);
+export async function syncChaletCalendars(chaletId: string): Promise<FormState> {
+  return attempt(async () => {
+    assertIds(chaletId);
+    await syncChaletSources(chaletId);
+    refresh(chaletId);
+  });
 }
 
 /** Invalida o link antigo (se vazou ou mudou de plataforma). Use com `.bind(null, chaletId)`. */
-export async function regenerateIcalLink(chaletId: string): Promise<void> {
-  await (await availabilityRepository()).regenerateToken(chaletId);
-  refresh(chaletId);
+export async function regenerateIcalLink(chaletId: string): Promise<FormState> {
+  return attempt(async () => {
+    assertIds(chaletId);
+    await (await availabilityRepository()).regenerateToken(chaletId);
+    refresh(chaletId);
+  });
 }

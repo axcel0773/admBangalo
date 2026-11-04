@@ -50,6 +50,9 @@ Testadas em `supabase/tests/database/02_rules.test.sql`.
   - `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` (apenas câmera, para fotografar comprovantes);
   - HSTS quando o site é servido em HTTPS.
 - **Validação:** toda Server Action valida a entrada com zod no servidor. O RLS confere de novo no banco.
+- **IDs das actions:** argumentos de `.bind(null, id)` chegam do navegador **sem criptografia** (só variáveis capturadas em closures são criptografadas pelo Next). Toda action confere os ids com `isUuid`/`assertIds` (`src/lib/ids.ts`) antes de ir ao banco; o RLS continua impedindo mexer em dados de outro dono.
+- **Erros:** em produção o Next esconde a mensagem de erros lançados. Ações de um botão usam `attempt` (`src/lib/actions.ts`) e `<ActionForm>`, que mostram a mensagem amigável ao lado do botão; o resto cai na tela genérica, sem detalhes técnicos.
+- **CSV:** as exportações passam por `src/lib/csv.ts`, que neutraliza texto começando com `= + - @` (CSV injection: um nome de hóspede não vira fórmula no Excel). Os downloads exigem login e saem com `Cache-Control: no-store`.
 - **Sessão:** o `proxy.ts` renova a sessão e manda para `/login` quem não está logado. O destino do login (`next`) aceita apenas caminhos internos (`safeRedirectPath`).
 - **Importação de iCal:** o servidor só busca links `https://` com nome público (sem IP, `localhost` ou rede interna), com prazo de 10 s e até 2 MB, e grava com a sessão do dono (RLS), sem chave secreta.
 - **Uploads:** o tipo e o tamanho do arquivo são conferidos no navegador, no servidor (caminho), no bucket (`allowed_mime_types` e 5 MB) e no banco.
