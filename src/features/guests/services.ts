@@ -3,7 +3,7 @@ import "server-only";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { createGuestsRepository } from "./data/guests.repository";
-import type { Guest, GuestStay, GuestSummary } from "./domain";
+import { guestsCsv, type Guest, type GuestStay, type GuestSummary } from "./domain";
 
 export async function guestsRepository() {
   return createGuestsRepository(await createSupabaseServerClient());
@@ -32,4 +32,8 @@ export async function getGuestWithStays(
 
 export async function getGuest(id: string): Promise<Guest | null> {
   return (await guestsRepository()).findById(id);
+}
+
+export async function getGuestsCsv(): Promise<string> {
+  return guestsCsv(await (await guestsRepository()).listAll());
 }

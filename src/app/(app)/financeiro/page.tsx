@@ -5,6 +5,7 @@ import { routes } from "@/components/layout/navigation";
 import { PageBody, PageHeader } from "@/components/layout/page-header";
 import { buttonVariants } from "@/components/ui/button";
 import {
+  ChaletBreakdown,
   FinanceSummary,
   getFinanceOverview,
   MonthNav,
@@ -25,7 +26,7 @@ interface FinancePageProps {
 export default async function FinancePage({ searchParams }: FinancePageProps) {
   const { mes } = await searchParams;
   const month = parseMonthParam(mes, todayIso());
-  const { report, trend } = await getFinanceOverview(month);
+  const { report, chalets, trend } = await getFinanceOverview(month);
 
   return (
     <>
@@ -52,7 +53,10 @@ export default async function FinancePage({ searchParams }: FinancePageProps) {
             <RevenueChart points={trend} currentMonth={month} />
             <MonthReservations stays={report.stays} />
           </div>
-          <RevenueBreakdown report={report} />
+          <div className="flex flex-col gap-4 md:gap-6">
+            <ChaletBreakdown rows={chalets} />
+            <RevenueBreakdown report={report} />
+          </div>
         </div>
       </PageBody>
     </>
