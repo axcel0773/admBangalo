@@ -19,7 +19,12 @@ export function ChaletCard({ chalet }: { chalet: ChaletOverview }) {
   return (
     <article className="w-[78%] shrink-0 snap-start overflow-hidden rounded-card bg-surface shadow-card md:w-auto">
       <div className="h-28 md:h-36">
-        <ChaletLandscape tone={toneFromColor(chalet.color)} />
+        {chalet.photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- URL assinada do Storage, já reduzida no envio
+          <img src={chalet.photoUrl} alt={`Foto de ${chalet.name}`} className="size-full object-cover" />
+        ) : (
+          <ChaletLandscape tone={toneFromColor(chalet.color)} />
+        )}
       </div>
       <div className="flex flex-col gap-3 p-4 md:p-5">
         <div className="flex items-center justify-between gap-2">

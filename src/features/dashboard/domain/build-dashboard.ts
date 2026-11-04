@@ -66,6 +66,7 @@ export function buildChaletOverview(
   chalets: ChaletRow[],
   stays: StayRow[],
   today: IsoDate,
+  photoUrls: Record<string, string> = {},
 ): ChaletOverview[] {
   const monthNights = nightsInMonth(stays, today);
   const totalNights = daysInMonth(today);
@@ -89,6 +90,7 @@ export function buildChaletOverview(
       id: chalet.id,
       name: chalet.name,
       color: chalet.color,
+      photoUrl: chalet.photo_path ? (photoUrls[chalet.photo_path] ?? null) : null,
       maxGuests: chalet.max_guests,
       nightlyRate: chalet.base_nightly_rate,
       status,
@@ -183,6 +185,8 @@ export function buildDashboard(input: {
   monthPayments: PaymentRow[];
   upcoming: StayRow[];
   schedules?: SchedulesByReservation;
+  /** Links assinados das fotos, por caminho no Storage. */
+  photoUrls?: Record<string, string>;
   receivablesLimit?: number;
 }): DashboardData {
   const { today, chalets, monthStays, openBalances, monthPayments, upcoming, schedules } = input;
@@ -191,7 +195,7 @@ export function buildDashboard(input: {
     today,
     summary: buildSummary({ chalets, monthStays, openBalances, monthPayments, today, schedules }),
     agenda: buildAgenda(monthStays, chalets, today),
-    chalets: buildChaletOverview(chalets, monthStays, today),
+    chalets: buildChaletOverview(chalets, monthStays, today, input.photoUrls),
     receivables: buildReceivables(openBalances, today, schedules).slice(0, input.receivablesLimit ?? 4),
     upcoming: buildUpcoming(upcoming),
   };

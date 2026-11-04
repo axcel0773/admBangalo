@@ -15,10 +15,19 @@ export function createDashboardRepository(db: DbClient) {
     async listActiveChalets(): Promise<ChaletRow[]> {
       const result = await db
         .from("chalets")
-        .select("id, name, color, max_guests, base_nightly_rate, check_in_time, check_out_time")
+        .select("id, name, color, max_guests, base_nightly_rate, check_in_time, check_out_time, photo_path")
         .eq("active", true)
         .order("name");
       return unwrapList(result, "Listar chalés");
+    },
+
+    /** Links temporários (1 h) das fotos de capa, por caminho. */
+    async signPhotoUrls(paths: string[]): Promise<Record<string, string>> {
+      if (paths.length === 0) return {};
+      const { data } = await db.storage.from("chalet-photos").createSignedUrls(paths, 3600);
+      const urls: Record<string, string> = {};
+      for (const item of data ?? []) if (item.path && item.signedUrl) urls[item.path] = item.signedUrl;
+      return urls;
     },
 
     /** Estadias que tocam o período [from, to] (inclusive). */

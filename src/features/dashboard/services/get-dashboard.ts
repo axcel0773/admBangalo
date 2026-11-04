@@ -37,5 +37,9 @@ export async function getDashboard(
     schedules.set(row.reservation_id, [...(schedules.get(row.reservation_id) ?? []), row]);
   }
 
-  return buildDashboard({ today, chalets, monthStays, openBalances, monthPayments, upcoming, schedules });
+  const photoUrls = await repository.signPhotoUrls(
+    chalets.map((chalet) => chalet.photo_path).filter((path): path is string => Boolean(path)),
+  );
+
+  return buildDashboard({ today, chalets, monthStays, openBalances, monthPayments, upcoming, schedules, photoUrls });
 }
