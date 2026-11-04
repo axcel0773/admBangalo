@@ -31,17 +31,16 @@ begin
 
   -- Chalés ---------------------------------------------------------------
   insert into chalets (owner_id, name, max_guests, base_guests, base_nightly_rate, color)
-  values (v_owner, 'Chalé Ipê', 4, 2, 350, '#4A6B3A') returning id into v_ipe;
+  values (v_owner, 'Chalé Ipê', 4, 4, 350, '#4A6B3A') returning id into v_ipe;
   insert into chalets (owner_id, name, max_guests, base_guests, base_nightly_rate, color)
-  values (v_owner, 'Chalé Araucária', 6, 4, 480, '#5E7C8C') returning id into v_arau;
+  values (v_owner, 'Chalé Araucária', 6, 6, 480, '#5E7C8C') returning id into v_arau;
   insert into chalets (owner_id, name, max_guests, base_guests, base_nightly_rate, color)
   values (v_owner, 'Chalé Jabuticaba', 2, 2, 290, '#8B5A6B') returning id into v_jabu;
 
   -- Taxas gerais (valem para todos os chalés) ----------------------------
   insert into fees (owner_id, name, kind, mode, amount) values
     (v_owner, 'Limpeza',          'cleaning',    'per_stay',        150),
-    (v_owner, 'Energia elétrica', 'energy',      'metered',         1.00),
-    (v_owner, 'Pessoa extra',     'extra_guest', 'per_guest_night', 60);
+    (v_owner, 'Energia elétrica', 'energy',      'metered',         1.00);
 
   -- Hóspedes ---------------------------------------------------------------
   insert into guests (owner_id, full_name, document, phone, city, state)

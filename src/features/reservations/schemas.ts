@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { MAX_CHALET_GUESTS } from "@/features/chalets/domain";
 import { daysBetween } from "@/lib/dates";
 import { document, integer, isoDate, money, optionalText, phone } from "@/lib/validation";
 import type { Json } from "@/types/database";
@@ -29,8 +30,8 @@ export const newReservationSchema = z
     chalet_id: z.string({ required_error: "Escolha o chalé" }).uuid("Escolha o chalé"),
     check_in: isoDate("Data de entrada"),
     check_out: isoDate("Data de saída"),
-    adults: integer("Adultos", 1, 30),
-    children: integer("Crianças", 0, 30),
+    adults: integer("Adultos", 1, MAX_CHALET_GUESTS),
+    children: integer("Crianças", 0, MAX_CHALET_GUESTS - 1),
     source: z.enum(["direct", "whatsapp", "airbnb", "booking", "other"]).default("direct"),
     status: z.enum(["pending", "confirmed"]).default("confirmed"),
     guest_mode: z.enum(["existing", "new"]),
@@ -48,6 +49,13 @@ export const newReservationSchema = z
     notes: optionalText(1000),
   })
   .superRefine((data, ctx) => {
+    if (data.adults + data.children > MAX_CHALET_GUESTS) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["children"],
+        message: `Regra do condomínio: no máximo ${MAX_CHALET_GUESTS} pessoas por bangalô`,
+      });
+    }
     if (data.check_in && data.check_out && daysBetween(data.check_in, data.check_out) < 1) {
       ctx.addIssue({ code: "custom", path: ["check_out"], message: "A saída precisa ser depois da entrada" });
     }

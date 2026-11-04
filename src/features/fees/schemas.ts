@@ -4,7 +4,7 @@ import { checkbox, money, requiredText } from "@/lib/validation";
 
 export const feeSchema = z.object({
   name: requiredText("Nome", 60),
-  kind: z.enum(["energy", "cleaning", "extra_guest", "pet", "other"], {
+  kind: z.enum(["energy", "cleaning", "pet", "other"], {
     errorMap: () => ({ message: "Escolha o tipo da taxa" }),
   }),
   mode: z.enum(["per_stay", "per_night", "per_guest", "per_guest_night", "metered"], {

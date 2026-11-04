@@ -230,7 +230,7 @@ Boas práticas que valem para todas as etapas seguintes.
 - [x] `service_role` fora do app, com teste de guarda
 - [x] Cabeçalhos: CSP, `X-Frame-Options`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS em HTTPS
 - [x] Limites de tentativa de login no `supabase/config.toml` (local); produção no painel (ver `docs/seguranca.md`)
-- [x] LGPD: dados só para o dono, "Apagar dados pessoais" na ficha do hóspede (`anonymize_guest`), política de retenção
+- [x] LGPD: dados só para o dono, "Excluir hóspede" na ficha (`remove_guest`: apaga o cadastro ou anonimiza quando há reservas), política de retenção
 - [x] Callback de login aceita `token_hash` (modelo de e-mail recomendado para SSR)
 - [ ] No painel de produção: desligar cadastro público e conferir o Security Advisor
 

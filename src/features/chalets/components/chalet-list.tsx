@@ -37,7 +37,7 @@ export function ChaletList({ chalets }: { chalets: Chalet[] }) {
             </span>
           }
           title={chalet.name}
-          subtitle={`até ${chalet.max_guests} pessoas · ${chalet.base_guests} inclusas · ${formatCurrency(chalet.base_nightly_rate)}/noite`}
+          subtitle={`até ${chalet.max_guests} pessoas · ${formatCurrency(chalet.base_nightly_rate)}/noite`}
           trailing={chalet.active ? null : <Badge tone="neutral">Inativo</Badge>}
         />
       ))}

@@ -29,7 +29,7 @@ export function FeeList({ fees, chaletNames }: FeeListProps) {
       <EmptyState
         icon={<Receipt />}
         title="Nenhuma taxa cadastrada"
-        description="Cadastre limpeza, energia e pessoa extra para que entrem sozinhas nas reservas."
+        description="Cadastre limpeza, energia e outras taxas para que entrem sozinhas nas reservas."
         action={<ButtonLink href={routes.newFee}>Cadastrar taxa</ButtonLink>}
       />
     );

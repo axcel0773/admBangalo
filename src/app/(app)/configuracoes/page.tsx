@@ -43,7 +43,7 @@ export default async function SettingsPage() {
             href={routes.fees}
             leading={<IconTile tone="energy"><Receipt /></IconTile>}
             title="Taxas"
-            subtitle={`${pluralize(activeFees, "taxa ativa", "taxas ativas")} · limpeza, energia, pessoa extra`}
+            subtitle={`${pluralize(activeFees, "taxa ativa", "taxas ativas")} · limpeza, energia e outras`}
           />
           <ListRow
             href={routes.profile}

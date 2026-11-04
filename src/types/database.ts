@@ -126,6 +126,7 @@ export type Database = {
           city: string | null;
           state: string | null;
           notes: string | null;
+          deleted_at: string | null;
         } & Timestamps;
         Insert: {
           id?: string;
@@ -392,6 +393,10 @@ export type Database = {
       anonymize_guest: {
         Args: { p_guest_id: string };
         Returns: undefined;
+      };
+      remove_guest: {
+        Args: { p_guest_id: string };
+        Returns: string;
       };
       ical_feed: {
         Args: { p_token: string };

@@ -8,7 +8,7 @@ export type ChargeMode = Enums<"charge_mode">;
 export const FEE_KIND_LABELS: Record<FeeKind, string> = {
   cleaning: "Limpeza",
   energy: "Energia",
-  extra_guest: "Pessoa extra",
+  extra_guest: "Pessoa extra (desativada)",
   pet: "Pet",
   other: "Outra",
 };

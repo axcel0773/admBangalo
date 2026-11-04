@@ -15,7 +15,6 @@ import { moneyProblem } from "@/lib/masks";
 const KIND_OPTIONS = [
   { value: "other", label: "Outra" },
   { value: "cleaning", label: "Limpeza" },
-  { value: "extra_guest", label: "Pessoa extra" },
   { value: "pet", label: "Pet" },
 ];
 
