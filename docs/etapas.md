@@ -120,7 +120,7 @@ Boas práticas que valem para todas as etapas seguintes.
 - [x] Lista com busca por nome, CPF ou telefone (`?q=` na URL)
 - [x] Ficha do hóspede: dados, observações, histórico de estadias e total em reservas
 - [x] Criar e editar hóspede; validação de CPF (dígitos verificadores), telefone, e-mail e UF
-- [x] Atalho para WhatsApp (`wa.me`) e e-mail
+- [x] Atalho para WhatsApp (`api.whatsapp.com/send`, com emojis) e e-mail
 
 ### Reservas
 - [x] Nova reserva em 3 etapas: estadia → hóspedes → valores, com prévia de valores ao vivo

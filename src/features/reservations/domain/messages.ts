@@ -39,7 +39,7 @@ export function confirmationMessage(input: ConfirmationInput): string {
         ? `💰 Total: ${brl(input.total)} · pago ${brl(input.paid)} · falta ${brl(balance)}`
         : `💰 Total: ${brl(input.total)} · tudo pago, obrigado!`;
 
-  return [
+  const message = [
     opening,
     "",
     `📅 Entrada: ${day(input.checkIn)}, a partir das ${input.checkInTime.slice(0, 5)}`,
@@ -49,4 +49,7 @@ export function confirmationMessage(input: ConfirmationInput): string {
     "",
     `Qualquer dúvida, é só chamar. ${input.businessName}`,
   ].join("\n");
+
+  // O toLocaleString do real usa espaço não separável (U+00A0); no link ele vira %C2%A0 e alguns apps estranham.
+  return message.replace(/\u00A0/g, " ");
 }

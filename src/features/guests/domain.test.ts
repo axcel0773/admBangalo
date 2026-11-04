@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { formatCityState, guestsCsv, sanitizeSearch, whatsappUrl } from "./domain";
+import { encodeForUrl, formatCityState, guestsCsv, sanitizeSearch, whatsappUrl } from "./domain";
 
 describe("guests domain", () => {
   it("monta link do WhatsApp com DDI do Brasil", () => {
-    expect(whatsappUrl("(11) 98765-4321")).toBe("https://wa.me/5511987654321");
-    expect(whatsappUrl("+55 11 98765-4321", "Olá")).toBe("https://wa.me/5511987654321?text=Ol%C3%A1");
+    expect(whatsappUrl("(11) 98765-4321")).toBe("https://api.whatsapp.com/send?phone=5511987654321");
+    expect(whatsappUrl("+55 11 98765-4321", "Olá")).toBe("https://api.whatsapp.com/send?phone=5511987654321&text=Ol%C3%A1");
     expect(whatsappUrl("123")).toBe(null);
     expect(whatsappUrl(null)).toBe(null);
   });
@@ -44,5 +44,21 @@ describe("guestsCsv", () => {
     expect(line).toBe(
       "'=Ana Lima;529.982.247-25;20/05/1990;(11) 98888-7777;;Campos do Jordão;SP;\"Gosta de lenha; chega tarde\";01/11/2026",
     );
+  });
+});
+
+describe("encodeForUrl", () => {
+  it("codifica emojis em UTF-8 e pontuação que corta o texto", () => {
+    expect(encodeForUrl("Olá, Ana! ✅ 📅")).toBe("Ol%C3%A1%2C%20Ana%21%20%E2%9C%85%20%F0%9F%93%85");
+    expect(encodeForUrl("(a) *b* 'c'")).toBe("%28a%29%20%2Ab%2A%20%27c%27");
+  });
+
+  it("não gera código inválido com emoji quebrado", () => {
+    expect(encodeForUrl("a\ud83d")).toBe("a%EF%BF%BD");
+  });
+
+  it("mantém emojis no link de confirmação", () => {
+    const url = whatsappUrl("11987654321", "Oi 📅") ?? "";
+    expect(url.endsWith("text=Oi%20%F0%9F%93%85")).toBe(true);
   });
 });
