@@ -86,6 +86,9 @@
  * Áreas seguras do iPhone (notch, barra de status, cantos arredondados).
  * O app usa viewport-fit=cover, então cada tela reserva esse espaço.
  */
+/* Áreas seguras do iPhone (entalhe, cantos e barra inferior).
+   ATENÇÃO: estas classes definem o padding do elemento; não combine com p-*/px-*/pt-* no mesmo
+   elemento (elas vencem). Ponha o padding da página num elemento interno. */
 @utility pt-safe {
   padding-top: env(safe-area-inset-top);
 }
