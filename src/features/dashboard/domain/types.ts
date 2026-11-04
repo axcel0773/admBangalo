@@ -5,7 +5,7 @@ import type { Tables, Views } from "@/types/database";
 
 export type ChaletRow = Pick<
   Tables<"chalets">,
-  "id" | "name" | "color" | "max_guests" | "base_nightly_rate" | "check_in_time" | "check_out_time"
+  "id" | "name" | "color" | "max_guests" | "base_nightly_rate" | "check_in_time" | "check_out_time" | "photo_path"
 >;
 
 export type StayRow = Pick<
@@ -49,6 +49,8 @@ export interface ChaletOverview {
   id: string;
   name: string;
   color: string;
+  /** Link temporário da foto de capa; null usa a ilustração. */
+  photoUrl: string | null;
   maxGuests: number;
   nightlyRate: number;
   status: ChaletDayStatus;

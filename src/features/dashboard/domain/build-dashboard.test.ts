@@ -13,6 +13,7 @@ const chalet = (id: string, name: string): ChaletRow => ({
   base_nightly_rate: 350,
   check_in_time: "14:00:00",
   check_out_time: "12:00:00",
+  photo_path: null,
 });
 
 const stay = (overrides: Partial<StayRow>): StayRow => ({

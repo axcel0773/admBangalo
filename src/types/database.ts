@@ -50,6 +50,7 @@ export type Database = {
           color: string;
           active: boolean;
           ical_token: string;
+          photo_path: string | null;
         } & Timestamps;
         Insert: {
           id?: string;
@@ -64,6 +65,7 @@ export type Database = {
           color?: string;
           active?: boolean;
           ical_token?: string;
+          photo_path?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["chalets"]["Insert"]>;
         Relationships: [];

@@ -4,11 +4,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { paths, routes } from "@/components/layout/navigation";
+import { requireOwner } from "@/features/auth/session";
 import { attempt } from "@/lib/actions";
 import { errorFormState, formDataToObject, invalidFormState, type FormState } from "@/lib/forms";
 import { assertIds, INVALID_ID_MESSAGE, isUuid } from "@/lib/ids";
 import { MutationError } from "@/lib/supabase/errors";
 
+import { isOwnChaletPhotoPath } from "./photo";
 import { chaletSchema, seasonRateSchema } from "./schemas";
 import { chaletsRepository, seasonRatesRepository } from "./services";
 
@@ -64,5 +66,28 @@ export async function deleteSeasonRate(chaletId: string, rateId: string): Promis
     await (await seasonRatesRepository()).remove(chaletId, rateId);
     revalidatePath(paths.chalet(chaletId));
     revalidatePath(routes.newReservation);
+  });
+}
+
+/** Chamada depois que o navegador subiu a foto: grava o caminho e apaga a foto antiga. */
+export async function saveChaletPhoto(chaletId: string, path: string): Promise<FormState> {
+  return attempt(async () => {
+    assertIds(chaletId);
+    const owner = await requireOwner();
+    if (!isOwnChaletPhotoPath(path, owner.id, chaletId)) throw new MutationError("Foto inválida.");
+    const repo = await chaletsRepository();
+    const previous = await repo.setPhotoPath(chaletId, path);
+    if (previous && previous !== path) await repo.removePhotoFile(previous);
+    revalidatePath("/", "layout");
+  });
+}
+
+export async function removeChaletPhoto(chaletId: string): Promise<FormState> {
+  return attempt(async () => {
+    assertIds(chaletId);
+    const repo = await chaletsRepository();
+    const previous = await repo.setPhotoPath(chaletId, null);
+    if (previous) await repo.removePhotoFile(previous);
+    revalidatePath("/", "layout");
   });
 }

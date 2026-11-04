@@ -35,3 +35,7 @@ export async function listCurrentSeasonRates(): Promise<SeasonRate[]> {
 }
 
 export { repository as chaletsRepository };
+
+export async function getChaletPhotoUrl(chalet: Chalet): Promise<string | null> {
+  return (await repository()).photoUrl(chalet.photo_path);
+}
