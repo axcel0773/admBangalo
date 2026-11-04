@@ -269,6 +269,7 @@ Boas práticas que valem para todas as etapas seguintes.
 - [x] **Limite de 6 pessoas por bangalô** (regra do condomínio) no banco, no servidor e nos formulários; sem taxa de pessoa extra
 - [x] **Financeiro por bangalô**: receita, noites, entradas e ocupação de cada bangalô no mês
 - [x] **Exportar hóspedes (CSV)** em Hóspedes → Exportar: backup do cadastro e portabilidade (LGPD)
+- [x] **Excluir reserva** (limpar testes e lançamentos por engano): só sem dinheiro registrado (estorne antes); trava no banco (`0008`), apaga taxas, parcelas e comprovantes junto
 - [ ] Notificação push do check-in do dia — fica para depois: precisa de agendador; a Vercel gratuita só roda cron 1×/dia e exigiria chave secreta no servidor
 - [ ] Modo offline com fila de lançamentos — fica para depois: conflitos de reserva (sobreposição) só se resolvem online; o PWA já abre a página offline
 - [ ] Fotos reais dos chalés — conteúdo do dono (pode usar o Storage gratuito, 1 GB)

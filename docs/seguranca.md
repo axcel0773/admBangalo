@@ -39,7 +39,8 @@ As regras que não podem falhar ficam no Postgres, e não só na tela:
 - energia calculada a partir da leitura do medidor;
 - estorno limitado ao que foi pago;
 - reserva cancelada só aceita estorno;
-- temporadas sem sobreposição.
+- temporadas sem sobreposição;
+- reserva com dinheiro registrado (pagamentos − estornos ≠ 0) não pode ser excluída: gatilho `reservations_delete_guard` (migração 0008). Apagar o chalé ou a conta, que exclui em cascata, não passa por essa regra.
 
 Testadas em `supabase/tests/database/02_rules.test.sql`.
 

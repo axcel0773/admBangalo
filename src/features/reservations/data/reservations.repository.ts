@@ -109,6 +109,22 @@ export function createReservationsRepository(db: DbClient) {
       assertMutation(await db.from("reservations").update(changes).eq("id", id), "Não foi possível mudar o status.");
     },
 
+    /**
+     * Exclui a reserva. O banco recusa se houver dinheiro registrado (trigger
+     * reservations_delete_guard); parcelas, taxas e hóspedes da reserva saem junto.
+     * Depois apaga do Storage os comprovantes dos lançamentos que saíram com ela.
+     */
+    async remove(id: string): Promise<void> {
+      const { data: receipts } = await db.from("payments").select("receipt_path").eq("reservation_id", id);
+      const paths = (receipts ?? []).map((row) => row.receipt_path).filter((path): path is string => Boolean(path));
+
+      const result = await db.from("reservations").delete().eq("id", id).select("id");
+      assertMutation(result, "Não foi possível excluir a reserva.");
+      if (!result.data || result.data.length === 0) throw new MutationError("Reserva não encontrada.");
+
+      if (paths.length > 0) await db.storage.from("receipts").remove(paths);
+    },
+
     async findStatus(id: string): Promise<ReservationStatus | null> {
       const { data } = await db.from("reservations").select("status").eq("id", id).maybeSingle();
       return data?.status ?? null;
