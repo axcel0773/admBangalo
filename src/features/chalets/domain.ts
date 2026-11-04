@@ -2,6 +2,9 @@ import type { Tables } from "@/types/database";
 
 export type Chalet = Tables<"chalets">;
 
+/** Regra interna do condomínio: cada bangalô recebe no máximo 6 pessoas. */
+export const MAX_CHALET_GUESTS = 6;
+
 export interface ChaletColor {
   value: string;
   label: string;

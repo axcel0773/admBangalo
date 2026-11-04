@@ -37,9 +37,9 @@ export async function updateGuest(id: string, _prev: FormState, formData: FormDa
   return save(id, formData);
 }
 
-/** LGPD: apaga os dados pessoais do hóspede. Use com `.bind(null, id)`. */
-export async function anonymizeGuest(id: string): Promise<void> {
-  await (await guestsRepository()).anonymize(id);
+/** Exclui o hóspede e volta para a lista. Use com `.bind(null, id)`. */
+export async function removeGuest(id: string): Promise<void> {
+  await (await guestsRepository()).remove(id);
   revalidatePath("/", "layout");
-  redirect(paths.guest(id));
+  redirect(routes.guests);
 }

@@ -14,7 +14,7 @@ export function createGuestsRepository(db: DbClient) {
   return {
     /** Busca por nome, documento ou telefone; sem termo, os mais recentes. */
     async search(term: string | undefined, limit = 50): Promise<Guest[]> {
-      let query = db.from("guests").select("*").limit(limit);
+      let query = db.from("guests").select("*").is("deleted_at", null).limit(limit);
       const clean = term ? sanitizeSearch(term) : "";
       if (clean) {
         query = query
@@ -53,9 +53,14 @@ export function createGuestsRepository(db: DbClient) {
       assertMutation(await db.from("guests").update(input).eq("id", id), "Não foi possível salvar o hóspede.");
     },
 
-    /** LGPD: apaga dados pessoais e mantém reservas e pagamentos (função anonymize_guest). */
-    async anonymize(id: string): Promise<void> {
-      assertMutation(await db.rpc("anonymize_guest", { p_guest_id: id }), "Não foi possível apagar os dados.");
+    /**
+     * Exclui o hóspede (função remove_guest): sem reservas some de vez; com reservas
+     * os dados pessoais são apagados e ele sai das listas, mas o financeiro fica.
+     */
+    async remove(id: string): Promise<"deleted" | "archived"> {
+      const result = await db.rpc("remove_guest", { p_guest_id: id });
+      assertMutation(result, "Não foi possível excluir o hóspede.");
+      return result.data === "archived" ? "archived" : "deleted";
     },
   };
 }

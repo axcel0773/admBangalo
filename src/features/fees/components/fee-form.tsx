@@ -46,7 +46,8 @@ export function FeeForm({ action, chaletOptions, fee }: FeeFormProps) {
           <SelectField
             label="Tipo"
             name="kind"
-            options={toOptions(FEE_KIND_LABELS)}
+            // Pessoa extra não existe mais: todos estão inclusos na diária (máx. 6 por bangalô).
+            options={toOptions(FEE_KIND_LABELS).filter((option) => option.value !== "extra_guest")}
             defaultValue={v("kind", fee?.kind ?? "cleaning")}
             error={error("kind")}
           />

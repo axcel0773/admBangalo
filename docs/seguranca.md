@@ -66,8 +66,9 @@ Testadas em `supabase/tests/database/02_rules.test.sql`.
 
 - **Quem vê:** os dados dos hóspedes (CPF, telefone, e-mail) aparecem apenas para o proprietário dono do cadastro (RLS). Não vão para logs nem para serviços de terceiros.
 - **Finalidade:** reserva, contato e emissão de cobrança. Não há marketing nem compartilhamento.
-- **Direito de exclusão:** na ficha do hóspede, **Privacidade → Apagar dados pessoais**. Isso chama `anonymize_guest`, que:
-  - apaga nome, CPF, nascimento, telefone, e-mail, cidade e observações do hóspede e dos acompanhantes das reservas dele;
+- **Direito de exclusão:** na ficha do hóspede, **Excluir hóspede**. Isso chama `remove_guest`, que:
+  - sem reservas como responsável: apaga o cadastro de vez;
+  - com reservas: chama `anonymize_guest` (apaga nome, CPF, nascimento, telefone, e-mail, cidade e observações do hóspede e dos acompanhantes das reservas dele), marca `deleted_at` e tira o hóspede das listas;
   - mantém as reservas e os pagamentos, sem identificar a pessoa, para a contabilidade.
 - **Retenção:**
   - dados pessoais de hóspedes sem reserva há mais de **5 anos** devem ser anonimizados;

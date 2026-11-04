@@ -15,6 +15,7 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { SwitchField } from "@/components/ui/switch-field";
 import { TextareaField } from "@/components/ui/textarea-field";
 import { blockWarning, overlappingBlocks, type ChaletBlock } from "@/features/availability/domain/blocks";
+import { MAX_CHALET_GUESTS } from "@/features/chalets/domain";
 import { addDays, type IsoDate } from "@/lib/dates";
 import { fieldError, idleFormState } from "@/lib/forms";
 import { formatCurrency, formatMoneyInput, pluralize } from "@/lib/format";
@@ -254,13 +255,20 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
                 <NumberStepper
                   name="adults"
                   label="Adultos"
-                  description={chalet ? `${chalet.base_guests} inclusos na diária` : undefined}
+                  description={chalet ? `até ${chalet.max_guests} pessoas no total` : undefined}
                   min={1}
-                  max={30}
+                  max={Math.max(1, (chalet?.max_guests ?? MAX_CHALET_GUESTS) - children)}
                   value={adults}
                   onChange={setAdults}
                 />
-                <NumberStepper name="children" label="Crianças" min={0} max={30} value={children} onChange={setChildren} />
+                <NumberStepper
+                  name="children"
+                  label="Crianças"
+                  min={0}
+                  max={Math.max(0, (chalet?.max_guests ?? MAX_CHALET_GUESTS) - adults)}
+                  value={children}
+                  onChange={setChildren}
+                />
               </div>
               {issues.capacity ? <p className="text-xs font-semibold text-danger-ink">{issues.capacity}</p> : null}
               <SelectField

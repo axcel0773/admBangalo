@@ -16,7 +16,7 @@ import { checkedOf, fieldError, idleFormState, valueOf, type FormState } from "@
 import { formatMoneyInput } from "@/lib/format";
 import { moneyProblem } from "@/lib/masks";
 
-import { CHALET_COLORS, DEFAULT_CHALET_COLOR, shortTime, type Chalet } from "../domain";
+import { CHALET_COLORS, DEFAULT_CHALET_COLOR, MAX_CHALET_GUESTS, shortTime, type Chalet } from "../domain";
 
 interface ChaletFormProps {
   action: (state: FormState, formData: FormData) => Promise<FormState>;
@@ -25,15 +25,9 @@ interface ChaletFormProps {
 
 export function ChaletForm({ action, chalet }: ChaletFormProps) {
   const [state, formAction] = useActionState(action, idleFormState);
-  const [maxGuests, setMaxGuests] = useState(chalet?.max_guests ?? 4);
-  const [baseGuests, setBaseGuests] = useState(chalet?.base_guests ?? 2);
+  const [maxGuests, setMaxGuests] = useState(Math.min(chalet?.max_guests ?? 4, MAX_CHALET_GUESTS));
   const error = (name: string) => fieldError(state, name);
   const v = (name: string, saved?: string | number | null) => valueOf(state, name, saved);
-
-  function changeMaxGuests(value: number) {
-    setMaxGuests(value);
-    if (baseGuests > value) setBaseGuests(value);
-  }
 
   return (
     <form action={formAction} className="flex flex-col gap-4 md:gap-6" noValidate>
@@ -57,19 +51,19 @@ export function ChaletForm({ action, chalet }: ChaletFormProps) {
         />
       </FormSection>
 
-      <FormSection title="Capacidade e diária" description="A diária inclui os hóspedes inclusos; acima disso vale a taxa de pessoa extra.">
-        <div className="divide-y divide-line">
-          <NumberStepper name="max_guests" label="Capacidade máxima" min={1} max={30} value={maxGuests} onChange={changeMaxGuests} />
-          <NumberStepper
-            name="base_guests"
-            label="Hóspedes inclusos na diária"
-            min={1}
-            max={maxGuests}
-            value={baseGuests}
-            onChange={setBaseGuests}
-          />
-        </div>
-        {error("base_guests") ? <p className="text-xs font-semibold text-danger-ink">{error("base_guests")}</p> : null}
+      <FormSection
+        title="Capacidade e diária"
+        description={`Regra do condomínio: no máximo ${MAX_CHALET_GUESTS} pessoas por bangalô. A diária vale para todos.`}
+      >
+        <NumberStepper
+          name="max_guests"
+          label="Capacidade máxima"
+          min={1}
+          max={MAX_CHALET_GUESTS}
+          value={maxGuests}
+          onChange={setMaxGuests}
+        />
+        {error("max_guests") ? <p className="text-xs font-semibold text-danger-ink">{error("max_guests")}</p> : null}
         <Field
           label="Diária base (R$)"
           name="base_nightly_rate"
