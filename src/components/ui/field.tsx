@@ -58,14 +58,15 @@ export function Field({
 
   return (
     <div className="flex min-w-0 flex-col gap-1.5">
-      <label htmlFor={inputId} className="text-[13px] font-semibold text-ink-soft">
+      {/* Asterisco por CSS: não muda o texto do rótulo (nome acessível e testes); o input tem aria-required. */}
+      <label
+        htmlFor={inputId}
+        className={cn(
+          "text-[13px] font-semibold text-ink-soft",
+          required && "after:ml-1 after:text-accent-ink after:content-['*']",
+        )}
+      >
         {label}
-        {required ? (
-          <span aria-hidden="true" className="text-accent-ink">
-            {" "}
-            *
-          </span>
-        ) : null}
       </label>
       <input
         id={inputId}
