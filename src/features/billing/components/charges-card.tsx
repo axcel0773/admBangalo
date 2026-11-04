@@ -64,7 +64,7 @@ export function ChargesCard({ reservation, charges, grandTotal }: ChargesCardPro
                     triggerSize="icon"
                     triggerLabel={`Remover ${charge.description}`}
                     block={false}
-                    className="size-9 text-ink-muted"
+                    className="size-11 text-ink-muted md:size-9"
                   >
                     <X aria-hidden="true" />
                   </ConfirmSubmit>

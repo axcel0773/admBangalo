@@ -7,6 +7,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Field } from "@/components/ui/field";
 import { inputClassName } from "@/components/ui/input-styles";
 import { cn } from "@/lib/cn";
+import { documentProblem, phoneProblem } from "@/lib/masks";
 
 export type GuestMode = "existing" | "new";
 
@@ -140,6 +141,8 @@ export function GuestPicker({
             value={newGuest.full_name}
             onChange={(event) => onNewGuestChange({ ...newGuest, full_name: event.target.value })}
             autoComplete="off"
+            maxLength={120}
+            required
             error={errors.new_guest_name}
           />
           <Field
@@ -150,6 +153,8 @@ export function GuestPicker({
             value={newGuest.phone}
             onChange={(event) => onNewGuestChange({ ...newGuest, phone: event.target.value })}
             placeholder="(11) 98765-4321"
+            mask="phone"
+            validate={phoneProblem}
             error={errors.new_guest_phone}
           />
           <Field
@@ -157,6 +162,10 @@ export function GuestPicker({
             name="new_guest_document"
             value={newGuest.document}
             onChange={(event) => onNewGuestChange({ ...newGuest, document: event.target.value })}
+            placeholder="000.000.000-00"
+            mask="document"
+            validate={documentProblem}
+            maxLength={20}
             error={errors.new_guest_document}
           />
         </div>

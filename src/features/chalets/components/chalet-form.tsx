@@ -14,6 +14,7 @@ import { SwitchField } from "@/components/ui/switch-field";
 import { TextareaField } from "@/components/ui/textarea-field";
 import { checkedOf, fieldError, idleFormState, valueOf, type FormState } from "@/lib/forms";
 import { formatMoneyInput } from "@/lib/format";
+import { moneyProblem } from "@/lib/masks";
 
 import { CHALET_COLORS, DEFAULT_CHALET_COLOR, shortTime, type Chalet } from "../domain";
 
@@ -39,7 +40,7 @@ export function ChaletForm({ action, chalet }: ChaletFormProps) {
       <FormAlert state={state} />
 
       <FormSection title="Identificação">
-        <Field label="Nome" name="name" defaultValue={v("name", chalet?.name)} placeholder="Chalé Ipê" required error={error("name")} />
+        <Field label="Nome" name="name" defaultValue={v("name", chalet?.name)} placeholder="Chalé Ipê" maxLength={60} required error={error("name")} />
         <TextareaField
           label="Descrição (opcional)"
           name="description"
@@ -75,6 +76,8 @@ export function ChaletForm({ action, chalet }: ChaletFormProps) {
           inputMode="decimal"
           defaultValue={v("base_nightly_rate", formatMoneyInput(chalet?.base_nightly_rate))}
           placeholder="350,00"
+          mask="money"
+          validate={(value) => moneyProblem(value, { required: true })}
           required
           error={error("base_nightly_rate")}
         />

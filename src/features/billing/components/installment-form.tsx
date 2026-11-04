@@ -10,6 +10,7 @@ import { FieldRow } from "@/components/ui/form-layout";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { fieldError, idleFormState, valueOf, type FormState } from "@/lib/forms";
 import { formatMoneyInput } from "@/lib/format";
+import { moneyProblem } from "@/lib/masks";
 
 interface InstallmentFormProps {
   action: (state: FormState, formData: FormData) => Promise<FormState>;
@@ -49,7 +50,8 @@ export function InstallmentForm({ action, suggestedAmount, suggestedDate }: Inst
         <Field
           label="Valor (R$)"
           name="amount"
-          inputMode="decimal"
+          inputMode="decimal" mask="money"
+          validate={(value) => moneyProblem(value, { required: true, positive: true })}
           defaultValue={v("amount", suggestedAmount > 0 ? formatMoneyInput(suggestedAmount) : "")}
           required
           error={error("amount")}

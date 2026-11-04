@@ -58,7 +58,7 @@ export function AvailabilityCard({ chaletId, availability }: { chaletId: string;
                   triggerSize="icon"
                   triggerLabel={`Remover bloqueio ${block.reason}`}
                   block={false}
-                  className="size-9 text-ink-muted"
+                  className="size-11 text-ink-muted md:size-9"
                 >
                   <X aria-hidden="true" />
                 </ConfirmSubmit>
@@ -102,7 +102,7 @@ export function AvailabilityCard({ chaletId, availability }: { chaletId: string;
                     triggerSize="icon"
                     triggerLabel={`Desligar ${source.label}`}
                     block={false}
-                    className="size-9 text-ink-muted"
+                    className="size-11 text-ink-muted md:size-9"
                   >
                     <X aria-hidden="true" />
                   </ConfirmSubmit>

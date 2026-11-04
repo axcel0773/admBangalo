@@ -12,6 +12,7 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { TextareaField } from "@/components/ui/textarea-field";
 import { fieldError, idleFormState, valueOf, type FormState } from "@/lib/forms";
 import { formatMoneyInput } from "@/lib/format";
+import { moneyProblem } from "@/lib/masks";
 
 import { PAYMENT_KIND_LABELS, PAYMENT_METHOD_LABELS, type PaymentKind } from "../domain/payments";
 import { ReceiptField } from "./receipt-field";
@@ -78,7 +79,8 @@ export function PaymentForm({ action, suggestedKind, suggestedAmount, today, own
         <Field
           label="Valor (R$)"
           name="amount"
-          inputMode="decimal"
+          inputMode="decimal" mask="money"
+          validate={(value) => moneyProblem(value, { required: true, positive: true })}
           defaultValue={v("amount", suggestedAmount > 0 ? formatMoneyInput(suggestedAmount) : "")}
           required
           error={error("amount")}

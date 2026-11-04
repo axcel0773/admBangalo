@@ -9,6 +9,8 @@ import { FieldRow, FormActions, FormSection } from "@/components/ui/form-layout"
 import { SubmitButton } from "@/components/ui/submit-button";
 import { TextareaField } from "@/components/ui/textarea-field";
 import { fieldError, idleFormState, valueOf, type FormState } from "@/lib/forms";
+import { documentProblem, emailProblem, phoneProblem, ufProblem } from "@/lib/masks";
+import { todayIso } from "@/lib/dates";
 
 import type { Guest } from "../domain";
 
@@ -28,16 +30,20 @@ export function GuestForm({ action, cancelHref, guest }: GuestFormProps) {
       <FormAlert state={state} />
 
       <FormSection title="Dados pessoais">
-        <Field label="Nome completo" name="full_name" defaultValue={v("full_name", guest?.full_name)} autoComplete="name" required error={error("full_name")} />
+        <Field label="Nome completo" name="full_name" defaultValue={v("full_name", guest?.full_name)} autoComplete="name" maxLength={120} required error={error("full_name")} />
         <FieldRow>
           <Field
             label="CPF ou documento"
             name="document"
             defaultValue={v("document", guest?.document)}
             placeholder="000.000.000-00"
+            inputMode="text"
+            mask="document"
+            validate={documentProblem}
+            maxLength={20}
             error={error("document")}
           />
-          <Field label="Nascimento" name="birth_date" type="date" defaultValue={v("birth_date", guest?.birth_date)} error={error("birth_date")} />
+          <Field label="Nascimento" name="birth_date" type="date" min="1900-01-01" max={todayIso()} defaultValue={v("birth_date", guest?.birth_date)} error={error("birth_date")} />
         </FieldRow>
       </FormSection>
 
@@ -50,6 +56,8 @@ export function GuestForm({ action, cancelHref, guest }: GuestFormProps) {
             inputMode="tel"
             defaultValue={v("phone", guest?.phone)}
             placeholder="(11) 98765-4321"
+            mask="phone"
+            validate={phoneProblem}
             error={error("phone")}
           />
           <Field
@@ -58,12 +66,15 @@ export function GuestForm({ action, cancelHref, guest }: GuestFormProps) {
             type="email"
             inputMode="email"
             defaultValue={v("email", guest?.email)}
+            autoComplete="off"
+            maxLength={120}
+            validate={emailProblem}
             error={error("email")}
           />
         </FieldRow>
         <div className="grid grid-cols-[1fr_96px] gap-4">
           <Field label="Cidade" name="city" defaultValue={v("city", guest?.city)} error={error("city")} />
-          <Field label="UF" name="state" defaultValue={v("state", guest?.state)} maxLength={2} placeholder="SP" error={error("state")} />
+          <Field label="UF" name="state" defaultValue={v("state", guest?.state)} maxLength={2} placeholder="SP" mask="uf" validate={ufProblem} autoCapitalize="characters" error={error("state")} />
         </div>
       </FormSection>
 

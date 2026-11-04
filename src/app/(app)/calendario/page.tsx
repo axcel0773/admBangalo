@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { CalendarDays, ChevronDown, Plus } from "lucide-react";
 import type { Metadata } from "next";
 
 import { paths } from "@/components/layout/navigation";
@@ -10,6 +10,7 @@ import {
   buildDays,
   CalendarGrid,
   CalendarLegend,
+  DatePicker,
   DayAgenda,
   getCalendarData,
   PeriodNav,
@@ -56,6 +57,14 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
         actions={
           <>
             <PeriodNav start={start} today={today} step={WEEK_DAYS} />
+            <DatePicker
+              selected={selectedDay}
+              today={today}
+              className="hidden h-12 rounded-control border border-line-strong bg-surface px-4 text-sm font-semibold md:inline-flex"
+            >
+              <CalendarDays className="size-[18px]" aria-hidden="true" />
+              Ir para data
+            </DatePicker>
             <ButtonLink href={paths.newReservation({ checkIn: selectedDay })} className="hidden md:inline-flex">
               <Plus aria-hidden="true" />
               Nova reserva
@@ -67,8 +76,18 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
       <PageBody>
         {/* Celular: semana + agenda do dia */}
         <div className="flex flex-col gap-4 md:hidden">
+          <DatePicker
+            selected={selectedDay}
+            today={today}
+            label="Escolher semana e dia no calendário"
+            className="-mb-1 self-start px-1 py-1 text-sm font-semibold text-ink-soft"
+          >
+            <CalendarDays className="size-4" aria-hidden="true" />
+            {formatDayMonth(start)} – {formatDayMonth(weekEnd)}
+            <ChevronDown className="size-4 text-ink-muted" aria-hidden="true" />
+          </DatePicker>
           <WeekStrip days={week} start={start} selected={selectedDay} chalets={chalets} stays={stays} />
-          <DayAgenda entries={agenda} day={selectedDay} />
+          <DayAgenda entries={agenda} day={selectedDay} today={today} />
         </div>
 
         {/* Tablet e desktop: grade de 2 semanas */}

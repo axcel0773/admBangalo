@@ -4,6 +4,8 @@ import {
   buildCalendarGrid,
   buildDayAgenda,
   buildDays,
+  buildMonthGrid,
+  shiftCalendarMonth,
   occupiedChaletIds,
   toBlockSegment,
   toSegment,
@@ -122,5 +124,29 @@ describe("buildDayAgenda", () => {
 
   it("lista chalés ocupados na noite", () => {
     expect(occupiedChaletIds(stays, "2026-11-03")).toEqual(["ipe", "jabu"]);
+  });
+});
+
+describe("seletor de data", () => {
+  it("monta as semanas do mês começando no domingo", () => {
+    const grid = buildMonthGrid("2026-11-01", "2026-11-03", "2026-11-20");
+    // novembro/2026 começa num domingo e tem 30 dias: 5 semanas
+    expect(grid).toHaveLength(5);
+    expect(grid[0]?.[0]).toMatchObject({ date: "2026-11-01", inMonth: true });
+    expect(grid[0]?.[2]).toMatchObject({ date: "2026-11-03", isToday: true });
+    expect(grid[2]?.[5]).toMatchObject({ date: "2026-11-20", isSelected: true });
+    expect(grid[4]?.[6]).toMatchObject({ date: "2026-12-05", inMonth: false });
+  });
+
+  it("completa com dias do mês anterior", () => {
+    const grid = buildMonthGrid("2026-12-01", "2026-11-03", null);
+    expect(grid[0]?.[0]).toMatchObject({ date: "2026-11-29", inMonth: false });
+    expect(grid[0]?.[2]).toMatchObject({ date: "2026-12-01", inMonth: true });
+    expect(grid.every((week) => week.length === 7)).toBe(true);
+  });
+
+  it("anda entre meses atravessando o ano", () => {
+    expect(shiftCalendarMonth("2026-12-15", 1)).toBe("2027-01-01");
+    expect(shiftCalendarMonth("2026-01-31", -1)).toBe("2025-12-01");
   });
 });

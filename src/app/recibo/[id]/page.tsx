@@ -30,7 +30,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
   const number = id.slice(0, 8).toUpperCase();
 
   return (
-    <main className="mx-auto max-w-2xl bg-surface p-5 text-ink print:max-w-none print:p-0 md:my-8 md:rounded-card md:p-10 md:shadow-card print:shadow-none">
+    <main className="pt-safe px-safe mx-auto max-w-2xl bg-surface p-5 text-ink print:max-w-none print:p-0 md:my-8 md:rounded-card md:p-10 md:shadow-card print:shadow-none">
       <div className="mb-6 flex items-center justify-between gap-3 print:hidden">
         <Link href={paths.reservation(id)} className="inline-flex items-center gap-1 text-sm font-semibold text-ink-soft">
           <ChevronLeft className="size-4" aria-hidden="true" />

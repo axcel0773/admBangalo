@@ -73,7 +73,7 @@ export function PaymentsCard({ reservationId, ownerId, payments, context }: Paym
                     triggerSize="icon"
                     triggerLabel="Remover lançamento"
                     block={false}
-                    className="size-9 text-ink-muted"
+                    className="size-11 text-ink-muted md:size-9"
                   >
                     <Trash2 aria-hidden="true" />
                   </ConfirmSubmit>

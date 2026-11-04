@@ -18,7 +18,7 @@ export function AppShell({ businessName, ownerName, children }: AppShellProps) {
   return (
     <div className="flex min-h-dvh">
       <Sidebar businessName={businessName} ownerName={ownerName} />
-      <main className="pb-safe-nav min-w-0 flex-1 md:pb-14">
+      <main className="pb-safe-nav pt-safe px-safe min-w-0 flex-1 md:pb-14">
         <div className="mx-auto w-full max-w-[1200px]">{children}</div>
       </main>
       <BottomNav />
