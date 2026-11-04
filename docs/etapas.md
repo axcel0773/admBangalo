@@ -115,6 +115,10 @@ Boas práticas que valem para todas as etapas seguintes.
 - [x] Feature `fees`: taxas por chalé ou gerais, com os 5 modos de cobrança e "aplicar automático"
 - [ ] Tarifas sazonais (`chalet_rates`) com período e mínimo de noites → movido para a etapa 4
 - [x] Editar perfil (nome, nome do negócio, telefone, chave Pix)
+- [x] **Foto de perfil** (Configurações › Perfil, migração `0009`): reduzida a 256 px no aparelho e enviada direto ao bucket privado `avatars`; aparece no menu lateral, no Painel e em Configurações; sem foto, mostra as iniciais
+- [x] **Botão de sair** no menu lateral (com confirmação); no celular segue em Configurações
+- [x] **Taxas: editar e excluir** na lista (botões em cada taxa, exclusão com confirmação em dois toques); reservas já criadas não mudam, pois guardam cópia da taxa
+- [x] **Taxas no menu lateral** (atalho direto); no celular continuam em Configurações
 
 ### Hóspedes
 - [x] Lista com busca por nome, CPF ou telefone (`?q=` na URL)
@@ -269,7 +273,9 @@ Boas práticas que valem para todas as etapas seguintes.
 - [x] **Limite de 6 pessoas por bangalô** (regra do condomínio) no banco, no servidor e nos formulários; sem taxa de pessoa extra
 - [x] **Financeiro por bangalô**: receita, noites, entradas e ocupação de cada bangalô no mês
 - [x] **Exportar hóspedes (CSV)** em Hóspedes → Exportar: backup do cadastro e portabilidade (LGPD)
+- [x] **Mobile/iPhone**: conteúdo abaixo da barra de status (sem `viewport-fit=cover`), barra "Concluir" no teclado e seletor de data nativo
 - [x] **Excluir reserva** (limpar testes e lançamentos por engano): só sem dinheiro registrado (estorne antes); trava no banco (`0008`), apaga taxas, parcelas e comprovantes junto
+- [x] Migrações `0007`, `0008` e `0009` aplicadas nos bancos de teste e de produção; tudo testado no celular pelo proprietário
 - [ ] Notificação push do check-in do dia — fica para depois: precisa de agendador; a Vercel gratuita só roda cron 1×/dia e exigiria chave secreta no servidor
 - [ ] Modo offline com fila de lançamentos — fica para depois: conflitos de reserva (sobreposição) só se resolvem online; o PWA já abre a página offline
 - [ ] Fotos reais dos chalés — conteúdo do dono (pode usar o Storage gratuito, 1 GB)

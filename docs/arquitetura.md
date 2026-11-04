@@ -117,7 +117,7 @@ Testado em Postgres 16: 3 noites × R$ 350, 3 hóspedes (2 inclusos), limpeza R$
 
 - Supabase Auth (e-mail/senha ou link mágico); trigger cria `profiles`.
 - RLS `owner_id = auth.uid()` em todas as tabelas; `owner_id` tem default, o app não envia.
-- `service_role` nunca no cliente. Comprovantes em bucket privado `receipts/<owner_id>/...`.
+- `service_role` nunca no cliente. Comprovantes em bucket privado `receipts/<owner_id>/...` e fotos de perfil em `avatars/<owner_id>/...`.
 - PWA: `manifest.ts`, ícones 192/512 maskable, `standalone`; Serwist faz cache da casca e das últimas leituras. Gravação exige conexão na v1.
 - Layout base é o celular; a partir de 768 px a barra inferior vira sidebar lateral.
 
