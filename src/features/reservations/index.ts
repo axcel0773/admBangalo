@@ -4,6 +4,7 @@ export { NewReservationForm } from "./components/new-reservation/new-reservation
 export { ReservationDetail } from "./components/reservation-detail";
 export { PaymentStatusBadge } from "./components/payment-status-badge";
 export { ReservationList } from "./components/reservation-list";
+export { receiptMessage } from "./domain/messages";
 export {
   getNewReservationContext,
   getReservationDetail,

@@ -1,13 +1,15 @@
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, MessageCircle } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { paths } from "@/components/layout/navigation";
+import { buttonVariants } from "@/components/ui/button";
 import { PrintButton } from "@/components/ui/print-button";
 import { getReservationBilling, PAYMENT_KIND_LABELS, PAYMENT_METHOD_LABELS } from "@/features/billing";
 import { getMyProfile } from "@/features/profile/services";
-import { getReservationDetail } from "@/features/reservations";
+import { whatsappUrl } from "@/features/guests/domain";
+import { getReservationDetail, receiptMessage } from "@/features/reservations";
 import { formatShortDate, todayIso } from "@/lib/dates";
 import { formatCurrency, formatDecimal, pluralize } from "@/lib/format";
 
@@ -28,6 +30,26 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
   });
   const issuer = profile?.business_name || profile?.full_name || "Chalés";
   const number = id.slice(0, 8).toUpperCase();
+  const whatsapp = whatsappUrl(
+    mainGuest.phone,
+    receiptMessage({
+      guestName: mainGuest.full_name,
+      chaletName: chalet.name,
+      issuer,
+      number,
+      checkIn: reservation.check_in,
+      checkOut: reservation.check_out,
+      total: financials.grand_total,
+      paid: financials.paid_total,
+      payments: billing.payments.map((payment) => ({
+        paidAt: payment.paid_at,
+        kindLabel: PAYMENT_KIND_LABELS[payment.kind],
+        methodLabel: PAYMENT_METHOD_LABELS[payment.method],
+        amount: payment.amount,
+        refund: payment.kind === "refund",
+      })),
+    }),
+  );
 
   return (
     <main className="pt-safe px-safe mx-auto max-w-2xl bg-surface p-5 text-ink print:max-w-none print:p-0 md:my-8 md:rounded-card md:p-10 md:shadow-card print:shadow-none">
@@ -36,8 +58,26 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
           <ChevronLeft className="size-4" aria-hidden="true" />
           Voltar
         </Link>
-        <PrintButton size="sm" />
+        <div className="flex flex-wrap justify-end gap-2">
+          {whatsapp ? (
+            <a
+              href={whatsapp}
+              target="_blank"
+              rel="noreferrer"
+              className={buttonVariants({ variant: "soft", size: "sm" })}
+            >
+              <MessageCircle aria-hidden="true" />
+              Enviar no WhatsApp
+            </a>
+          ) : null}
+          <PrintButton size="sm">Imprimir ou PDF</PrintButton>
+        </div>
       </div>
+      {!mainGuest.phone ? (
+        <p className="-mt-3 mb-5 text-xs text-ink-muted print:hidden">
+          Cadastre o telefone do hóspede para enviar o recibo pelo WhatsApp.
+        </p>
+      ) : null}
 
       <header className="mb-6 flex flex-wrap items-start justify-between gap-4 border-b-2 border-ink pb-4">
         <div>
