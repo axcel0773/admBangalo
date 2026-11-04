@@ -113,6 +113,7 @@ Client Component (useActionState) → Server Action ("use server") → schema zo
 
 - Upload vai **direto do navegador para o Storage** (`lib/supabase/storage.ts`), sem passar pela Server Action: evita o limite de corpo e deixa o servidor leve. Fotos são reduzidas antes (`lib/images.ts`).
 - Buckets são privados; a política só deixa cada dono mexer na pasta `<owner_id>/…`. O servidor confere o caminho recebido (`isOwnReceiptPath`) e o banco também (`payments_receipt_path_owner`).
+- Foto de perfil segue o mesmo padrão (`avatars`, reduzida a 256 px); o caminho muda a cada troca para não ficar em cache.
 - Para exibir, gere link temporário (`createSignedUrls`), nunca torne o bucket público.
 
 ## Estado na URL

@@ -12,7 +12,7 @@ Gestão de chalés para o proprietário: hóspedes, calendário de reservas, val
 | 3 | Chalés e taxas, hóspedes, reservas, calendário | ✅ |
 | 4 | Cobranças, pagamentos, parcelas, comprovantes, temporadas, financeiro | ✅ |
 | 5 | Testes (componentes, E2E, banco), segurança, CI e deploy | ✅ produção em https://admbangalo.vercel.app |
-| 6 | Bloqueios, iCal Airbnb/Booking, confirmação no WhatsApp, recibo | ✅ |
+| 6 | Bloqueios, iCal Airbnb/Booking, confirmação e recibo (PDF) no WhatsApp, excluir hóspede/reserva/taxa, foto de perfil | ✅ |
 
 ## Como rodar
 
@@ -28,7 +28,7 @@ cp .env.example .env.local      # no Windows: copy .env.example .env.local
 
 # 3. banco (uma vez)
 #    cole, em ordem, os arquivos de supabase/migrations/ no SQL Editor do Supabase
-#    (0001_init.sql … 0006_availability.sql)
+#    (0001_init.sql … 0009_profile_avatar.sql)
 #    ou: npx supabase link --project-ref <ref> && npx supabase db push
 
 # 4. crie seu usuário
