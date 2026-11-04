@@ -10,6 +10,8 @@ export interface CurrentOwner {
   email: string;
   fullName: string;
   businessName: string;
+  /** URL temporária (1 h) da foto de perfil; null se não houver. */
+  avatarUrl: string | null;
 }
 
 const FALLBACK_BUSINESS_NAME = "Meus Chalés";
@@ -27,9 +29,15 @@ export const getCurrentOwner = cache(async (): Promise<CurrentOwner | null> => {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, business_name")
+    .select("full_name, business_name, avatar_path")
     .eq("id", user.id)
     .maybeSingle();
+
+  let avatarUrl: string | null = null;
+  if (profile?.avatar_path) {
+    const { data } = await supabase.storage.from("avatars").createSignedUrl(profile.avatar_path, 3600);
+    avatarUrl = data?.signedUrl ?? null;
+  }
 
   const email = user.email ?? "";
   return {
@@ -37,6 +45,7 @@ export const getCurrentOwner = cache(async (): Promise<CurrentOwner | null> => {
     email,
     fullName: profile?.full_name || email.split("@")[0] || "Proprietário",
     businessName: profile?.business_name || FALLBACK_BUSINESS_NAME,
+    avatarUrl,
   };
 });
 
