@@ -53,3 +53,53 @@ export function confirmationMessage(input: ConfirmationInput): string {
   // O toLocaleString do real usa espaço não separável (U+00A0); no link ele vira %C2%A0 e alguns apps estranham.
   return message.replace(/\u00A0/g, " ");
 }
+
+export interface ReceiptPayment {
+  paidAt: IsoDate;
+  /** "Sinal", "Saldo"… */
+  kindLabel: string;
+  /** "Pix", "Dinheiro"… */
+  methodLabel: string;
+  amount: number;
+  refund: boolean;
+}
+
+export interface ReceiptInput {
+  guestName: string;
+  chaletName: string;
+  issuer: string;
+  /** Número do recibo, o mesmo da página. */
+  number: string;
+  checkIn: IsoDate;
+  checkOut: IsoDate;
+  total: number;
+  paid: number;
+  payments: ReceiptPayment[];
+}
+
+/** Resumo do recibo para o WhatsApp (a página do recibo é privada, então vai o conteúdo, não o link). */
+export function receiptMessage(input: ReceiptInput): string {
+  const firstName = input.guestName.trim().split(/\s+/)[0] || input.guestName;
+  const balance = Math.max(Math.round((input.total - input.paid) * 100) / 100, 0);
+
+  const payments = input.payments.map(
+    (payment) =>
+      `• ${formatShortDate(payment.paidAt)} · ${payment.kindLabel} · ${payment.methodLabel}: ${payment.refund ? "−" : ""}${brl(payment.amount)}`,
+  );
+
+  const message = [
+    `🧾 Recibo nº ${input.number}`,
+    `Olá, ${firstName}! Segue o recibo da sua hospedagem no ${input.chaletName}.`,
+    "",
+    `📅 ${formatShortDate(input.checkIn)} a ${formatShortDate(input.checkOut)}`,
+    `💰 Total: ${brl(input.total)}`,
+    ...(payments.length > 0 ? ["", "Pagamentos:", ...payments] : []),
+    "",
+    `✅ Total pago: ${brl(Math.max(input.paid, 0))}`,
+    balance > 0 ? `⏳ Saldo a pagar: ${brl(balance)}` : "Tudo quitado, obrigado!",
+    "",
+    input.issuer,
+  ].join("\n");
+
+  return message.replace(/\u00A0/g, " ");
+}
