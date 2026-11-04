@@ -23,12 +23,12 @@ describe("mensagem de confirmação", () => {
   it("traz datas, horários, pessoas e saldo", () => {
     expect(plain(confirmationMessage(base))).toBe(
       [
-        "Olá, Maria! Sua reserva no Chalé Ipê está confirmada!",
+        "Olá, Maria! Sua reserva no Chalé Ipê está confirmada ✅",
         "",
-        "*Entrada:* quinta-feira, 10/12, a partir das 14:00",
-        "*Saída:* domingo, 13/12, até 12:00",
-        "*Hóspedes:* 3 pessoas, 3 noites",
-        "*Total:* R$ 1.284,50 (pago R$ 600,00, falta R$ 684,50)",
+        "📅 Entrada: quinta-feira, 10/12, a partir das 14:00",
+        "📅 Saída: domingo, 13/12, até 12:00",
+        "👥 3 pessoas · 3 noites",
+        "💰 Total: R$ 1.284,50 · pago R$ 600,00 · falta R$ 684,50",
         "",
         "Qualquer dúvida, é só chamar. Chalés da Serra",
       ].join("\n"),
@@ -38,17 +38,12 @@ describe("mensagem de confirmação", () => {
   it("pendente avisa que confirma com o sinal; sem pagamento mostra só o total", () => {
     const text = plain(confirmationMessage({ ...base, status: "pending", paid: 0 }));
     expect(text).toMatch(/confirmada após o sinal/);
-    expect(text).toContain("*Total:* R$ 1.284,50\n");
+    expect(text).toContain("💰 Total: R$ 1.284,50\n");
   });
 
   it("quitada agradece; singular para 1 noite e 1 pessoa", () => {
     const text = plain(confirmationMessage({ ...base, paid: 1284.5, guests: 1, nights: 1 }));
     expect(text).toContain("tudo pago, obrigado!");
-    expect(text).toContain("*Hóspedes:* 1 pessoa, 1 noite");
-  });
-
-  it("não usa emojis (o link do WhatsApp os transforma em �)", () => {
-    const text = confirmationMessage(base);
-    expect(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{FE0F}]/u.test(text)).toBe(false);
+    expect(text).toContain("👥 1 pessoa · 1 noite");
   });
 });

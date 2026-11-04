@@ -30,14 +30,28 @@ export function formatCityState(guest: Pick<Guest, "city" | "state">): string | 
 /** Nome gravado pela função anonymize_guest (LGPD). */
 export const ANONYMIZED_GUEST_NAME = "Hóspede removido";
 
-/** Link do WhatsApp (assume Brasil quando o número vem sem DDI). */
+/**
+ * Codifica para a URL em UTF-8 e também os caracteres que o encodeURIComponent deixa
+ * passar (! ' ( ) *) e que alguns navegadores embutidos tratam como fim do texto.
+ * toWellFormed troca pares de surrogate quebrados (viram "�" no WhatsApp) por U+FFFD
+ * antes de codificar, em vez de gerar um %-código inválido.
+ */
+export function encodeForUrl(text: string): string {
+  return encodeURIComponent(text.toWellFormed()).replace(/[!'()*]/g, (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`);
+}
+
+/**
+ * Link do WhatsApp (assume Brasil quando o número vem sem DDI).
+ * Usa api.whatsapp.com/send, o destino final do wa.me: pular o redirecionamento evita
+ * que emojis e acentos se percam no meio do caminho em alguns aparelhos.
+ */
 export function whatsappUrl(phone: string | null, text?: string): string | null {
   if (!phone) return null;
   const digits = phone.replace(/\D/g, "");
   if (digits.length < 10) return null;
   const withCountry = digits.length <= 11 ? `55${digits}` : digits;
-  const query = text ? `?text=${encodeURIComponent(text)}` : "";
-  return `https://wa.me/${withCountry}${query}`;
+  const query = text ? `&text=${encodeForUrl(text)}` : "";
+  return `https://api.whatsapp.com/send?phone=${withCountry}${query}`;
 }
 
 /** Remove caracteres que quebram o filtro `or` do PostgREST. */
