@@ -14,7 +14,7 @@ import {
   ScheduleCard,
 } from "@/features/billing";
 import { requireOwner } from "@/features/auth/session";
-import { getReservationDetail, ReservationDetail } from "@/features/reservations";
+import { DeleteReservationCard, getReservationDetail, ReservationDetail } from "@/features/reservations";
 import { todayIso } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "Reserva" };
@@ -58,6 +58,7 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
                 />
               ) : null}
               <ChargesCard reservation={reservation} charges={charges} grandTotal={financials.grand_total} />
+              <DeleteReservationCard reservationId={id} paid={financials.paid_total} />
             </>
           }
           aside={

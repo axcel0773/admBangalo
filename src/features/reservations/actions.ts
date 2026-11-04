@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { paths } from "@/components/layout/navigation";
+import { paths, routes } from "@/components/layout/navigation";
 import { attempt } from "@/lib/actions";
 import { errorFormState, formDataToObject, invalidFormState, type FormState } from "@/lib/forms";
 import { assertIds } from "@/lib/ids";
@@ -28,6 +28,16 @@ export async function createReservation(_prev: FormState, formData: FormData): P
   // Painel, calendário, listas e ficha do hóspede mudam com uma reserva nova.
   revalidatePath("/", "layout");
   redirect(paths.reservation(reservationId));
+}
+
+/** Exclui a reserva (só sem dinheiro registrado) e volta para a lista. Use com `.bind(null, id)`. */
+export async function deleteReservation(id: string): Promise<FormState> {
+  return attempt(async () => {
+    assertIds(id);
+    await (await reservationsRepository()).remove(id);
+    revalidatePath("/", "layout");
+    redirect(routes.reservations);
+  });
 }
 
 /** Botões de status da reserva. Use com `.bind(null, id, "checked_in")`. */
