@@ -22,6 +22,8 @@ export const initialAuthState: AuthFormState = { status: "idle" };
 
 /** Aceita só caminhos internos, para não virar redirecionamento aberto. */
 export function safeRedirectPath(next: string | undefined | null): string {
+  // "/\\site.com" e "/\t/site.com" são lidos pelo navegador como "//site.com" (outro site).
   if (!next || !next.startsWith("/") || next.startsWith("//")) return "/";
+  if (next.includes("\\") || /[\u0000-\u001f\u007f]/.test(next)) return "/";
   return next;
 }
