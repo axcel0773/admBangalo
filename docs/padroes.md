@@ -50,6 +50,7 @@ Regras de negócio críticas (conflito de datas, capacidade, taxas automáticas,
 - Navegação: `BottomNav` no celular, `Sidebar` a partir de `md`.
 - Alvos de toque ≥ 44 px; ações principais no alcance do polegar.
 - Use `min-h-dvh` (não `100vh`) e as utilidades `pb-safe` / `pb-safe-nav` para a área segura do iPhone.
+- **Barra de status do iPhone:** o app não usa `viewport-fit=cover` e a barra de status do app instalado é `default`, então o conteúdo começa abaixo do relógio em qualquer modelo. Com `cover`, `env(safe-area-inset-top)` chegou zerado e os títulos ficaram sob o relógio; não reative sem testar no aparelho.
 
 ## Design tokens
 
