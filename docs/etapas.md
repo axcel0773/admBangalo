@@ -263,7 +263,7 @@ Boas práticas que valem para todas as etapas seguintes.
   - proteção contra SSRF: só https, sem IP, sem rede interna, prazo de 10 s, até 2 MB
 - [x] **Exportar iCal**: link `/ical/<token>.ics` por chalé para colar no Airbnb/Booking; só datas ocupadas, sem dados de hóspedes; "Gerar novo link" invalida o antigo
 - [x] **Mensagem de confirmação** pronta para o WhatsApp (datas, horários, pessoas, total, pago e saldo)
-- [x] **Recibo** em página própria, pronto para imprimir ou "Salvar como PDF" no celular, com botão para enviar o resumo no WhatsApp do hóspede
+- [x] **Recibo** em página própria, pronto para imprimir ou "Salvar como PDF" no celular, com botões para enviar o resumo no WhatsApp (Mensagem) e compartilhar o PDF do recibo (Enviar PDF: menu de compartilhar do celular, gerado no aparelho com pdf-lib)
 - [x] Testes: leitura/geração de iCal, segurança do link, bloqueios, mensagem (125 de domínio) e 9 asserções de banco para bloqueios e o link público
 - [x] **Excluir hóspede** (`remove_guest`, migração `0007`): sem reservas apaga o cadastro; com reservas anonimiza e tira das listas
 - [x] **Limite de 6 pessoas por bangalô** (regra do condomínio) no banco, no servidor e nos formulários; sem taxa de pessoa extra
