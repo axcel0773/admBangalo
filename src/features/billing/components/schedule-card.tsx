@@ -1,5 +1,6 @@
 import { CalendarClock, X } from "lucide-react";
 
+import { ActionForm } from "@/components/ui/action-form";
 import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { CardSection } from "@/components/ui/card";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
@@ -43,12 +44,12 @@ export function ScheduleCard({ reservationId, schedule, total, checkIn, today, c
             Sem parcelas, o saldo vence no check-in. Combine sinal e saldo para o Painel avisar na data certa.
           </p>
           {!cancelled && total > 0 ? (
-            <form action={addDepositPlan.bind(null, reservationId)}>
+            <ActionForm action={addDepositPlan.bind(null, reservationId)}>
               <SubmitButton variant="soft" block pendingLabel="Criando…">
                 <CalendarClock aria-hidden="true" />
                 Sinal 50% hoje + saldo no check-in
               </SubmitButton>
-            </form>
+            </ActionForm>
           ) : null}
         </div>
       ) : (
@@ -69,7 +70,7 @@ export function ScheduleCard({ reservationId, schedule, total, checkIn, today, c
                   </span>
                 </span>
                 <span className="text-[15px] font-bold tabular-nums">{formatCurrency(item.amount)}</span>
-                <form action={removeInstallment.bind(null, reservationId, item.id)} className="contents">
+                <ActionForm action={removeInstallment.bind(null, reservationId, item.id)} className="contents">
                   <ConfirmSubmit
                     message={`Remover a parcela “${item.description}”? Pagamentos já lançados não mudam.`}
                     confirmLabel="Remover"
@@ -81,7 +82,7 @@ export function ScheduleCard({ reservationId, schedule, total, checkIn, today, c
                   >
                     <X aria-hidden="true" />
                   </ConfirmSubmit>
-                </form>
+                </ActionForm>
               </div>
               {nextPix?.installmentId === item.id ? (
                 <div className="rounded-2xl bg-primary-strong p-3">

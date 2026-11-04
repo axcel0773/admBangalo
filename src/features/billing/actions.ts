@@ -3,8 +3,10 @@
 import { revalidatePath } from "next/cache";
 
 import { requireOwner } from "@/features/auth/session";
+import { attempt } from "@/lib/actions";
 import { todayIso } from "@/lib/dates";
 import { errorFormState, formDataToObject, invalidFormState, submittedValues, type FormState } from "@/lib/forms";
+import { assertIds, INVALID_ID_MESSAGE, isUuid } from "@/lib/ids";
 import { MutationError } from "@/lib/supabase/errors";
 
 import { validatePayment } from "./domain/payments";
@@ -31,6 +33,7 @@ async function run(formData: FormData, task: () => Promise<void>, success: strin
 
 /** Leituras do medidor. Use com `.bind(null, reservationId)`. */
 export async function saveMeterReading(reservationId: string, _prev: FormState, formData: FormData): Promise<FormState> {
+  if (!isUuid(reservationId)) return errorFormState(INVALID_ID_MESSAGE, formData);
   const parsed = meterReadingSchema.safeParse(formDataToObject(formData));
   if (!parsed.success) return invalidFormState(parsed.error, formData);
 
@@ -57,6 +60,7 @@ export async function saveMeterReading(reservationId: string, _prev: FormState, 
 
 /** Taxa avulsa. Use com `.bind(null, reservationId)`. */
 export async function addExtraCharge(reservationId: string, _prev: FormState, formData: FormData): Promise<FormState> {
+  if (!isUuid(reservationId)) return errorFormState(INVALID_ID_MESSAGE, formData);
   const parsed = extraChargeSchema.safeParse(formDataToObject(formData));
   if (!parsed.success) return invalidFormState(parsed.error, formData);
 
@@ -68,13 +72,17 @@ export async function addExtraCharge(reservationId: string, _prev: FormState, fo
 }
 
 /** Use com `.bind(null, reservationId, chargeId)`. */
-export async function removeCharge(reservationId: string, chargeId: string): Promise<void> {
-  await (await billingRepository()).deleteCharge(reservationId, chargeId);
-  refresh();
+export async function removeCharge(reservationId: string, chargeId: string): Promise<FormState> {
+  return attempt(async () => {
+    assertIds(reservationId, chargeId);
+    await (await billingRepository()).deleteCharge(reservationId, chargeId);
+    refresh();
+  });
 }
 
 /** Pagamento ou estorno. Use com `.bind(null, reservationId)`. */
 export async function registerPayment(reservationId: string, _prev: FormState, formData: FormData): Promise<FormState> {
+  if (!isUuid(reservationId)) return errorFormState(INVALID_ID_MESSAGE, formData);
   const parsed = paymentSchema.safeParse(formDataToObject(formData));
   if (!parsed.success) return invalidFormState(parsed.error, formData);
 
@@ -109,15 +117,19 @@ export async function registerPayment(reservationId: string, _prev: FormState, f
 }
 
 /** Use com `.bind(null, reservationId, paymentId)`. */
-export async function removePayment(reservationId: string, paymentId: string): Promise<void> {
-  const repo = await billingRepository();
-  const receipt = await repo.deletePayment(reservationId, paymentId);
-  if (receipt) await repo.removeReceipt(receipt);
-  refresh();
+export async function removePayment(reservationId: string, paymentId: string): Promise<FormState> {
+  return attempt(async () => {
+    assertIds(reservationId, paymentId);
+    const repo = await billingRepository();
+    const receipt = await repo.deletePayment(reservationId, paymentId);
+    if (receipt) await repo.removeReceipt(receipt);
+    refresh();
+  });
 }
 
 /** Parcela prevista. Use com `.bind(null, reservationId)`. */
 export async function addInstallment(reservationId: string, _prev: FormState, formData: FormData): Promise<FormState> {
+  if (!isUuid(reservationId)) return errorFormState(INVALID_ID_MESSAGE, formData);
   const parsed = installmentSchema.safeParse(formDataToObject(formData));
   if (!parsed.success) return invalidFormState(parsed.error, formData);
 
@@ -129,20 +141,26 @@ export async function addInstallment(reservationId: string, _prev: FormState, fo
 }
 
 /** Atalho "sinal 50% hoje + saldo no check-in". Use com `.bind(null, reservationId)`. */
-export async function addDepositPlan(reservationId: string): Promise<void> {
-  const repo = await billingRepository();
-  const [context, existing] = await Promise.all([repo.findContext(reservationId), repo.listSchedule(reservationId)]);
-  if (!context || existing.length > 0 || context.status === "cancelled") return;
+export async function addDepositPlan(reservationId: string): Promise<FormState> {
+  return attempt(async () => {
+    assertIds(reservationId);
+    const repo = await billingRepository();
+    const [context, existing] = await Promise.all([repo.findContext(reservationId), repo.listSchedule(reservationId)]);
+    if (!context || existing.length > 0 || context.status === "cancelled") return;
 
-  await repo.createInstallments(
-    reservationId,
-    depositAndBalance({ total: context.total, checkIn: context.checkIn, today: todayIso() }),
-  );
-  refresh();
+    await repo.createInstallments(
+      reservationId,
+      depositAndBalance({ total: context.total, checkIn: context.checkIn, today: todayIso() }),
+    );
+    refresh();
+  });
 }
 
 /** Use com `.bind(null, reservationId, installmentId)`. */
-export async function removeInstallment(reservationId: string, installmentId: string): Promise<void> {
-  await (await billingRepository()).deleteInstallment(reservationId, installmentId);
-  refresh();
+export async function removeInstallment(reservationId: string, installmentId: string): Promise<FormState> {
+  return attempt(async () => {
+    assertIds(reservationId, installmentId);
+    await (await billingRepository()).deleteInstallment(reservationId, installmentId);
+    refresh();
+  });
 }

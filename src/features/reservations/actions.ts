@@ -4,7 +4,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { paths } from "@/components/layout/navigation";
+import { attempt } from "@/lib/actions";
 import { errorFormState, formDataToObject, invalidFormState, type FormState } from "@/lib/forms";
+import { assertIds } from "@/lib/ids";
 import { MutationError } from "@/lib/supabase/errors";
 
 import { canTransition, timestampsFor } from "./domain/status";
@@ -29,15 +31,20 @@ export async function createReservation(_prev: FormState, formData: FormData): P
 }
 
 /** Botões de status da reserva. Use com `.bind(null, id, "checked_in")`. */
-export async function changeReservationStatus(id: string, next: string): Promise<void> {
-  const target = statusChangeSchema.parse(next);
-  const repo = await reservationsRepository();
+export async function changeReservationStatus(id: string, next: string): Promise<FormState> {
+  return attempt(async () => {
+    assertIds(id);
+    const parsed = statusChangeSchema.safeParse(next);
+    if (!parsed.success) throw new MutationError("Status inválido.");
+    const target = parsed.data;
+    const repo = await reservationsRepository();
 
-  const current = await repo.findStatus(id);
-  if (!current || !canTransition(current, target)) {
-    throw new MutationError("Esta mudança de status não é permitida agora.");
-  }
+    const current = await repo.findStatus(id);
+    if (!current || !canTransition(current, target)) {
+      throw new MutationError("Esta mudança de status não é permitida agora.");
+    }
 
-  await repo.updateStatus(id, { status: target, ...timestampsFor(target) });
-  revalidatePath("/", "layout");
+    await repo.updateStatus(id, { status: target, ...timestampsFor(target) });
+    revalidatePath("/", "layout");
+  });
 }

@@ -1,3 +1,4 @@
+import { ActionForm } from "@/components/ui/action-form";
 import { Button } from "@/components/ui/button";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -16,7 +17,7 @@ export function StatusActions({ reservationId, status }: { reservationId: string
       {transitions.map((transition) => {
         const action = changeReservationStatus.bind(null, reservationId, transition.to);
         return (
-          <form key={transition.to} action={action} className="flex-1 sm:flex-none">
+          <ActionForm key={transition.to} action={action} className="flex-1 sm:flex-none">
             {transition.destructive ? (
               <ConfirmSubmit message="Cancelar esta reserva? As datas voltam a ficar livres no calendário.">
                 {transition.label}
@@ -30,7 +31,7 @@ export function StatusActions({ reservationId, status }: { reservationId: string
                 {transition.label}
               </Button>
             )}
-          </form>
+          </ActionForm>
         );
       })}
     </div>

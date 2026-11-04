@@ -1,5 +1,6 @@
 import { Paperclip, Trash2 } from "lucide-react";
 
+import { ActionForm } from "@/components/ui/action-form";
 import { CardSection } from "@/components/ui/card";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
 import { Money } from "@/components/ui/money";
@@ -65,7 +66,7 @@ export function PaymentsCard({ reservationId, ownerId, payments, context }: Paym
                   tone={refund ? "pending" : "positive"}
                   className="text-[15px] font-bold"
                 />
-                <form action={removePayment.bind(null, reservationId, payment.id)} className="contents">
+                <ActionForm action={removePayment.bind(null, reservationId, payment.id)} className="contents">
                   <ConfirmSubmit
                     message={`Remover o lançamento de ${formatCurrency(payment.amount)}?`}
                     confirmLabel="Remover"
@@ -77,7 +78,7 @@ export function PaymentsCard({ reservationId, ownerId, payments, context }: Paym
                   >
                     <Trash2 aria-hidden="true" />
                   </ConfirmSubmit>
-                </form>
+                </ActionForm>
               </li>
             );
           })}

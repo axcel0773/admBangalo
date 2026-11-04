@@ -1,5 +1,6 @@
 import { X, Zap } from "lucide-react";
 
+import { ActionForm } from "@/components/ui/action-form";
 import { CardSection } from "@/components/ui/card";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
 import { formatCurrency, formatDecimal, pluralize } from "@/lib/format";
@@ -56,7 +57,7 @@ export function ChargesCard({ reservation, charges, grandTotal }: ChargesCardPro
             <dd className="flex items-center gap-1 font-semibold">
               {formatCurrency(charge.total)}
               {editable && charge.mode !== "metered" ? (
-                <form action={removeCharge.bind(null, reservation.id, charge.id)} className="contents">
+                <ActionForm action={removeCharge.bind(null, reservation.id, charge.id)} className="contents">
                   <ConfirmSubmit
                     message={`Remover “${charge.description}” desta reserva?`}
                     confirmLabel="Remover"
@@ -68,7 +69,7 @@ export function ChargesCard({ reservation, charges, grandTotal }: ChargesCardPro
                   >
                     <X aria-hidden="true" />
                   </ConfirmSubmit>
-                </form>
+                </ActionForm>
               ) : null}
             </dd>
           </div>

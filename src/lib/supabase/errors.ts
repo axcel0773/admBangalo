@@ -13,6 +13,8 @@ const MESSAGES_BY_CONSTRAINT: Record<string, string> = {
   guests_owner_document_uq: "Já existe um hóspede com esse documento.",
   reservation_guests_one_main: "A reserva só pode ter um hóspede responsável.",
   chalet_rates_chalet_id_period_excl: "Já existe uma temporada neste chalé que cruza essas datas.",
+  chalets_max_guests_limit: "Regra do condomínio: cada bangalô recebe no máximo 6 pessoas.",
+  reservations_guests_limit: "Regra do condomínio: no máximo 6 pessoas por bangalô.",
 };
 
 export function friendlyDbMessage(error: PostgresLikeError, fallback: string): string {
