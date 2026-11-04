@@ -25,7 +25,7 @@ interface ChaletFormProps {
 
 export function ChaletForm({ action, chalet }: ChaletFormProps) {
   const [state, formAction] = useActionState(action, idleFormState);
-  const [maxGuests, setMaxGuests] = useState(Math.min(chalet?.max_guests ?? 4, MAX_CHALET_GUESTS));
+  const [maxGuests, setMaxGuests] = useState(Math.min(chalet?.max_guests ?? MAX_CHALET_GUESTS, MAX_CHALET_GUESTS));
   const error = (name: string) => fieldError(state, name);
   const v = (name: string, saved?: string | number | null) => valueOf(state, name, saved);
 
