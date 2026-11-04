@@ -57,109 +57,112 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
   });
 
   return (
-    <main className="pt-safe px-safe mx-auto max-w-2xl bg-surface p-5 text-ink print:max-w-none print:p-0 md:my-8 md:rounded-card md:p-10 md:shadow-card print:shadow-none">
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-3 print:hidden">
-        <Link href={paths.reservation(id)} className="inline-flex items-center gap-1 py-2 text-sm font-semibold text-ink-soft">
-          <ChevronLeft className="size-4" aria-hidden="true" />
-          Voltar
-        </Link>
-        <div className="flex flex-wrap items-start justify-end gap-2">
-          <ReceiptShare data={receipt} message={message} whatsappHref={whatsappUrl(mainGuest.phone, message)} />
-          <PrintButton size="sm">Imprimir ou PDF</PrintButton>
+    // A área segura do iPhone fica no elemento de fora: pt-safe/px-safe sobrescrevem o padding do mesmo elemento.
+    <div className="pt-safe px-safe min-h-dvh bg-surface md:bg-transparent print:min-h-0 print:bg-transparent">
+      <main className="mx-auto max-w-2xl bg-surface p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-ink print:max-w-none print:p-0 md:my-8 md:rounded-card md:p-10 md:shadow-card print:shadow-none">
+        <div className="mb-5 flex flex-wrap items-start justify-between gap-x-3 gap-y-2 print:hidden">
+          <Link href={paths.reservation(id)} className="inline-flex items-center gap-1 py-2 text-sm font-semibold text-ink-soft">
+            <ChevronLeft className="size-4" aria-hidden="true" />
+            Voltar
+          </Link>
+          <div className="flex flex-wrap items-start justify-end gap-2">
+            <ReceiptShare data={receipt} message={message} whatsappHref={whatsappUrl(mainGuest.phone, message)} />
+            <PrintButton size="sm">Imprimir ou PDF</PrintButton>
+          </div>
         </div>
-      </div>
-      {!mainGuest.phone ? (
-        <p className="-mt-3 mb-5 text-xs text-ink-muted print:hidden">
-          Cadastre o telefone do hóspede para abrir a conversa dele direto pelo botão Mensagem.
-        </p>
-      ) : null}
+        {!mainGuest.phone ? (
+          <p className="-mt-3 mb-5 text-xs text-ink-muted print:hidden">
+            Cadastre o telefone do hóspede para abrir a conversa dele direto pelo botão Mensagem.
+          </p>
+        ) : null}
 
-      <header className="mb-6 flex flex-wrap items-start justify-between gap-4 border-b-2 border-ink pb-4">
-        <div>
-          <p className="font-display text-2xl font-semibold">{receipt.issuer}</p>
-          {receipt.issuerPhone ? <p className="text-sm text-ink-soft">{receipt.issuerPhone}</p> : null}
-        </div>
-        <div className="text-right text-sm">
-          <p className="font-display text-xl font-semibold">Recibo</p>
-          <p className="text-ink-soft">nº {receipt.number}</p>
-          <p className="text-ink-soft">emitido em {receipt.issuedAt}</p>
-        </div>
-      </header>
+        <header className="mb-6 flex flex-wrap items-start justify-between gap-x-4 gap-y-2 border-b-2 border-ink pb-4">
+          <div>
+            <p className="font-display text-2xl font-semibold break-words">{receipt.issuer}</p>
+            {receipt.issuerPhone ? <p className="text-sm text-ink-soft">{receipt.issuerPhone}</p> : null}
+          </div>
+          <div className="text-right text-sm">
+            <p className="font-display text-xl font-semibold">Recibo</p>
+            <p className="text-ink-soft">nº {receipt.number}</p>
+            <p className="text-ink-soft">emitido em {receipt.issuedAt}</p>
+          </div>
+        </header>
 
-      <section className="mb-6 grid gap-1 text-sm">
-        <p>
-          <span className="text-ink-muted">Hóspede: </span>
-          <strong>{receipt.guestName}</strong>
-          {receipt.guestDocument ? ` · ${receipt.guestDocument}` : ""}
-        </p>
-        <p>
-          <span className="text-ink-muted">Hospedagem: </span>
-          {receipt.stay}
-        </p>
-        <p>
-          <span className="text-ink-muted">Pessoas: </span>
-          {receipt.people}
-        </p>
-      </section>
+        <section className="mb-6 grid gap-1 text-sm">
+          <p>
+            <span className="text-ink-muted">Hóspede: </span>
+            <strong>{receipt.guestName}</strong>
+            {receipt.guestDocument ? ` · ${receipt.guestDocument}` : ""}
+          </p>
+          <p>
+            <span className="text-ink-muted">Hospedagem: </span>
+            {receipt.stay}
+          </p>
+          <p>
+            <span className="text-ink-muted">Pessoas: </span>
+            {receipt.people}
+          </p>
+        </section>
 
-      <table className="mb-6 w-full text-sm">
-        <thead>
-          <tr className="border-b border-line text-left text-ink-muted">
-            <th className="py-2 font-medium">Descrição</th>
-            <th className="py-2 text-right font-medium">Valor</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-line">
-          {receipt.items.map((item, index) => (
-            <tr key={index}>
-              <td className="py-2">{item.description}</td>
-              <td className="py-2 text-right tabular-nums">{formatCurrency(item.amount)}</td>
-            </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr className="border-t-2 border-ink font-semibold">
-            <td className="py-2">Total</td>
-            <td className="py-2 text-right tabular-nums">{formatCurrency(receipt.total)}</td>
-          </tr>
-        </tfoot>
-      </table>
-
-      <h2 className="mb-2 font-display text-lg font-semibold">Pagamentos</h2>
-      {receipt.payments.length === 0 ? (
-        <p className="mb-6 text-sm text-ink-muted">Nenhum pagamento registrado.</p>
-      ) : (
         <table className="mb-6 w-full text-sm">
+          <thead>
+            <tr className="border-b border-line text-left text-ink-muted">
+              <th className="py-2 font-medium">Descrição</th>
+              <th className="py-2 text-right font-medium">Valor</th>
+            </tr>
+          </thead>
           <tbody className="divide-y divide-line">
-            {receipt.payments.map((payment, index) => (
+            {receipt.items.map((item, index) => (
               <tr key={index}>
-                <td className="py-2">{payment.label}</td>
-                <td className="py-2 text-right tabular-nums">
-                  {payment.refund ? "−" : ""}
-                  {formatCurrency(payment.amount)}
-                </td>
+                <td className="py-2 pr-3">{item.description}</td>
+                <td className="py-2 text-right whitespace-nowrap tabular-nums">{formatCurrency(item.amount)}</td>
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr className="border-t-2 border-ink font-semibold">
+              <td className="py-2">Total</td>
+              <td className="py-2 text-right tabular-nums">{formatCurrency(receipt.total)}</td>
+            </tr>
+          </tfoot>
         </table>
-      )}
 
-      <div className="mb-8 grid gap-1 rounded-2xl bg-canvas p-4 text-sm print:bg-transparent print:p-0">
-        <p className="flex justify-between">
-          <span>Total pago</span>
-          <strong className="tabular-nums">{formatCurrency(receipt.paid)}</strong>
-        </p>
-        <p className="flex justify-between">
-          <span>Saldo a pagar</span>
-          <strong className="tabular-nums">{formatCurrency(receipt.balance)}</strong>
-        </p>
-      </div>
+        <h2 className="mb-2 font-display text-lg font-semibold">Pagamentos</h2>
+        {receipt.payments.length === 0 ? (
+          <p className="mb-6 text-sm text-ink-muted">Nenhum pagamento registrado.</p>
+        ) : (
+          <table className="mb-6 w-full text-sm">
+            <tbody className="divide-y divide-line">
+              {receipt.payments.map((payment, index) => (
+                <tr key={index}>
+                  <td className="py-2 pr-3">{payment.label}</td>
+                  <td className="py-2 text-right whitespace-nowrap tabular-nums">
+                    {payment.refund ? "−" : ""}
+                    {formatCurrency(payment.amount)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
 
-      <p className="text-sm leading-relaxed">
-        Recebemos de <strong>{receipt.guestName}</strong> a quantia de{" "}
-        <strong>{formatCurrency(Math.max(receipt.paid, 0))}</strong> referente à hospedagem descrita acima.
-      </p>
-      <div className="mt-14 w-64 border-t border-ink pt-1 text-center text-sm">{receipt.issuer}</div>
-    </main>
+        <div className="mb-8 grid gap-1 rounded-2xl bg-canvas p-4 text-sm print:bg-transparent print:p-0">
+          <p className="flex justify-between">
+            <span>Total pago</span>
+            <strong className="tabular-nums">{formatCurrency(receipt.paid)}</strong>
+          </p>
+          <p className="flex justify-between">
+            <span>Saldo a pagar</span>
+            <strong className="tabular-nums">{formatCurrency(receipt.balance)}</strong>
+          </p>
+        </div>
+
+        <p className="text-sm leading-relaxed">
+          Recebemos de <strong>{receipt.guestName}</strong> a quantia de{" "}
+          <strong>{formatCurrency(Math.max(receipt.paid, 0))}</strong> referente à hospedagem descrita acima.
+        </p>
+        <div className="mt-14 w-64 max-w-full border-t border-ink pt-1 text-center text-sm">{receipt.issuer}</div>
+      </main>
+    </div>
   );
 }
