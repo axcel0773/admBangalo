@@ -36,7 +36,7 @@ export function LoginForm({ next }: LoginFormProps) {
   const fieldErrors = state.status === "error" ? state.fieldErrors : undefined;
 
   return (
-    <form action={formAction} className="flex flex-col gap-4" noValidate>
+    <form action={formAction} className="flex flex-col gap-4" noValidate data-enter-submit>
       <input type="hidden" name="next" value={next ?? "/"} />
       <input type="hidden" name="mode" value={mode} />
 

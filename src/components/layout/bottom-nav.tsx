@@ -33,7 +33,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Navegação principal"
-      className="pb-safe fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 items-center rounded-t-3xl border-t border-line bg-surface px-2.5 pt-2 shadow-[0_-6px_20px_rgb(80_55_30/0.06)] md:hidden"
+      className="pb-safe keyboard-hide fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 items-center rounded-t-3xl border-t border-line bg-surface px-2.5 pt-2 shadow-[0_-6px_20px_rgb(80_55_30/0.06)] md:hidden"
     >
       {bottomNavItems.left.map((item) => (
         <BottomNavLink key={item.href} item={item} pathname={pathname} />

@@ -369,7 +369,7 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
       </div>
 
       {/* Barra de ações: fixa acima da navegação no celular */}
-      <div className="sticky bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-3 border-t border-line bg-surface/95 px-4 py-3 backdrop-blur md:static md:mx-0 md:justify-end md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
+      <div className="keyboard-static sticky bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-3 border-t border-line bg-surface/95 px-4 py-3 backdrop-blur md:static md:mx-0 md:justify-end md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <div className="min-w-0 flex-1 md:hidden">
           <p className="text-[11px] text-ink-muted">Previsto{nights > 0 ? ` · ${pluralize(nights, "noite", "noites")}` : ""}</p>
           <p className="font-display text-xl leading-tight font-semibold">{quote ? formatCurrency(quote.total) : "—"}</p>

@@ -26,7 +26,7 @@ export function PageHeader({ title, eyebrow, description, actions, back, classNa
       <div className="min-w-0">
         {back ? <BackLink href={back.href} label={back.label} /> : null}
         {eyebrow ? <p className="mb-1 text-sm font-medium text-ink-muted">{eyebrow}</p> : null}
-        <h1 className="font-display text-[30px] leading-tight font-semibold md:text-[40px]">{title}</h1>
+        <h1 className="font-display text-[30px] leading-tight font-semibold break-words md:text-[40px]">{title}</h1>
         {description ? <div className="mt-2 text-[15px] text-ink-soft">{description}</div> : null}
       </div>
       {actions ? <div className="flex flex-wrap gap-3">{actions}</div> : null}
