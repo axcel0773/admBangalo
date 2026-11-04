@@ -193,3 +193,42 @@ export function occupiedChaletIds(stays: CalendarStay[], day: IsoDate): string[]
     .filter((stay) => stay.status !== "cancelled" && stay.check_in <= day && day < stay.check_out)
     .map((stay) => stay.chalet_id);
 }
+
+/* ---------- Seletor de data (mês inteiro) ---------- */
+
+export interface MonthCell {
+  date: IsoDate;
+  dayNumber: number;
+  inMonth: boolean;
+  isToday: boolean;
+  isSelected: boolean;
+}
+
+/** Semanas (domingo a sábado) que cobrem o mês de `month`, com os dias vizinhos completando as pontas. */
+export function buildMonthGrid(month: IsoDate, today: IsoDate, selected: IsoDate | null): MonthCell[][] {
+  const first = `${month.slice(0, 7)}-01`;
+  const firstWeekday = new Date(`${first}T00:00:00Z`).getUTCDay();
+  const gridStart = addDays(first, -firstWeekday);
+  const nextMonth = new Date(Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 1)).toISOString().slice(0, 10);
+  const totalDays = daysBetween(gridStart, nextMonth);
+  const weeks = Math.ceil(totalDays / 7);
+
+  return Array.from({ length: weeks }, (_, week) =>
+    Array.from({ length: 7 }, (_, weekday) => {
+      const date = addDays(gridStart, week * 7 + weekday);
+      return {
+        date,
+        dayNumber: Number(date.slice(8)),
+        inMonth: date.slice(0, 7) === month.slice(0, 7),
+        isToday: date === today,
+        isSelected: date === selected,
+      };
+    }),
+  );
+}
+
+/** Primeiro dia do mês anterior/seguinte. */
+export function shiftCalendarMonth(month: IsoDate, delta: number): IsoDate {
+  const date = new Date(Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5, 7)) - 1 + delta, 1));
+  return date.toISOString().slice(0, 10);
+}

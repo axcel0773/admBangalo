@@ -1,4 +1,4 @@
-import { CalendarOff, ChevronRight, House, Plus } from "lucide-react";
+import { CalendarOff, ChevronDown, ChevronRight, House, Plus } from "lucide-react";
 import Link from "next/link";
 
 import { paths } from "@/components/layout/navigation";
@@ -7,6 +7,7 @@ import { formatCurrencyRounded, pluralize } from "@/lib/format";
 import { formatDayMonth, formatLongDate, type IsoDate } from "@/lib/dates";
 
 import type { ChaletDayEntry } from "../domain";
+import { DatePicker } from "./date-picker";
 
 const STATE_LABEL: Record<ChaletDayEntry["state"], string> = {
   arriving: "Entrada",
@@ -91,15 +92,18 @@ function EntryCard({ entry, day }: { entry: ChaletDayEntry; day: IsoDate }) {
   );
 }
 
-export function DayAgenda({ entries, day }: { entries: ChaletDayEntry[]; day: IsoDate }) {
+export function DayAgenda({ entries, day, today }: { entries: ChaletDayEntry[]; day: IsoDate; today: IsoDate }) {
   const occupied = entries.filter((entry) => !["free", "leaving", "blocked"].includes(entry.state)).length;
   const title = formatLongDate(day);
 
   return (
     <section aria-labelledby="day-agenda-title" className="flex flex-col gap-3">
-      <div className="flex items-baseline justify-between gap-3">
-        <h2 id="day-agenda-title" className="font-display text-xl font-semibold first-letter:uppercase">
-          {title}
+      <div className="flex items-center justify-between gap-3">
+        <h2 id="day-agenda-title" className="min-w-0 font-display text-xl font-semibold">
+          <DatePicker selected={day} today={today} label={`${title}: escolher outro dia no calendário`} className="-ml-1 px-1 py-0.5">
+            <span className="truncate first-letter:uppercase">{title}</span>
+            <ChevronDown className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
+          </DatePicker>
         </h2>
         <span className="shrink-0 text-xs font-semibold text-ink-muted">
           {occupied} de {entries.length} ocupados
