@@ -5,8 +5,8 @@ import { useId, useState, useTransition } from "react";
 
 import { ChaletLandscape, toneFromColor } from "@/components/illustrations/chalet-landscape";
 import { Button } from "@/components/ui/button";
+import { PhotoCropper } from "@/components/ui/photo-cropper";
 import { CardSection } from "@/components/ui/card";
-import { shrinkImage } from "@/lib/images";
 import { uploadToBucket } from "@/lib/supabase/storage";
 
 import { removeChaletPhoto, saveChaletPhoto } from "../actions";
@@ -24,22 +24,30 @@ interface ChaletPhotoCardProps {
   photoUrl: string | null;
 }
 
-/** Foto de capa do chalé: reduzida no aparelho (1280 px), enviada direto ao Storage e registrada no chalé. */
+/** Mesma proporção do topo do cartão em “Seus chalés” (o recorte já sai no tamanho final). */
+export const COVER_ASPECT = 8 / 3;
+const COVER_WIDTH = 1280;
+
+/** Foto de capa do chalé: o usuário enquadra a foto, o recorte (1280 px) vai direto ao Storage e é registrado no chalé. */
 export function ChaletPhotoCard({ ownerId, chaletId, color, photoUrl }: ChaletPhotoCardProps) {
   const inputId = useId();
   const [pending, startTransition] = useTransition();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [picked, setPicked] = useState<File | null>(null);
 
-  async function handleFile(file: File | undefined) {
+  function handleFile(file: File | undefined) {
     if (!file) return;
     setMessage(null);
     const typeProblem = chaletPhotoProblem({ type: file.type, size: 0 });
     if (typeProblem) return setMessage(typeProblem);
+    setPicked(file);
+  }
 
+  async function handleCropped({ blob, type }: { blob: Blob; type: string }) {
+    setMessage(null);
     setBusy(true);
     try {
-      const { blob, type } = await shrinkImage(file, { maxSide: 1280, quality: 0.8 });
       const problem = chaletPhotoProblem({ type, size: blob.size });
       if (problem) return setMessage(problem);
 
@@ -47,6 +55,7 @@ export function ChaletPhotoCard({ ownerId, chaletId, color, photoUrl }: ChaletPh
       await uploadToBucket({ bucket: CHALET_PHOTO_BUCKET, path, file: blob, contentType: type });
       const result = await saveChaletPhoto(chaletId, path);
       if (result.status === "error") setMessage(result.message);
+      else setPicked(null);
     } catch {
       setMessage("Não foi possível enviar a foto. Tente de novo.");
     } finally {
@@ -66,7 +75,18 @@ export function ChaletPhotoCard({ ownerId, chaletId, color, photoUrl }: ChaletPh
 
   return (
     <CardSection title="Foto de capa" titleId="chalet-photo">
-      <div className="h-40 overflow-hidden rounded-2xl bg-muted md:h-52">
+      {picked ? (
+        <PhotoCropper
+          file={picked}
+          aspect={COVER_ASPECT}
+          outputWidth={COVER_WIDTH}
+          busy={busy}
+          onCancel={() => setPicked(null)}
+          onConfirm={(result) => void handleCropped(result)}
+        />
+      ) : (
+      <>
+      <div className="aspect-[8/3] overflow-hidden rounded-2xl bg-muted">
         {photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- URL assinada do Storage, já reduzida no envio
           <img src={photoUrl} alt="Foto do chalé" className="size-full object-cover" />
@@ -95,14 +115,16 @@ export function ChaletPhotoCard({ ownerId, chaletId, color, photoUrl }: ChaletPh
           className="sr-only"
           disabled={working}
           onChange={(event) => {
-            void handleFile(event.target.files?.[0]);
+            handleFile(event.target.files?.[0]);
             event.target.value = "";
           }}
         />
       </div>
       <p className="mt-2 text-xs text-ink-muted">
-        Aparece como capa em “Seus chalés”, no Painel. JPG, PNG ou WebP; a foto é reduzida antes do envio.
+        Aparece como capa em “Seus chalés”, no Painel. Depois de escolher a foto você enquadra do jeito que quiser.
       </p>
+      </>
+      )}
       {message ? (
         <p role="alert" className="mt-1 text-xs font-semibold text-danger-ink">
           {message}

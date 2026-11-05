@@ -18,7 +18,7 @@ export function ChaletCard({ chalet }: { chalet: ChaletOverview }) {
 
   return (
     <article className="w-[78%] shrink-0 snap-start overflow-hidden rounded-card bg-surface shadow-card md:w-auto">
-      <div className="h-28 md:h-36">
+      <div className="aspect-[8/3]">
         {chalet.photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- URL assinada do Storage, já reduzida no envio
           <img src={chalet.photoUrl} alt={`Foto de ${chalet.name}`} className="size-full object-cover" />
