@@ -40,7 +40,9 @@ export function DashboardHeader({ greeting, ownerName, avatarUrl, today, agenda 
 
   return (
     <>
-      <header className="relative h-48 overflow-hidden bg-primary-strong text-on-primary md:hidden">
+      {/* z-20: o menu de tema (abre para baixo) precisa ficar acima do conteúdo que sobe sobre a faixa. */}
+      <header className="relative z-20 h-48 bg-primary-strong text-on-primary md:hidden">
+        <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
         <svg
           viewBox="0 0 390 196"
           preserveAspectRatio="xMidYMid slice"
@@ -55,6 +57,7 @@ export function DashboardHeader({ greeting, ownerName, avatarUrl, today, agenda 
             <path d="M352 94c-14-14-30-14-42-6M352 94c14-14 30-14 42-6M352 94c-10-20-26-24-38-20M352 94c10-20 26-24 38-20" />
           </g>
         </svg>
+        </div>
         <div className="relative flex items-start justify-between p-5">
           <div>
             <p className="text-[13px] text-[#cfe2f3] first-letter:uppercase">{dateLabel}</p>
