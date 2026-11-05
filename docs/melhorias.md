@@ -1,8 +1,8 @@
 # Melhorias sugeridas — backlog com esforço e guia de implementação
 
-**Última atualização:** 05/11/2026 · Complementa `docs/etapas.md` (o que já foi feito), `docs/padroes.md` e `docs/arquitetura.md`.
+**Última atualização:** 05/11/2026 (lote M entregue) · Complementa `docs/etapas.md` (o que já foi feito), `docs/padroes.md` e `docs/arquitetura.md`.
 
-**Já feitas (05/11):** 2, 5, 11, 12 e a contagem de hóspedes do 17 — marcadas com ✅ (PRs #40, #41 e #42). **Faltam** as de esforço M e G: 1, 3, 7, 8, 4, 6, 10, 9, 13–16 e, do 17, busca global e modo escuro. Próxima na ordem recomendada: **1 (sinal)**.
+**Já feitas (05/11):** todas as de esforço **P** e **M** — 1, 2, 3, 4, 5, 6, 7 (já existia), 8, 10, 11, 12 e 17 (✅). **Faltam** só as de esforço G: 9, 13, 14, 15 e 16. Migrações novas: `0013` (sinal), `0014` (despesas), `0015` (status do orçamento), `0016` (limpeza).
 
 **Esforço:** **P** = até meio dia · **M** = 1 a 2 dias · **G** = 3 dias ou mais. Considera código, testes, migração e documentação.
 **Restrição fixa:** tudo precisa continuar rodando no plano **gratuito** da Vercel e do Supabase.
@@ -13,25 +13,25 @@
 
 | # | Melhoria | Esforço | Banco (migração) | Prioridade |
 | --- | --- | --- | --- | --- |
-| 1 | Sinal (entrada) em orçamentos e reservas | M | sim | Alta |
+| 1 | Sinal (entrada) em orçamentos e reservas ✅ | M | sim | Alta |
 | 2 | Lembretes de WhatsApp prontos ✅ | P | não | Alta |
-| 3 | "Ações de hoje" no Painel | M | não | Alta |
-| 4 | Orçamentos com status | M | sim | Média |
+| 3 | "Ações de hoje" no Painel ✅ | M | não | Alta |
+| 4 | Orçamentos com status ✅ | M | sim | Média |
 | 5 | Duplicar reserva/orçamento e "reservar de novo" ✅ | P | não | Média |
-| 6 | Controle de limpeza | M | sim | Média |
-| 7 | Leitura de medidor (kWh) no check-in/out | M | sim | Alta |
-| 8 | Despesas por bangalô | M | sim | Alta |
+| 6 | Controle de limpeza ✅ | M | sim | Média |
+| 7 | Leitura de medidor (kWh) no check-in/out ✅ | M | sim | Alta |
+| 8 | Despesas por bangalô ✅ | M | sim | Alta |
 | 9 | Tarifas sazonais e mínimo de noites | G | sim | Média |
-| 10 | Relatórios e exportação CSV/PDF | M | não | Média |
+| 10 | Relatórios e exportação CSV/PDF ✅ | M | não | Média |
 | 11 | Hóspedes recorrentes (marcas e filtros) ✅ | P | sim | Baixa |
 | 12 | Comparativo de meses ✅ | P | não | Baixa |
 | 13 | Notificações push (PWA) | G | sim | Média |
 | 14 | Modo offline (leitura) | G | não | Baixa |
 | 15 | Histórico de alterações e exportação de dados | G | sim | Média |
 | 16 | Acesso de equipe (perfil limitado) | G | sim | Baixa |
-| 17 | Refinos de interface (contagem nos atalhos ✅, busca global, modo escuro) | P–M | não | Baixa |
+| 17 | Refinos de interface (contagem nos atalhos, busca global, modo escuro) ✅ | P–M | não | Baixa |
 
-**Ordem recomendada:** 1 → 2 → 3 → 7 → 8 → 4 → 5 → 6 → 10 → 9 → demais.
+**Ordem recomendada:** 1 → 2 → 3 → 7 → 8 → 4 → 5 → 6 → 10 → 9 → demais. (Feitas até a 10; segue a 9.)
 
 ---
 
@@ -77,7 +77,7 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 
 ---
 
-## 1. Sinal (entrada) em orçamentos e reservas — esforço **M**
+## 1. Sinal (entrada) em orçamentos e reservas — esforço **M** ✅
 
 **Objetivo:** definir um percentual de sinal e mostrar "pague R$ X para garantir" com a chave Pix no PDF e na mensagem.
 
@@ -100,7 +100,7 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 
 **Cuidados:** telefone normalizado (só dígitos, DDI 55); não enviar nada automaticamente — o dono toca e o WhatsApp abre.
 
-## 3. "Ações de hoje" no Painel — esforço **M**
+## 3. "Ações de hoje" no Painel — esforço **M** ✅
 
 **Objetivo:** lista priorizada do que precisa de atenção: saldos vencidos, chegadas sem sinal pago, orçamentos que vencem em até 2 dias.
 
@@ -112,7 +112,7 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 
 **Cuidados:** sem consultas por item; datas sempre pelo `lib/dates` (fuso de São Paulo).
 
-## 4. Orçamentos com status — esforço **M**
+## 4. Orçamentos com status — esforço **M** ✅
 
 **Objetivo:** enviado → aceito/recusado/expirado, e aviso quando as datas ficam ocupadas por outra reserva.
 
@@ -128,7 +128,7 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 
 **Cuidados:** não copiar valores antigos; o cálculo é refeito com as taxas atuais.
 
-## 6. Controle de limpeza — esforço **M**
+## 6. Controle de limpeza — esforço **M** ✅
 
 **Objetivo:** para cada saída, uma tarefa de limpeza com status (pendente/feita) e mensagem para a faxineira.
 
@@ -137,7 +137,9 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 - Feature `cleaning/` em camadas (modelo: `quotes/`). Tarefas **derivadas** das saídas já existentes: criar sob demanda (upsert por `reservation_id`) em vez de trigger, para ficar simples de testar.
 - UI: aba/seção "Limpeza" na agenda do dia e no calendário; botão "Feita" (action) e "Avisar faxineira" (mensagem WhatsApp com bangalô e horário, função pura em `domain`).
 
-## 7. Leitura de medidor (kWh) no check-in/out — esforço **M**
+## 7. Leitura de medidor (kWh) no check-in/out — esforço **M** ✅ (já existia)
+
+> **Nota:** já estava pronto antes do lote M — `EnergyCard`, `saveMeterReading`, `meter.ts`, `reservation_charges.meter_start/meter_end` e `estimateEnergy` no billing. Nada novo foi necessário.
 
 **Objetivo:** registrar a leitura na entrada e na saída e calcular a taxa de energia automaticamente (hoje sai "a calcular").
 
@@ -148,7 +150,7 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 
 **Cuidados:** reservas antigas continuam funcionando (campos opcionais); arredondar em centavos.
 
-## 8. Despesas por bangalô — esforço **M**
+## 8. Despesas por bangalô — esforço **M** ✅
 
 **Objetivo:** lançar gastos (luz, manutenção, limpeza, compras) e ver **lucro** no Financeiro.
 
@@ -169,7 +171,7 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 
 **Cuidados:** é a mudança com maior risco de regressão no preço — cobrir com testes antes de mexer e manter a cópia de valores guardada nas reservas/orçamentos já criados.
 
-## 10. Relatórios e exportação — esforço **M**
+## 10. Relatórios e exportação — esforço **M** ✅
 
 **Onde mexer**
 - `features/finance` ganha `reports/`: ocupação por mês e por bangalô, diária média, origem da reserva (campo `source` já usado no iCal). Cálculos puros em `domain` + testes; consultas agregadas no repositório (uma por relatório).
@@ -210,11 +212,11 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 
 **Onde mexer:** novo papel (`member`) em `profiles`/tabela `team_members`; **todas** as políticas RLS precisam passar a considerar o papel (revisar migração por migração) e a UI esconder Financeiro/Configurações. É a melhoria que mais mexe em segurança: exige revisão em `docs/seguranca.md`, testes pgTAP de "membro não lê financeiro" e E2E com dois usuários. Só fazer depois de 6 (limpeza), que é o caso de uso.
 
-## 17. Refinos de interface — esforço **P a M** (parcial ✅)
+## 17. Refinos de interface — esforço **P a M** ✅
 
 - **Contagem de hóspedes nos atalhos do Painel (P) — ✅ feito (PR #42):** adicionar `guestCount` ao `buildDashboard` (consulta `count` exata, sem listar linhas) e usar em `shortcuts.tsx`.
-- **Busca global (M):** campo no topo que consulta hóspedes, reservas e orçamentos; usar `?q=` e uma action de busca com limite de resultados; debounce no cliente.
-- **Modo escuro (M):** novos valores dos tokens de `globals.css` em `@media (prefers-color-scheme: dark)`; revisar contraste (WCAG AA) e ilustrações/PDFs (PDF continua claro).
+- **Busca global (M) — ✅ feito:** `/busca?q=` (feature `search/`), campo no Painel e item "Buscar" no menu lateral; busca por GET (sem JS), mínimo de 2 letras e 8 resultados por grupo. Original:  campo no topo que consulta hóspedes, reservas e orçamentos; usar `?q=` e uma action de busca com limite de resultados; debounce no cliente.
+- **Modo escuro (M) — ✅ feito:** tokens em `@media (prefers-color-scheme: dark)` no `globals.css` (contrastes conferidos ≥ 4,5:1), `themeColor` por esquema e impressão do recibo de volta ao claro. Original:  novos valores dos tokens de `globals.css` em `@media (prefers-color-scheme: dark)`; revisar contraste (WCAG AA) e ilustrações/PDFs (PDF continua claro).
 
 ---
 
