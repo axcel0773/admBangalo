@@ -3,7 +3,6 @@ import Link from "next/link";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { routes } from "@/components/layout/navigation";
-import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Avatar } from "@/components/ui/avatar";
 import { ButtonLink } from "@/components/ui/button";
 import { formatLongDate, type IsoDate } from "@/lib/dates";
@@ -40,9 +39,7 @@ export function DashboardHeader({ greeting, ownerName, avatarUrl, today, agenda 
 
   return (
     <>
-      {/* z-20: o menu de tema (abre para baixo) precisa ficar acima do conteúdo que sobe sobre a faixa. */}
-      <header className="relative z-20 h-48 bg-primary-strong text-on-primary md:hidden">
-        <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
+      <header className="relative h-48 overflow-hidden bg-primary-strong text-on-primary md:hidden">
         <svg
           viewBox="0 0 390 196"
           preserveAspectRatio="xMidYMid slice"
@@ -57,7 +54,6 @@ export function DashboardHeader({ greeting, ownerName, avatarUrl, today, agenda 
             <path d="M352 94c-14-14-30-14-42-6M352 94c14-14 30-14 42-6M352 94c-10-20-26-24-38-20M352 94c10-20 26-24 38-20" />
           </g>
         </svg>
-        </div>
         <div className="relative flex items-start justify-between p-5">
           <div>
             <p className="text-[13px] text-[#cfe2f3] first-letter:uppercase">{dateLabel}</p>
@@ -67,12 +63,9 @@ export function DashboardHeader({ greeting, ownerName, avatarUrl, today, agenda 
               {firstName}
             </h1>
           </div>
-          <div className="flex items-center gap-2.5">
-            <ThemeToggle variant="photo" />
-            <Link href={routes.settings} aria-label="Configurações da conta">
-              <Avatar name={ownerName} src={avatarUrl} color="#F29A3E" size="md" className="ring-3 ring-white/35" />
-            </Link>
-          </div>
+          <Link href={routes.settings} aria-label="Configurações da conta">
+            <Avatar name={ownerName} src={avatarUrl} color="#F29A3E" size="md" className="ring-3 ring-white/35" />
+          </Link>
         </div>
       </header>
 

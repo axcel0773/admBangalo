@@ -2,10 +2,11 @@ import { FileText, House, LogOut, UserRound, Users } from "lucide-react";
 import type { Metadata } from "next";
 
 import { routes } from "@/components/layout/navigation";
+import { ThemeChooser } from "@/components/layout/theme-chooser";
 import { PageBody, PageHeader } from "@/components/layout/page-header";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardSection } from "@/components/ui/card";
 import { IconTile } from "@/components/ui/icon-tile";
 import { ListCard, ListRow } from "@/components/ui/list-row";
 import { signOut } from "@/features/auth/actions";
@@ -59,6 +60,11 @@ export default async function SettingsPage() {
             subtitle="Foto, nome, nome do negócio e chave Pix"
           />
         </ListCard>
+
+        <CardSection title="Aparência" titleId="settings-theme">
+          <ThemeChooser />
+          <p className="mt-3 text-xs text-ink-muted">Automático segue o modo claro ou escuro do aparelho. A escolha vale só neste aparelho.</p>
+        </CardSection>
 
         <form action={signOut}>
           <Button type="submit" variant="secondary" block size="lg">
