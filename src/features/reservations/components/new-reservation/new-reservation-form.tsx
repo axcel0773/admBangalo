@@ -5,15 +5,10 @@ import { useActionState, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Field } from "@/components/ui/field";
 import { FormAlert } from "@/components/ui/form-alert";
-import { FieldRow, FormSection } from "@/components/ui/form-layout";
-import { NumberStepper } from "@/components/ui/number-stepper";
-import { SelectField } from "@/components/ui/select-field";
+import { FormSection } from "@/components/ui/form-layout";
 import { StepIndicator } from "@/components/ui/step-indicator";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { SwitchField } from "@/components/ui/switch-field";
-import { TextareaField } from "@/components/ui/textarea-field";
 import { blockWarning, overlappingBlocks, type ChaletBlock } from "@/features/availability/domain/blocks";
 import { MAX_CHALET_GUESTS } from "@/features/chalets/domain";
 import { addDays, type IsoDate } from "@/lib/dates";
@@ -24,10 +19,11 @@ import { parseMoney } from "@/lib/money";
 import { createReservation } from "../../actions";
 import { nightsOf, quoteDraft, validateDraft, type FeeForQuote } from "../../domain/quote";
 import { nightlyBreakdown, type SeasonRate } from "../../domain/seasons";
-import { SOURCE_LABELS } from "../../domain/status";
 import { QuoteSummary } from "../quote-summary";
-import { ChaletPicker, type ChaletOption } from "./chalet-picker";
+import type { ChaletOption } from "./chalet-picker";
 import { CompanionsFields, type CompanionDraft } from "./companions-fields";
+import { PricingStep } from "./pricing-step";
+import { StayStep } from "./stay-step";
 import { GuestPicker, type GuestMode, type GuestOption, type NewGuestDraft } from "./guest-picker";
 
 const STEPS = ["Estadia", "Hóspedes", "Valores"];
@@ -108,6 +104,11 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
   const minNightsWarning = breakdown?.minNightsIssue
     ? `A temporada “${breakdown.minNightsIssue.label}” pede no mínimo ${pluralize(breakdown.minNightsIssue.minNights, "noite", "noites")}.`
     : null;
+  const rateHint = rateTouched
+    ? undefined
+    : breakdown?.seasonal
+      ? "Média das noites, com a tarifa de temporada."
+      : "Diária base do chalé.";
   const discountValue = parseMoney(discount) ?? 0;
 
   const draft = { chalet, checkIn, checkOut, adults, children, nightlyRate: rate, discount: discountValue };
@@ -203,82 +204,30 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
         <div className="flex flex-col gap-4 md:gap-6">
           {/* Etapa 1 — Estadia (os campos ficam no DOM em todas as etapas para irem no envio) */}
           <div hidden={step !== 0} className="flex flex-col gap-4 md:gap-6">
-            <ChaletPicker chalets={chalets} value={chaletId} onChange={chooseChalet} error={error("chalet_id")} />
-
-            <FormSection title="Datas">
-              <FieldRow>
-                <Field
-                  label="Entrada"
-                  name="check_in"
-                  type="date"
-                  value={checkIn}
-                  onChange={(event) => changeCheckIn(event.target.value)}
-                  error={error("check_in")}
-                />
-                <Field
-                  label="Saída"
-                  name="check_out"
-                  type="date"
-                  min={checkIn ? addDays(checkIn, 1) : undefined}
-                  value={checkOut}
-                  onChange={(event) => setCheckOut(event.target.value)}
-                  error={error("check_out") ?? issues.dates}
-                />
-              </FieldRow>
-              {nights > 0 ? (
-                <p className="rounded-xl bg-primary-soft px-4 py-2.5 text-sm font-semibold text-primary-ink">
-                  {pluralize(nights, "noite", "noites")}
-                  {breakdown?.seasonal ? " · com tarifa de temporada" : ""}
-                </p>
-              ) : null}
-              {blocked ? (
-                <p
-                  role="status"
-                  className={
-                    blocked.blocking
-                      ? "rounded-xl bg-danger-soft px-4 py-2.5 text-sm font-semibold text-danger-ink"
-                      : "rounded-xl bg-accent-soft px-4 py-2.5 text-sm font-semibold text-accent-ink"
-                  }
-                >
-                  {blocked.message}
-                </p>
-              ) : null}
-              {minNightsWarning ? (
-                <p role="status" className="rounded-xl bg-accent-soft px-4 py-2.5 text-sm font-semibold text-accent-ink">
-                  {minNightsWarning} Você pode seguir mesmo assim.
-                </p>
-              ) : null}
-            </FormSection>
-
-            <FormSection title="Pessoas">
-              <div className="divide-y divide-line">
-                <NumberStepper
-                  name="adults"
-                  label="Adultos"
-                  description={chalet ? `até ${chalet.max_guests} pessoas no total` : undefined}
-                  min={1}
-                  max={Math.max(1, (chalet?.max_guests ?? MAX_CHALET_GUESTS) - children)}
-                  value={adults}
-                  onChange={setAdults}
-                />
-                <NumberStepper
-                  name="children"
-                  label="Crianças"
-                  min={0}
-                  max={Math.max(0, (chalet?.max_guests ?? MAX_CHALET_GUESTS) - adults)}
-                  value={children}
-                  onChange={setChildren}
-                />
-              </div>
-              {issues.capacity ? <p className="text-xs font-semibold text-danger-ink">{issues.capacity}</p> : null}
-              <SelectField
-                label="Como chegou a reserva"
-                name="source"
-                value={source}
-                onChange={(event) => setSource(event.target.value)}
-                options={Object.entries(SOURCE_LABELS).map(([value, label]) => ({ value, label }))}
-              />
-            </FormSection>
+            <StayStep
+              chalets={chalets}
+              chalet={chalet}
+              chaletId={chaletId}
+              onChaletChange={chooseChalet}
+              checkIn={checkIn}
+              checkOut={checkOut}
+              onCheckInChange={changeCheckIn}
+              onCheckOutChange={setCheckOut}
+              nights={nights}
+              seasonal={Boolean(breakdown?.seasonal)}
+              blocked={blocked}
+              minNightsWarning={minNightsWarning}
+              dateIssue={issues.dates}
+              capacityIssue={issues.capacity}
+              maxGuests={chalet?.max_guests ?? MAX_CHALET_GUESTS}
+              adults={adults}
+              children={children}
+              onAdultsChange={setAdults}
+              onChildrenChange={setChildren}
+              source={source}
+              onSourceChange={setSource}
+              error={error}
+            />
           </div>
 
           {/* Etapa 2 — Hóspedes */}
@@ -309,52 +258,21 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
 
           {/* Etapa 3 — Valores */}
           <div hidden={step !== 2} className="flex flex-col gap-4 md:gap-6">
-            <FormSection title="Valores">
-              <FieldRow>
-                <Field
-                  label="Diária (R$)"
-                  name="nightly_rate"
-                  inputMode="decimal" mask="money"
-                  value={rateText}
-                  onChange={(event) => {
-                    setNightlyRate(event.target.value);
-                    setRateTouched(true);
-                  }}
-                  hint={
-                    rateTouched
-                      ? undefined
-                      : breakdown?.seasonal
-                        ? "Média das noites, com a tarifa de temporada."
-                        : "Diária base do chalé."
-                  }
-                  error={error("nightly_rate")}
-                />
-                <Field
-                  label="Desconto total (R$)"
-                  name="discount"
-                  inputMode="decimal" mask="money"
-                  placeholder="0,00"
-                  value={discount}
-                  onChange={(event) => setDiscount(event.target.value)}
-                  error={error("discount")}
-                />
-              </FieldRow>
-              <TextareaField
-                label="Observações"
-                name="notes"
-                value={notes}
-                onChange={(event) => setNotes(event.target.value)}
-                placeholder="Horário de chegada, pedidos especiais…"
-                error={error("notes")}
-              />
-              <SwitchField
-                label="Reserva confirmada"
-                description="Desligue se ainda aguarda o sinal ou a confirmação do hóspede."
-                checked={confirmed}
-                onChange={(event) => setConfirmed(event.target.checked)}
-              />
-            </FormSection>
-
+            <PricingStep
+              rateText={rateText}
+              rateHint={rateHint}
+              onRateChange={(value) => {
+                setNightlyRate(value);
+                setRateTouched(true);
+              }}
+              discount={discount}
+              onDiscountChange={setDiscount}
+              notes={notes}
+              onNotesChange={setNotes}
+              confirmed={confirmed}
+              onConfirmedChange={setConfirmed}
+              error={error}
+            />
             {quote ? (
               <Card className="p-4 md:p-6 lg:hidden">
                 <QuoteSummary quote={quote} nights={nights} nightlyRate={rate} discount={discountValue} seasonGroups={breakdown?.seasonal && !rateTouched ? breakdown.groups : undefined} />
