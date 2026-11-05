@@ -1,4 +1,4 @@
-import { ChevronRight, House, Settings, Users } from "lucide-react";
+import { ChevronRight, House, Settings, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -38,14 +38,14 @@ function Shortcut({ href, icon, title, description, className }: ShortcutProps) 
   );
 }
 
-/** Atalhos no fim do Painel: Bangalôs, Hóspedes e Configurações. */
+/** Atalhos no fim do Painel: Bangalôs, Hóspedes, Limpeza e Configurações. */
 export function Shortcuts({ chaletCount, guestCount }: { chaletCount: number; guestCount: number }) {
   return (
     <section aria-labelledby="shortcuts-title">
       <h2 id="shortcuts-title" className="mb-3 font-display text-xl font-semibold md:text-2xl">
         Atalhos
       </h2>
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
         <Shortcut
           href={routes.chalets}
           icon={<House />}
@@ -54,12 +54,12 @@ export function Shortcuts({ chaletCount, guestCount }: { chaletCount: number; gu
         />
         <Shortcut href={routes.guests} icon={<Users />} title="Hóspedes"
           description={guestCount > 0 ? pluralize(guestCount, "cadastrado", "cadastrados") : "Contatos e histórico"} />
+        <Shortcut href={routes.cleaning} icon={<Sparkles />} title="Limpeza" description="Faxinas das saídas" />
         <Shortcut
           href={routes.settings}
           icon={<Settings />}
           title="Configurações"
           description="Conta, perfil e preferências"
-          className="col-span-2 md:col-span-1"
         />
       </div>
     </section>

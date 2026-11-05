@@ -26,6 +26,7 @@ export const routes = {
   newQuote: "/orcamentos/novo",
   guests: "/hospedes",
   finance: "/financeiro",
+  cleaning: "/limpeza",
   expenses: "/financeiro/despesas",
   newExpense: "/financeiro/despesas/nova",
   settings: "/configuracoes",
