@@ -83,6 +83,8 @@ export interface QuoteDocument {
   people: string;
   items: QuoteLine[];
   total: number;
+  /** Sinal sugerido para garantir a reserva (0 = não pedir sinal). */
+  deposit: number;
   notes: string | null;
   pixKey: string | null;
 }
@@ -97,6 +99,7 @@ export interface QuoteDocumentInput {
     children: number;
     lines: unknown;
     total: number;
+    deposit_amount: number;
     notes: string | null;
     valid_until: IsoDate;
     created_at: string;
@@ -128,6 +131,7 @@ export function buildQuoteDocument({ quote, chalet, issuer, issuerPhone, pixKey,
     people: pluralize(quote.adults + quote.children, "pessoa", "pessoas"),
     items: parseQuoteLines(quote.lines),
     total: quote.total,
+    deposit: quote.deposit_amount,
     notes: quote.notes,
     pixKey,
   };
@@ -154,6 +158,7 @@ export function quoteMessage(doc: QuoteDocument): string {
     `📅 ${doc.stay.replace(`${doc.chaletName} · `, "")}`,
     `👥 ${doc.people}`,
     `💰 Total: ${formatCurrency(doc.total)}`,
+    ...(doc.deposit > 0 ? [`✅ Sinal para garantir a reserva: ${formatCurrency(doc.deposit)}`] : []),
     `⏳ Válido até ${doc.validUntil}`,
     "",
     `Para reservar é só me avisar. ${doc.issuer}`,

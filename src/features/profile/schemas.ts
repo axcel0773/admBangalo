@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { optionalText, phone, requiredText } from "@/lib/validation";
+import { integer, optionalText, phone, requiredText } from "@/lib/validation";
 
 export const profileSchema = z.object({
   full_name: requiredText("Seu nome", 80),
@@ -8,6 +8,7 @@ export const profileSchema = z.object({
   phone,
   pix_key: optionalText(120),
   pix_city: optionalText(40),
+  default_deposit_percent: integer("Sinal padrão", 0, 100),
 });
 
 export type ProfileInput = z.infer<typeof profileSchema>;

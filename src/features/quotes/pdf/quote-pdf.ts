@@ -152,6 +152,9 @@ export async function buildQuotePdf(data: QuoteDocument): Promise<Uint8Array> {
   const infoLines = [
     { text: "Este orçamento não é uma reserva: ela só fica garantida após a confirmação.", strong: true },
     { text: `Valores válidos até ${data.validUntil}.`, strong: false },
+    ...(data.deposit > 0
+      ? [{ text: `Sinal para garantir a reserva: ${formatCurrency(data.deposit)}.`, strong: true }]
+      : []),
     ...(data.pixKey ? [{ text: `Para reservar, o sinal pode ser pago por Pix. Chave: ${data.pixKey}`, strong: false }] : []),
   ];
   const wrapped = infoLines.flatMap((info) =>

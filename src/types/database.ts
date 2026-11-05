@@ -23,6 +23,7 @@ export type Database = {
           pix_key: string | null;
           pix_city: string | null;
           avatar_path: string | null;
+          default_deposit_percent: number;
         } & Timestamps;
         Insert: {
           id: string;
@@ -32,6 +33,7 @@ export type Database = {
           pix_key?: string | null;
           pix_city?: string | null;
           avatar_path?: string | null;
+          default_deposit_percent?: number;
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
         Relationships: [];
@@ -133,6 +135,7 @@ export type Database = {
           discount: number;
           lines: Json;
           total: number;
+          deposit_amount: number;
           notes: string | null;
           valid_until: string;
         } & Timestamps;
@@ -150,6 +153,7 @@ export type Database = {
           discount?: number;
           lines?: Json;
           total: number;
+          deposit_amount?: number;
           notes?: string | null;
           valid_until: string;
         };
