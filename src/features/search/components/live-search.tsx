@@ -33,11 +33,7 @@ export function LiveSearch({ initialTerm = "" }: { initialTerm?: string }) {
   useEffect(() => {
     const term = normalizeSearchTerm(value);
     const ticket = ++latest.current;
-    if (!term) {
-      setResults(null);
-      setFailed(false);
-      return;
-    }
+    if (!term) return;
     const timer = setTimeout(() => {
       searchSuggest(term)
         .then((found) => {
@@ -131,7 +127,7 @@ export function LiveSearch({ initialTerm = "" }: { initialTerm?: string }) {
         </section>
       ) : null}
 
-      {failed ? (
+      {failed && term ? (
         <p role="alert" className="text-sm font-semibold text-danger-ink">
           Não foi possível buscar agora. Confira a conexão e tente de novo.
         </p>
