@@ -12,7 +12,7 @@ export const buttonVariants = cva(
         primary: "bg-primary text-on-primary shadow-primary hover:bg-primary-strong",
         secondary: "border border-line-strong bg-surface text-ink hover:bg-subtle",
         soft: "bg-primary-soft text-primary-ink hover:bg-primary-soft/80",
-        accent: "bg-accent text-ink hover:bg-accent/90",
+        accent: "bg-accent text-[#2b2620] hover:bg-accent/90",
         ghost: "text-ink-soft hover:bg-muted",
         inverted: "bg-surface text-primary-strong hover:bg-subtle",
       },

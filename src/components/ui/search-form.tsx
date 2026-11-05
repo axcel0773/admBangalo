@@ -10,13 +10,15 @@ interface SearchFormProps {
   label: string;
   /** Outros parâmetros da URL a manter na busca. */
   hiddenParams?: Record<string, string>;
+  /** Página que mostra o resultado (padrão: a própria página). */
+  action?: string;
   className?: string;
 }
 
 /** Busca por GET (?q=): sem estado no cliente, compartilhável e funciona offline-first. */
-export function SearchForm({ defaultValue, placeholder, label, hiddenParams, className }: SearchFormProps) {
+export function SearchForm({ defaultValue, placeholder, label, hiddenParams, action, className }: SearchFormProps) {
   return (
-    <form role="search" className={cn("relative", className)}>
+    <form role="search" action={action} className={cn("relative", className)}>
       <label className="sr-only" htmlFor="search-q">
         {label}
       </label>
