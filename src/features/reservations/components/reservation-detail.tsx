@@ -177,7 +177,7 @@ export function ReservationDetail({ detail, billing, aside, businessName }: Rese
         {billing}
 
         {reservation.notes ? (
-          <Card className="bg-[#f9ede3] dark:bg-[#33281f] p-4 shadow-none md:p-6">
+          <Card className="bg-peach-soft p-4 shadow-none md:p-6">
             <p className="mb-1 font-display text-lg font-semibold">Observações</p>
             <p className="text-sm leading-relaxed whitespace-pre-line text-ink-soft">{reservation.notes}</p>
           </Card>

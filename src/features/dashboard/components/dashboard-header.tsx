@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { routes } from "@/components/layout/navigation";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Avatar } from "@/components/ui/avatar";
 import { ButtonLink } from "@/components/ui/button";
 import { formatLongDate, type IsoDate } from "@/lib/dates";
@@ -63,9 +64,12 @@ export function DashboardHeader({ greeting, ownerName, avatarUrl, today, agenda 
               {firstName}
             </h1>
           </div>
-          <Link href={routes.settings} aria-label="Configurações da conta">
-            <Avatar name={ownerName} src={avatarUrl} color="#F29A3E" size="md" className="ring-3 ring-white/35" />
-          </Link>
+          <div className="flex items-center gap-2.5">
+            <ThemeToggle variant="photo" />
+            <Link href={routes.settings} aria-label="Configurações da conta">
+              <Avatar name={ownerName} src={avatarUrl} color="#F29A3E" size="md" className="ring-3 ring-white/35" />
+            </Link>
+          </div>
         </div>
       </header>
 
