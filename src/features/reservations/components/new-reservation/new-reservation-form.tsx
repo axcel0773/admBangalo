@@ -65,6 +65,8 @@ interface NewReservationFormProps {
     /** Responsável novo vindo de um orçamento. */
     guestName?: string;
     guestPhone?: string;
+    /** Orçamento de origem (vira "aceito" quando a reserva é criada). */
+    quoteId?: string;
   };
 }
 
@@ -213,6 +215,7 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
       ) : null}
 
       {/* Campos que não têm input nativo próprio */}
+      {prefill.quoteId ? <input type="hidden" name="quote_id" value={prefill.quoteId} /> : null}
       <input type="hidden" name="companions" value={JSON.stringify(visibleCompanions)} />
       <input type="hidden" name="status" value={confirmed ? "confirmed" : "pending"} />
 

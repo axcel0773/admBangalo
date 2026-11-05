@@ -10,10 +10,13 @@ import { formatShortDate, todayIso } from "@/lib/dates";
 import { formatCurrency } from "@/lib/format";
 
 import type { QuoteListItem } from "../services";
+import { QuoteStatusBadge } from "./quote-status-badge";
 
-export function QuoteList({ quotes }: { quotes: QuoteListItem[] }) {
+export function QuoteList({ quotes, filtered = false }: { quotes: QuoteListItem[]; filtered?: boolean }) {
   if (quotes.length === 0) {
-    return (
+    return filtered ? (
+      <p className="py-8 text-center text-sm text-ink-muted">Nenhum orçamento nesta situação.</p>
+    ) : (
       <EmptyState
         icon={<FileText />}
         title="Nenhum orçamento ainda"
@@ -27,7 +30,6 @@ export function QuoteList({ quotes }: { quotes: QuoteListItem[] }) {
   return (
     <ListCard>
       {quotes.map((quote) => {
-        const expired = quote.valid_until < today;
         return (
           <ListRow
             key={quote.id}
@@ -38,7 +40,8 @@ export function QuoteList({ quotes }: { quotes: QuoteListItem[] }) {
             trailing={
               <div className="flex flex-col items-end gap-1">
                 <span className="text-sm font-semibold">{formatCurrency(quote.total)}</span>
-                <Badge tone={expired ? "danger" : "success"}>{expired ? "Vencido" : "Válido"}</Badge>
+                <QuoteStatusBadge quote={quote} today={today} />
+                {quote.datesTaken ? <Badge tone="warning">Datas ocupadas</Badge> : null}
               </div>
             }
           />

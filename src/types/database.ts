@@ -138,6 +138,7 @@ export type Database = {
           deposit_amount: number;
           notes: string | null;
           valid_until: string;
+          status: "draft" | "sent" | "accepted" | "declined";
         } & Timestamps;
         Insert: {
           id?: string;
@@ -156,6 +157,7 @@ export type Database = {
           deposit_amount?: number;
           notes?: string | null;
           valid_until: string;
+          status?: "draft" | "sent" | "accepted" | "declined";
         };
         Update: Partial<Database["public"]["Tables"]["quotes"]["Insert"]>;
         Relationships: [];

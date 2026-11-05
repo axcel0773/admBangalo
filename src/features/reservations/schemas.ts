@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { MAX_CHALET_GUESTS } from "@/features/chalets/domain";
 import { daysBetween } from "@/lib/dates";
+import { isUuid } from "@/lib/ids";
 import { document, integer, isoDate, money, optionalText, phone } from "@/lib/validation";
 import type { Json } from "@/types/database";
 
@@ -47,6 +48,11 @@ export const newReservationSchema = z
       .transform((value) => (value && value.trim() ? value : "0"))
       .pipe(money("Desconto")),
     notes: optionalText(1000),
+    // Orçamento que originou a reserva (opcional); vazio ou inválido é ignorado.
+    quote_id: z
+      .string()
+      .optional()
+      .transform((value) => (value && isUuid(value) ? value : undefined)),
   })
   .superRefine((data, ctx) => {
     if (data.adults + data.children > MAX_CHALET_GUESTS) {

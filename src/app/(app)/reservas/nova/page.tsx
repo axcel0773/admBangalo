@@ -7,6 +7,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getNewReservationContext, NewReservationForm } from "@/features/reservations";
 import { isIsoDate, todayIso } from "@/lib/dates";
+import { isUuid } from "@/lib/ids";
 import { toCount } from "@/lib/search-params";
 
 export const metadata: Metadata = { title: "Nova reserva" };
@@ -21,11 +22,12 @@ interface NewReservationPageProps {
     hospede?: string;
     nome?: string;
     telefone?: string;
+    orcamento?: string;
   }>;
 }
 
 export default async function NewReservationPage({ searchParams }: NewReservationPageProps) {
-  const [{ chale, entrada, saida, adultos, criancas, hospede, nome, telefone }, context] = await Promise.all([searchParams, getNewReservationContext()]);
+  const [{ chale, entrada, saida, adultos, criancas, hospede, nome, telefone, orcamento }, context] = await Promise.all([searchParams, getNewReservationContext()]);
 
   return (
     <>
@@ -55,6 +57,7 @@ export default async function NewReservationPage({ searchParams }: NewReservatio
               guestId: hospede,
               guestName: nome?.slice(0, 120),
               guestPhone: telefone?.slice(0, 20),
+              quoteId: orcamento && isUuid(orcamento) ? orcamento : undefined,
             }}
           />
         )}

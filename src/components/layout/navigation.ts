@@ -58,6 +58,8 @@ export const paths = {
       guest?: string;
       guestName?: string;
       guestPhone?: string;
+      /** Orçamento de origem: fica "aceito" quando a reserva é criada. */
+      quote?: string;
     } = {},
   ) => {
     const search = new URLSearchParams();
@@ -69,6 +71,7 @@ export const paths = {
     if (params.guest) search.set("hospede", params.guest);
     if (params.guestName) search.set("nome", params.guestName);
     if (params.guestPhone) search.set("telefone", params.guestPhone);
+    if (params.quote) search.set("orcamento", params.quote);
     const query = search.toString();
     return query ? `${routes.newReservation}?${query}` : routes.newReservation;
   },

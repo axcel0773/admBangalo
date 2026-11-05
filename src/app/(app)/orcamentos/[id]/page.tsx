@@ -14,7 +14,9 @@ import {
   getQuote,
   QuoteDocumentCard,
   quoteMessage,
+  quoteDatesTaken,
   QuoteShare,
+  QuoteStatusCard,
 } from "@/features/quotes";
 import { todayIso } from "@/lib/dates";
 
@@ -27,15 +29,17 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
   const chalet = chalets.find((candidate) => candidate.id === quote.chalet_id);
   if (!chalet) notFound();
 
+  const today = todayIso();
   const doc = buildQuoteDocument({
     quote,
     chalet,
     issuer: profile?.business_name || profile?.full_name || "Bangalôs",
     issuerPhone: profile?.phone ?? null,
     pixKey: profile?.pix_key ?? null,
-    today: todayIso(),
+    today,
   });
   const message = quoteMessage(doc);
+  const datesTaken = await quoteDatesTaken(quote);
 
   return (
     <>
@@ -67,6 +71,7 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
               children: quote.children,
               guestName: quote.guest_name,
               guestPhone: quote.guest_phone ?? undefined,
+              quote: quote.id,
             })}
             size="sm"
           >
@@ -77,6 +82,7 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
         }
       />
       <PageBody className="max-w-3xl">
+        <QuoteStatusCard quote={quote} today={today} datesTaken={datesTaken} />
         <QuoteDocumentCard doc={doc} />
         <QuoteShare data={doc} message={message} whatsappHref={whatsappUrl(quote.guest_phone, message)} />
         <DeleteQuoteCard quoteId={quote.id} />
