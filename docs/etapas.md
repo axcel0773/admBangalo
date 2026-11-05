@@ -306,6 +306,23 @@ Boas práticas que valem para todas as etapas seguintes.
 
 ---
 
+## Melhorias entregues (05/11/2026) ✅
+
+> Detalhes e guia de cada uma em `docs/melhorias.md`. Tudo no plano gratuito.
+> **Migrações novas (rodar no SQL Editor do Supabase de produção):** `0013_deposit`, `0014_expenses`, `0015_quote_status`, `0016_cleaning`.
+
+- [x] **Esforço P:** lembretes de WhatsApp, duplicar/reservar de novo, hóspedes recorrentes, comparativo de meses, contagem de hóspedes nos atalhos (#40–#42)
+- [x] **Sinal** (`0013`): percentual padrão no perfil, valor calculado no servidor, aparece no PDF, na mensagem e no cartão do orçamento (#45)
+- [x] **Ações de hoje** no Painel: cobranças, entradas/saídas e orçamentos vencendo, cada um levando à tela que resolve (#46)
+- [x] **Despesas e lucro** (`0014`): lançar despesas por categoria/bangalô; Financeiro mostra recebido − despesas (#47)
+- [x] **Orçamentos com status** (`0015`): rascunho/enviado/aceito/recusado/vencido, filtros e aviso de datas ocupadas; reservar a partir do orçamento marca como aceito (#48)
+- [x] **Controle de limpeza** (`0016`): `/limpeza` com uma faxina por saída, "Marcar como feita" e "Avisar faxineira" pelo WhatsApp (#49)
+- [x] **Relatórios anuais**: ocupação, diária média e origem das reservas por ano, com CSV (#50)
+- [x] **Busca global** (`/busca`) e **modo escuro** automático (#51)
+- [x] Leitura de medidor (kWh) já existia no billing — sem trabalho novo
+
+---
+
 ## Decisões tomadas
 
 - **Energia:** leitura do medidor na entrada e na saída, R$ 1,00 por kWh (taxa `metered`).
