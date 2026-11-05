@@ -1,4 +1,4 @@
-import { FileText, MessageCircle, Phone } from "lucide-react";
+import { FileText, MessageCircle, Phone, Repeat } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -113,6 +113,18 @@ export function ReservationDetail({ detail, billing, aside, businessName }: Rese
             <ButtonLink href={paths.receipt(reservation.id)} variant="secondary">
               <FileText aria-hidden="true" />
               Recibo
+            </ButtonLink>
+            <ButtonLink
+              href={paths.newReservation({
+                chalet: reservation.chalet_id,
+                adults: reservation.adults,
+                children: reservation.children,
+                guest: mainGuest.id,
+              })}
+              variant="secondary"
+            >
+              <Repeat aria-hidden="true" />
+              Reservar de novo
             </ButtonLink>
           </div>
 

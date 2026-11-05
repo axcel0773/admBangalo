@@ -1,4 +1,4 @@
-import { CalendarPlus } from "lucide-react";
+import { CalendarPlus, Copy } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -43,7 +43,22 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
         title="Orçamento"
         back={{ href: routes.quotes, label: "Orçamentos" }}
         actions={
-          <ButtonLink
+          <>
+            <ButtonLink
+              href={paths.newQuote({
+                chalet: quote.chalet_id,
+                adults: quote.adults,
+                children: quote.children,
+                guestName: quote.guest_name,
+                guestPhone: quote.guest_phone ?? undefined,
+              })}
+              variant="secondary"
+              size="sm"
+            >
+              <Copy aria-hidden="true" />
+              Duplicar
+            </ButtonLink>
+            <ButtonLink
             href={paths.newReservation({
               chalet: quote.chalet_id,
               checkIn: quote.check_in,
@@ -57,7 +72,8 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
           >
             <CalendarPlus aria-hidden="true" />
             Criar reserva
-          </ButtonLink>
+            </ButtonLink>
+          </>
         }
       />
       <PageBody className="max-w-3xl">

@@ -8,7 +8,7 @@ import { sanitizeSearch, type Guest, type GuestStay } from "../domain";
 import type { GuestInput } from "../schemas";
 
 const STAY_COLUMNS =
-  "reservation_id, main_guest_id, chalet_name, check_in, check_out, nights, guests_count, status, grand_total, payment_status";
+  "reservation_id, main_guest_id, chalet_id, chalet_name, check_in, check_out, nights, guests_count, status, grand_total, payment_status";
 
 export function createGuestsRepository(db: DbClient) {
   return {

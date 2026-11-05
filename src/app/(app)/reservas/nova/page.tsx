@@ -7,6 +7,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getNewReservationContext, NewReservationForm } from "@/features/reservations";
 import { isIsoDate, todayIso } from "@/lib/dates";
+import { toCount } from "@/lib/search-params";
 
 export const metadata: Metadata = { title: "Nova reserva" };
 
@@ -21,12 +22,6 @@ interface NewReservationPageProps {
     nome?: string;
     telefone?: string;
   }>;
-}
-
-/** Número de pessoas vindo da URL (por exemplo, de um orçamento); inválido vira indefinido. */
-function toCount(value: string | undefined): number | undefined {
-  const count = Number(value);
-  return Number.isInteger(count) && count >= 0 && count <= 6 ? count : undefined;
 }
 
 export default async function NewReservationPage({ searchParams }: NewReservationPageProps) {
