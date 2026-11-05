@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { paths, routes } from "@/components/layout/navigation";
+import { markQuoteAccepted } from "@/features/quotes/services";
 import { attempt } from "@/lib/actions";
 import { errorFormState, formDataToObject, invalidFormState, type FormState } from "@/lib/forms";
 import { assertIds } from "@/lib/ids";
@@ -24,6 +25,9 @@ export async function createReservation(_prev: FormState, formData: FormData): P
     if (error instanceof MutationError) return errorFormState(error.message, formData);
     throw error;
   }
+
+  // Reserva nascida de um orçamento: ele passa a "aceito".
+  if (parsed.data.quote_id) await markQuoteAccepted(parsed.data.quote_id);
 
   // Painel, calendário, listas e ficha do hóspede mudam com uma reserva nova.
   revalidatePath("/", "layout");

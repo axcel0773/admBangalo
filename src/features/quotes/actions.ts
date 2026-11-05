@@ -14,6 +14,7 @@ import { assertIds } from "@/lib/ids";
 import { MutationError } from "@/lib/supabase/errors";
 
 import { buildQuoteLines, validUntilFrom } from "./domain/quote-document";
+import { isQuoteStatus } from "./domain/status";
 import { newQuoteSchema } from "./schemas";
 import { quotesRepository } from "./services";
 
@@ -75,6 +76,16 @@ export async function createQuote(_prev: FormState, formData: FormData): Promise
 
   revalidatePath(routes.quotes);
   redirect(paths.quote(quoteId));
+}
+
+/** Muda a situação (enviado, aceito, recusado…). Use com `.bind(null, id, "sent")`. */
+export async function changeQuoteStatus(id: string, next: string): Promise<FormState> {
+  return attempt(async () => {
+    assertIds(id);
+    if (!isQuoteStatus(next)) throw new MutationError("Situação inválida.");
+    await (await quotesRepository()).setStatus(id, next);
+    revalidatePath("/", "layout");
+  });
 }
 
 /** Exclui o orçamento e volta para a lista. Use com `.bind(null, id)`. */
