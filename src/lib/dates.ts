@@ -70,6 +70,11 @@ export function formatLongDate(date: IsoDate): string {
   return longDateFormatter.format(toUtcMs(date));
 }
 
+/** "03/11/2026" */
+export function formatDate(date: IsoDate): string {
+  return `${date.slice(8, 10)}/${date.slice(5, 7)}/${date.slice(0, 4)}`;
+}
+
 /** "03/11" */
 export function formatShortDate(date: IsoDate): string {
   return shortDateFormatter.format(toUtcMs(date));

@@ -25,7 +25,10 @@ describe("winAnsiSafe", () => {
   it("mantém acentos e troca o que a fonte do PDF não desenha", () => {
     expect(winAnsiSafe("Hóspede João · R$ 1.050,00 × 3")).toBe("Hóspede João · R$ 1.050,00 × 3");
     expect(winAnsiSafe("−R$ 50")).toBe("-R$ 50");
-    expect(winAnsiSafe("Ana 🙂")).toBe("Ana ??");
+    expect(winAnsiSafe("Ana 🙂")).toBe("Ana");
+    expect(winAnsiSafe("Aceitamos pet🐶Crianças até 5 anos ✅ não paga")).toBe("Aceitamos pet Crianças até 5 anos não paga");
+    expect(winAnsiSafe("© 2026")).toBe("© 2026");
+    expect(winAnsiSafe("日本")).toBe("??");
   });
 });
 
