@@ -1,6 +1,17 @@
 import { describe, expect, it } from "vitest";
 
-import { encodeForUrl, formatCityState, guestsCsv, sanitizeSearch, whatsappUrl } from "./domain";
+import {
+  encodeForUrl,
+  filterGuests,
+  formatCityState,
+  guestsCsv,
+  isBirthdayMonth,
+  isGuestFilter,
+  isRecurringGuest,
+  sanitizeSearch,
+  whatsappUrl,
+  type GuestSummary,
+} from "./domain";
 
 describe("guests domain", () => {
   it("monta link do WhatsApp com DDI do Brasil", () => {
@@ -60,5 +71,33 @@ describe("encodeForUrl", () => {
   it("mantém emojis no link de confirmação", () => {
     const url = whatsappUrl("11987654321", "Oi 📅") ?? "";
     expect(url.endsWith("text=Oi%20%F0%9F%93%85")).toBe(true);
+  });
+});
+
+describe("hóspedes recorrentes e aniversariantes", () => {
+  it("recorrente = 2 ou mais estadias não canceladas", () => {
+    expect(isRecurringGuest([{ status: "confirmed" }])).toBe(false);
+    expect(isRecurringGuest([{ status: "confirmed" }, { status: "confirmed" }])).toBe(true);
+    expect(isRecurringGuest([{ status: "confirmed" }, { status: "cancelled" }])).toBe(false);
+    expect(isRecurringGuest([])).toBe(false);
+  });
+
+  it("aniversário no mês de hoje; sem data não conta", () => {
+    expect(isBirthdayMonth("1990-11-20", "2026-11-05")).toBe(true);
+    expect(isBirthdayMonth("1990-05-20", "2026-11-05")).toBe(false);
+    expect(isBirthdayMonth(null, "2026-11-05")).toBe(false);
+  });
+
+  it("filtra a lista e valida o parâmetro da URL", () => {
+    const make = (id: string, recurring: boolean, birthdayThisMonth: boolean) =>
+      ({ id, recurring, birthdayThisMonth }) as GuestSummary;
+    const list = [make("a", true, false), make("b", false, true), make("c", false, false)];
+    expect(filterGuests(list, "all")).toHaveLength(3);
+    expect(filterGuests(list, "recurring").map((g) => g.id)).toEqual(["a"]);
+    expect(filterGuests(list, "birthdays").map((g) => g.id)).toEqual(["b"]);
+    expect(isGuestFilter("recurring")).toBe(true);
+    expect(isGuestFilter("x")).toBe(false);
+    expect(isGuestFilter("toString")).toBe(false);
+    expect(isGuestFilter(undefined)).toBe(false);
   });
 });

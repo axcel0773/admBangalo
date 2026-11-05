@@ -39,7 +39,7 @@ export default async function DashboardPage() {
           <ReceivablesCard receivables={dashboard.receivables} />
           <UpcomingArrivals arrivals={dashboard.upcoming} />
         </div>
-        <Shortcuts chaletCount={dashboard.chalets.length} />
+        <Shortcuts chaletCount={dashboard.chalets.length} guestCount={dashboard.guestCount} />
       </PageBody>
     </>
   );

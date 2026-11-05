@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildChaletBreakdown,
+  compareWithPrevious,
+  previousTrendPoint,
   buildMonthReport,
   buildTrend,
   endOfMonth,
@@ -160,5 +162,31 @@ describe("por bangalô", () => {
   it("mostra bangalô parado com zero e ordena pela receita", () => {
     expect(rows.map((row) => row.name)).toEqual(["Bangalô Ipê", "Bangalô Antigo", "Bangalô Jabuticaba"]);
     expect(rows.at(-1)).toMatchObject({ revenue: 0, nights: 0, occupancy: 0 });
+  });
+});
+
+describe("comparativo com o mês anterior", () => {
+  it("alta, queda e igual, com variação percentual", () => {
+    expect(compareWithPrevious(1200, 1000)).toEqual({ direction: "up", delta: 200, ratio: 0.2 });
+    expect(compareWithPrevious(750, 1000)).toEqual({ direction: "down", delta: -250, ratio: 0.25 });
+    expect(compareWithPrevious(1000, 1000)).toEqual({ direction: "same", delta: 0, ratio: 0 });
+  });
+
+  it("mês anterior zerado não tem percentual", () => {
+    expect(compareWithPrevious(500, 0)).toEqual({ direction: "up", delta: 500, ratio: null });
+  });
+
+  it("arredonda centavos", () => {
+    expect(compareWithPrevious(100.1 + 0.2, 100.3).direction).toBe("same");
+  });
+
+  it("pega o penúltimo ponto da tendência", () => {
+    const points = [
+      { month: "2026-10-01", label: "out", expected: 10, received: 5 },
+      { month: "2026-11-01", label: "nov", expected: 20, received: 8 },
+    ];
+    expect(previousTrendPoint(points)?.label).toBe("out");
+    expect(previousTrendPoint(points.slice(1))).toBeNull();
+    expect(previousTrendPoint([])).toBeNull();
   });
 });

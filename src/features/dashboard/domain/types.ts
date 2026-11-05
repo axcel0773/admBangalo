@@ -101,6 +101,8 @@ export interface DashboardData {
   summary: DashboardSummary;
   agenda: AgendaEvent[];
   chalets: ChaletOverview[];
+  /** Total de hóspedes cadastrados (atalhos do Painel). */
+  guestCount: number;
   receivables: Receivable[];
   upcoming: UpcomingArrival[];
 }

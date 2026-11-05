@@ -21,6 +21,13 @@ export function createDashboardRepository(db: DbClient) {
       return unwrapList(result, "Listar bangalôs");
     },
 
+    /** Quantos hóspedes (não removidos) o proprietário tem; só conta, não traz linhas. */
+    async countGuests(): Promise<number> {
+      const { count, error } = await db.from("guests").select("id", { count: "exact", head: true }).is("deleted_at", null);
+      if (error) throw new Error("Não foi possível contar os hóspedes.");
+      return count ?? 0;
+    },
+
     /** Links temporários (1 h) das fotos de capa, por caminho. */
     async signPhotoUrls(paths: string[]): Promise<Record<string, string>> {
       if (paths.length === 0) return {};
