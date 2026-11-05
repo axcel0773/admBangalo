@@ -2,7 +2,7 @@
 
 **Última atualização:** 05/11/2026 · Complementa `docs/etapas.md` (o que já foi feito), `docs/padroes.md` e `docs/arquitetura.md`.
 
-**Já feitas (05/11):** 2, 5, 11, 12 e a contagem de hóspedes do 17 — marcadas com ✅.
+**Já feitas (05/11):** 2, 5, 11, 12 e a contagem de hóspedes do 17 — marcadas com ✅ (PRs #40, #41 e #42). **Faltam** as de esforço M e G: 1, 3, 7, 8, 4, 6, 10, 9, 13–16 e, do 17, busca global e modo escuro. Próxima na ordem recomendada: **1 (sinal)**.
 
 **Esforço:** **P** = até meio dia · **M** = 1 a 2 dias · **G** = 3 dias ou mais. Considera código, testes, migração e documentação.
 **Restrição fixa:** tudo precisa continuar rodando no plano **gratuito** da Vercel e do Supabase.
@@ -89,7 +89,7 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 
 **Cuidados:** nunca confiar em valor vindo do navegador; teste de domínio para 0 %, 100 % e centavos; PDF com `winAnsiSafe`.
 
-## 2. Lembretes de WhatsApp prontos — esforço **P**
+## 2. Lembretes de WhatsApp prontos — esforço **P** ✅
 
 **Objetivo:** botões com mensagem escrita para: antes da chegada (instruções + horário), cobrança de saldo e pós-estadia (agradecimento/avaliação).
 
@@ -122,7 +122,7 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 - Action `setQuoteStatus` (com `assertIds`); ao usar "Criar reserva", marcar `accepted` automaticamente.
 - UI: `Badge` de status na lista e filtro por status (`?status=` na URL, como `?q=` em hóspedes).
 
-## 5. Duplicar reserva/orçamento e "reservar de novo" — esforço **P**
+## 5. Duplicar reserva/orçamento e "reservar de novo" — esforço **P** ✅
 
 **Onde mexer:** reaproveite o pré-preenchimento já existente em `reservas/nova` (`saida`, `adultos`, `criancas`, `nome`, `telefone`) via `paths.newReservation`/`paths.newQuote`. Botão "Reservar de novo" na ficha do hóspede e "Duplicar" no orçamento levam à tela de criação com os campos preenchidos (datas em branco). **Sem migração.**
 
@@ -176,11 +176,11 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 - Exportar **CSV** no navegador (função pura `toCsv` em `src/lib`, com escape de aspas/ponto e vírgula e BOM UTF-8 para abrir bem no Excel) e **PDF** reaproveitando `src/lib/pdf.ts`.
 - Tela `financeiro/relatorios` com seletor de período (`?de=&ate=`), gráficos simples em SVG/CSS (sem biblioteca pesada).
 
-## 11. Hóspedes recorrentes — esforço **P**
+## 11. Hóspedes recorrentes — esforço **P** ✅
 
 **Onde mexer:** `guests` ganha `tags text[]` (ou apenas derivar "recorrente" por contagem de reservas, **sem** migração — preferível para começar). Marca "Cliente fiel" na lista/ficha, filtro `?filtro=recorrentes` e aniversariante do mês (se houver data de nascimento). Regras em `guests/domain` + testes.
 
-## 12. Comparativo de meses — esforço **P**
+## 12. Comparativo de meses — esforço **P** ✅
 
 **Onde mexer:** função pura em `finance/domain.ts` (`compareMonths(current, previous)` → variação em R$ e %, tratando mês anterior zerado) + testes; exibir seta e % no `finance-summary`. Sem banco.
 
@@ -210,9 +210,9 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 
 **Onde mexer:** novo papel (`member`) em `profiles`/tabela `team_members`; **todas** as políticas RLS precisam passar a considerar o papel (revisar migração por migração) e a UI esconder Financeiro/Configurações. É a melhoria que mais mexe em segurança: exige revisão em `docs/seguranca.md`, testes pgTAP de "membro não lê financeiro" e E2E com dois usuários. Só fazer depois de 6 (limpeza), que é o caso de uso.
 
-## 17. Refinos de interface — esforço **P a M**
+## 17. Refinos de interface — esforço **P a M** (parcial ✅)
 
-- **Contagem de hóspedes nos atalhos do Painel (P):** adicionar `guestCount` ao `buildDashboard` (consulta `count` exata, sem listar linhas) e usar em `shortcuts.tsx`.
+- **Contagem de hóspedes nos atalhos do Painel (P) — ✅ feito (PR #42):** adicionar `guestCount` ao `buildDashboard` (consulta `count` exata, sem listar linhas) e usar em `shortcuts.tsx`.
 - **Busca global (M):** campo no topo que consulta hóspedes, reservas e orçamentos; usar `?q=` e uma action de busca com limite de resultados; debounce no cliente.
 - **Modo escuro (M):** novos valores dos tokens de `globals.css` em `@media (prefers-color-scheme: dark)`; revisar contraste (WCAG AA) e ilustrações/PDFs (PDF continua claro).
 
@@ -227,3 +227,12 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 - [ ] Textos em português, termo "bangalô"; rotas registradas em `navigation.ts`
 - [ ] PDFs com `winAnsiSafe`; nada de segredos no código
 - [ ] `lint`, `typecheck`, `test`, `build` verdes; `docs/etapas.md` atualizado
+
+
+> **Status: feito (05/11).** Botões *Lembrar da chegada*, *Cobrar saldo* e *Agradecer* na ficha da reserva (só os que fazem sentido hoje; cancelada não tem). Textos e a regra `availableReminders` em `reservations/domain/messages.ts`, com testes. Ficou para depois: botões direto na agenda do Painel (a linha é um link, então botão aninhado foi evitado) e modelos de texto editáveis (fase 2). PR #40.
+
+> **Status: feito (05/11).** *Duplicar* no orçamento, *Reservar de novo* na reserva e na ficha do hóspede (já com o bangalô da última estadia). Criados `paths.newQuote` e o helper `toCount` em `src/lib/search-params.ts`; o orçamento novo aceita pré-preenchimento de bangalô, pessoas, nome e telefone. Sem migração. PR #41.
+
+> **Status: feito (05/11).** Feito pela opção **sem migração**: recorrente = 2+ estadias não canceladas (calculado em `guests/services.ts`), selos "Cliente fiel" e "Aniversário" e filtros `?filtro=recorrentes|aniversariantes`. Tags manuais (`tags text[]`) ficam como evolução futura. PR #42.
+
+> **Status: feito (05/11).** `compareWithPrevious` e `previousTrendPoint` em `finance/domain.ts` (testados); setas e % nos cartões Previsto e Recebido, usando a tendência de 6 meses já carregada (sem consulta extra). PR #42.
