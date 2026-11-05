@@ -18,8 +18,10 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-export function SearchResultsView({ results }: { results: SearchResults }) {
+/** `hasPages`: já há atalhos de página na tela, então "nada encontrado" não é um beco sem saída. */
+export function SearchResultsView({ results, hasPages = false }: { results: SearchResults; hasPages?: boolean }) {
   if (searchTotal(results) === 0) {
+    if (hasPages) return null;
     return (
       <EmptyState
         icon={<Search />}

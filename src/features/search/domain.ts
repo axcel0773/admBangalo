@@ -39,3 +39,36 @@ export interface SearchResults {
 
 export const searchTotal = (results: SearchResults) =>
   results.guests.length + results.reservations.length + results.quotes.length;
+
+// ---- Páginas do app (atalhos "Ir para") ----------------------------------------
+
+export interface SearchPage {
+  label: string;
+  description: string;
+  href: string;
+  /** Outras palavras que levam à página (sem acento, minúsculas). */
+  keywords?: string[];
+}
+
+/** Sem acento e em minúsculas: "Hóspedes" e "hospedes" se encontram. */
+export function foldText(text: string): string {
+  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+/** Páginas cujo nome (ou palavra-chave) começa com o que foi digitado. */
+export function matchPages(pages: SearchPage[], raw: string): SearchPage[] {
+  const term = foldText(raw.trim());
+  if (term.length < SEARCH_MIN_LENGTH) return [];
+  return pages.filter((page) => [page.label, ...(page.keywords ?? [])].some((word) => foldText(word).startsWith(term)));
+}
+
+/**
+ * Palavra que completa o que a pessoa digitou ("ho" → "Hóspedes"), ou null.
+ * Só completa pelo nome da página, e só quando o texto digitado é o começo dele.
+ */
+export function completionFor(pages: SearchPage[], raw: string): string | null {
+  const term = foldText(raw);
+  if (term.trim().length < SEARCH_MIN_LENGTH || term !== term.trimStart()) return null;
+  const page = pages.find((item) => foldText(item.label).startsWith(term) && item.label.length > raw.length);
+  return page?.label ?? null;
+}

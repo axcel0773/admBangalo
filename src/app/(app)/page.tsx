@@ -1,8 +1,9 @@
+import { Search } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { routes } from "@/components/layout/navigation";
 import { PageBody } from "@/components/layout/page-header";
-import { SearchForm } from "@/components/ui/search-form";
 import { requireOwner } from "@/features/auth/session";
 import {
   ChaletList,
@@ -35,11 +36,14 @@ export default async function DashboardPage() {
 
       {/* No celular os cartões sobem sobre a faixa verde do cabeçalho. */}
       <PageBody className="relative -mt-7 md:mt-0">
-        <SearchForm
-          action={routes.search}
-          placeholder="Buscar hóspede, reserva ou orçamento"
-          label="Buscar hóspedes, reservas e orçamentos"
-        />
+        {/* Leva à tela de busca, que já abre com o teclado e completa a palavra enquanto se digita. */}
+        <Link
+          href={routes.search}
+          className="flex h-12 items-center gap-3 rounded-control border border-line-strong bg-surface px-4 text-base text-ink-muted/80"
+        >
+          <Search aria-hidden="true" className="size-[18px] shrink-0 text-ink-muted" />
+          Buscar página, hóspede ou reserva
+        </Link>
         <SummaryCards summary={dashboard.summary} />
         <TodayActions actions={dashboard.actions} />
         <TodayAgenda events={dashboard.agenda} />
