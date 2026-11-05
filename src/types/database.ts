@@ -162,6 +162,12 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["quotes"]["Insert"]>;
         Relationships: [];
       };
+      cleaning_tasks: {
+        Row: { reservation_id: string; owner_id: string; done_at: string };
+        Insert: { reservation_id: string; owner_id?: string; done_at?: string };
+        Update: Partial<Database["public"]["Tables"]["cleaning_tasks"]["Insert"]>;
+        Relationships: [];
+      };
       expenses: {
         Row: {
           id: string;
