@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { confirmationMessage, receiptMessage, type ConfirmationInput, type ReceiptInput } from "./messages";
+import {
+  arrivalReminderMessage,
+  availableReminders,
+  balanceReminderMessage,
+  confirmationMessage,
+  receiptMessage,
+  thanksMessage,
+  type ConfirmationInput,
+  type ReceiptInput,
+} from "./messages";
 
 const base: ConfirmationInput = {
   guestName: "Maria Souza",
@@ -90,5 +99,45 @@ describe("mensagem do recibo", () => {
     expect(text).toContain("Tudo quitado, obrigado!");
     expect(text).not.toContain("Pagamentos:");
     expect(text).not.toContain("Saldo a pagar");
+  });
+});
+
+describe("lembretes", () => {
+  it("chegada traz dia, horários e saldo; sem saldo omite a linha de valor", () => {
+    const text = plain(arrivalReminderMessage(base));
+    expect(text).toContain("Chegada: quinta-feira, 10/12, a partir das 14:00");
+    expect(text).toContain("Saída: 13/12, até 12:00");
+    expect(text).toContain("Saldo a acertar: R$ 684,50");
+    expect(plain(arrivalReminderMessage({ ...base, paid: 1284.5 }))).not.toContain("Saldo");
+  });
+
+  it("cobrança mostra total, pago e quanto falta", () => {
+    expect(plain(balanceReminderMessage(base))).toContain("Total: R$ 1.284,50 · pago R$ 600,00 · falta R$ 684,50");
+  });
+
+  it("agradecimento usa o primeiro nome e assina com o negócio", () => {
+    const text = thanksMessage(base);
+    expect(text).toContain("Olá, Maria!");
+    expect(text).toContain("Bangalôs da Serra");
+  });
+
+  it("antes da estadia: chegada e cobrança (há saldo)", () => {
+    const kinds = availableReminders(base, "2026-12-01").map((reminder) => reminder.kind);
+    expect(kinds).toEqual(["arrival", "balance"]);
+  });
+
+  it("depois da saída e quitada: só agradecimento", () => {
+    const kinds = availableReminders({ ...base, paid: 1284.5 }, "2026-12-14").map((reminder) => reminder.kind);
+    expect(kinds).toEqual(["thanks"]);
+  });
+
+  it("pendente não lembra a chegada; cancelada não tem lembretes", () => {
+    expect(availableReminders({ ...base, status: "pending" }, "2026-12-01").map((r) => r.kind)).toEqual(["balance"]);
+    expect(availableReminders({ ...base, status: "cancelled" }, "2026-12-01")).toEqual([]);
+  });
+
+  it("no dia da chegada ainda lembra; no dia da saída já agradece", () => {
+    expect(availableReminders({ ...base, paid: 1284.5 }, "2026-12-10").map((r) => r.kind)).toEqual(["arrival"]);
+    expect(availableReminders({ ...base, paid: 1284.5 }, "2026-12-13").map((r) => r.kind)).toEqual(["thanks"]);
   });
 });

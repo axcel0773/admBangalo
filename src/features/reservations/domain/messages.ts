@@ -1,4 +1,4 @@
-import { formatLongDate, formatShortDate, type IsoDate } from "@/lib/dates";
+import { formatLongDate, formatShortDate, todayIso, type IsoDate } from "@/lib/dates";
 
 import type { ReservationStatus } from "./types";
 
@@ -102,4 +102,88 @@ export function receiptMessage(input: ReceiptInput): string {
   ].join("\n");
 
   return message.replace(/\u00A0/g, " ");
+}
+
+const firstNameOf = (name: string) => name.trim().split(/\s+/)[0] || name;
+const noNbsp = (text: string) => text.replace(/\u00A0/g, " ");
+
+/** Lembrete antes da chegada: dia, horário e valor ainda em aberto. */
+export function arrivalReminderMessage(input: ConfirmationInput): string {
+  const firstName = firstNameOf(input.guestName);
+  const balance = Math.max(Math.round((input.total - input.paid) * 100) / 100, 0);
+  const day = `${formatLongDate(input.checkIn).split(",")[0]}, ${formatShortDate(input.checkIn)}`;
+
+  return noNbsp(
+    [
+      `Olá, ${firstName}! Está chegando a sua estadia no ${input.chaletName} 🌴`,
+      "",
+      `📅 Chegada: ${day}, a partir das ${input.checkInTime.slice(0, 5)}`,
+      `📅 Saída: ${formatShortDate(input.checkOut)}, até ${input.checkOutTime.slice(0, 5)}`,
+      ...(balance > 0 ? [`💰 Saldo a acertar: ${brl(balance)}`] : []),
+      "",
+      `Qualquer dúvida sobre como chegar, é só chamar. Te esperamos! ${input.businessName}`,
+    ].join("\n"),
+  );
+}
+
+/** Cobrança educada do saldo pendente. */
+export function balanceReminderMessage(input: ConfirmationInput): string {
+  const firstName = firstNameOf(input.guestName);
+  const balance = Math.max(Math.round((input.total - input.paid) * 100) / 100, 0);
+
+  return noNbsp(
+    [
+      `Olá, ${firstName}! Tudo bem? Passando para lembrar do saldo da sua reserva no ${input.chaletName}.`,
+      "",
+      `💰 Total: ${brl(input.total)} · pago ${brl(Math.max(input.paid, 0))} · falta ${brl(balance)}`,
+      `📅 Estadia: ${formatShortDate(input.checkIn)} a ${formatShortDate(input.checkOut)}`,
+      "",
+      `Se já pagou, desconsidere e me avise para eu conferir. Obrigado! ${input.businessName}`,
+    ].join("\n"),
+  );
+}
+
+/** Agradecimento depois da saída. */
+export function thanksMessage(input: ConfirmationInput): string {
+  const firstName = firstNameOf(input.guestName);
+
+  return noNbsp(
+    [
+      `Olá, ${firstName}! Obrigado por se hospedar no ${input.chaletName} 💙`,
+      "",
+      "Esperamos que tenha sido uma estadia incrível. Se puder, conte para nós como foi — sua opinião ajuda muito!",
+      "",
+      `Quando quiser voltar, é só chamar. ${input.businessName}`,
+    ].join("\n"),
+  );
+}
+
+export type ReminderKind = "arrival" | "balance" | "thanks";
+
+export interface Reminder {
+  kind: ReminderKind;
+  label: string;
+  message: string;
+}
+
+/**
+ * Lembretes que fazem sentido para a reserva hoje:
+ * chegada (ainda não começou), saldo (falta pagar) e agradecimento (já saiu).
+ * Reservas canceladas não têm lembretes.
+ */
+export function availableReminders(input: ConfirmationInput, today: IsoDate = todayIso()): Reminder[] {
+  if (input.status === "cancelled") return [];
+  const reminders: Reminder[] = [];
+  const balance = Math.round((input.total - input.paid) * 100) / 100;
+
+  if (input.status === "confirmed" && input.checkIn >= today) {
+    reminders.push({ kind: "arrival", label: "Lembrar da chegada", message: arrivalReminderMessage(input) });
+  }
+  if (balance > 0) {
+    reminders.push({ kind: "balance", label: "Cobrar saldo", message: balanceReminderMessage(input) });
+  }
+  if (input.checkOut <= today) {
+    reminders.push({ kind: "thanks", label: "Agradecer", message: thanksMessage(input) });
+  }
+  return reminders;
 }

@@ -12,7 +12,7 @@ import { formatLongDate } from "@/lib/dates";
 import { pluralize } from "@/lib/format";
 
 import type { ReservationDetailRecord } from "../data/reservations.repository";
-import { confirmationMessage } from "../domain/messages";
+import { availableReminders, confirmationMessage, type ConfirmationInput } from "../domain/messages";
 import { SOURCE_LABELS } from "../domain/status";
 import { PaymentStatusBadge } from "./payment-status-badge";
 import { ReservationStatusBadge } from "./reservation-status-badge";
@@ -35,7 +35,7 @@ interface ReservationDetailProps {
 export function ReservationDetail({ detail, billing, aside, businessName }: ReservationDetailProps) {
   const { reservation, financials, chalet, mainGuest, guests } = detail;
   const people = reservation.adults + reservation.children;
-  const confirmation = confirmationMessage({
+  const messageInput: ConfirmationInput = {
     guestName: mainGuest.full_name,
     chaletName: chalet.name,
     businessName,
@@ -48,7 +48,12 @@ export function ReservationDetail({ detail, billing, aside, businessName }: Rese
     nights: reservation.nights,
     total: financials.grand_total,
     paid: financials.paid_total,
-  });
+  };
+  const confirmation = confirmationMessage(messageInput);
+  const reminders = availableReminders(messageInput).map((reminder) => ({
+    ...reminder,
+    href: whatsappUrl(mainGuest.phone, reminder.message),
+  }));
   const whatsapp = reservation.status === "cancelled" ? null : whatsappUrl(mainGuest.phone, confirmation);
 
   return (
@@ -110,6 +115,28 @@ export function ReservationDetail({ detail, billing, aside, businessName }: Rese
               Recibo
             </ButtonLink>
           </div>
+
+          {reminders.some((reminder) => reminder.href) ? (
+            <div>
+              <p className="mb-2 text-xs font-semibold tracking-wide text-ink-muted uppercase">Lembretes no WhatsApp</p>
+              <div className="flex flex-wrap gap-2">
+                {reminders.map((reminder) =>
+                  reminder.href ? (
+                    <a
+                      key={reminder.kind}
+                      href={reminder.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={buttonVariants({ variant: "secondary", size: "sm" })}
+                    >
+                      <MessageCircle aria-hidden="true" />
+                      {reminder.label}
+                    </a>
+                  ) : null,
+                )}
+              </div>
+            </div>
+          ) : null}
         </Card>
 
         {/* Pessoas */}
