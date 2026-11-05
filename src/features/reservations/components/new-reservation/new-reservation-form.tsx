@@ -221,7 +221,7 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
               capacityIssue={issues.capacity}
               maxGuests={chalet?.max_guests ?? MAX_CHALET_GUESTS}
               adults={adults}
-              children={children}
+              childCount={children}
               onAdultsChange={setAdults}
               onChildrenChange={setChildren}
               source={source}

@@ -28,7 +28,7 @@ interface StayStepProps {
   capacityIssue?: string;
   maxGuests: number;
   adults: number;
-  children: number;
+  childCount: number;
   onAdultsChange: (value: number) => void;
   onChildrenChange: (value: number) => void;
   source: string;
@@ -54,7 +54,7 @@ export function StayStep({
   capacityIssue,
   maxGuests,
   adults,
-  children,
+  childCount,
   onAdultsChange,
   onChildrenChange,
   source,
@@ -117,7 +117,7 @@ export function StayStep({
             label="Adultos"
             description={chalet ? `até ${maxGuests} pessoas no total` : undefined}
             min={1}
-            max={Math.max(1, maxGuests - children)}
+            max={Math.max(1, maxGuests - childCount)}
             value={adults}
             onChange={onAdultsChange}
           />
@@ -126,7 +126,7 @@ export function StayStep({
             label="Crianças"
             min={0}
             max={Math.max(0, maxGuests - adults)}
-            value={children}
+            value={childCount}
             onChange={onChildrenChange}
           />
         </div>
