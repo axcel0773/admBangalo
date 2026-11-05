@@ -12,6 +12,7 @@ import {
   monthParam,
   MonthReservations,
   parseMonthParam,
+  ProfitSummary,
   previousTrendPoint,
   RevenueBreakdown,
   RevenueChart,
@@ -49,6 +50,7 @@ export default async function FinancePage({ searchParams }: FinancePageProps) {
       <PageBody className="flex flex-col gap-4 md:gap-6">
         <MonthNav month={month} className="self-start" />
         <FinanceSummary report={report} previous={previousTrendPoint(trend)} />
+        <ProfitSummary report={report} />
         <div className="grid gap-4 md:gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
           <div className="flex flex-col gap-4 md:gap-6">
             <RevenueChart points={trend} currentMonth={month} />

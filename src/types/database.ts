@@ -160,6 +160,28 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["quotes"]["Insert"]>;
         Relationships: [];
       };
+      expenses: {
+        Row: {
+          id: string;
+          owner_id: string;
+          chalet_id: string | null;
+          category: "energy" | "cleaning" | "maintenance" | "supplies" | "taxes" | "other";
+          description: string | null;
+          amount: number;
+          spent_on: string;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          owner_id?: string;
+          chalet_id?: string | null;
+          category: "energy" | "cleaning" | "maintenance" | "supplies" | "taxes" | "other";
+          description?: string | null;
+          amount: number;
+          spent_on: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["expenses"]["Insert"]>;
+        Relationships: [];
+      };
       guests: {
         Row: {
           id: string;

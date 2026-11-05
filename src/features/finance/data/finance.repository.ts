@@ -33,6 +33,12 @@ export function createFinanceRepository(db: DbClient) {
       return unwrapList(result, "Listar pagamentos do mês");
     },
 
+    /** Soma das despesas lançadas no período (só o valor, sem trazer descrições). */
+    async listExpenseAmounts(from: IsoDate, to: IsoDate): Promise<{ amount: number }[]> {
+      const result = await db.from("expenses").select("amount").gte("spent_on", from).lte("spent_on", to);
+      return unwrapList(result, "Listar despesas do mês");
+    },
+
     async listMonthlySummary(from: IsoDate, to: IsoDate): Promise<MonthSummaryRow[]> {
       const result = await db
         .from("monthly_summary")
