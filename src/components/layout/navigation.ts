@@ -27,6 +27,7 @@ export const routes = {
   guests: "/hospedes",
   finance: "/financeiro",
   cleaning: "/limpeza",
+  reports: "/financeiro/relatorios",
   expenses: "/financeiro/despesas",
   newExpense: "/financeiro/despesas/nova",
   settings: "/configuracoes",

@@ -15,6 +15,7 @@ import {
   type MonthReport,
   type TrendPoint,
 } from "./domain";
+import { buildYearReport, yearReportCsv, type YearReport } from "./reports";
 
 const TREND_MONTHS = 6;
 
@@ -51,4 +52,17 @@ export async function getFinanceOverview(
 
 export async function getMonthCsv(month: IsoDate): Promise<string> {
   return financeCsv((await loadMonth(month)).report);
+}
+
+export async function getYearReport(year: number): Promise<YearReport> {
+  const repo = await financeRepository();
+  const [stays, chalets] = await Promise.all([
+    repo.listYearStays(`${year}-01-01`, `${year}-12-31`),
+    repo.listActiveChalets(),
+  ]);
+  return buildYearReport({ year, stays, chaletNames: chalets.map((chalet) => chalet.name) });
+}
+
+export async function getYearReportCsv(year: number): Promise<string> {
+  return yearReportCsv(await getYearReport(year));
 }

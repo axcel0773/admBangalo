@@ -5,6 +5,7 @@ import { unwrapList } from "@/lib/supabase/result";
 import type { DbClient } from "@/lib/supabase/server";
 
 import type { CashPayment, ChaletRef, FinanceStay, MonthSummaryRow } from "../domain";
+import type { ReportStay } from "../reports";
 
 const STAY_COLUMNS =
   "reservation_id, chalet_name, main_guest_name, check_in, check_out, nights, guests_count, status, lodging_total, charges_total, energy_total, cleaning_total, grand_total, paid_total, balance_due, payment_status";
@@ -37,6 +38,24 @@ export function createFinanceRepository(db: DbClient) {
     async listExpenseAmounts(from: IsoDate, to: IsoDate): Promise<{ amount: number }[]> {
       const result = await db.from("expenses").select("amount").gte("spent_on", from).lte("spent_on", to);
       return unwrapList(result, "Listar despesas do mês");
+    },
+
+    /** Estadias do ano (sem canceladas) com a origem da reserva, para o relatório anual. */
+    async listYearStays(from: IsoDate, to: IsoDate): Promise<ReportStay[]> {
+      const result = await db
+        .from("reservation_financials")
+        .select("reservation_id, chalet_name, check_in, check_out, nights, lodging_total")
+        .neq("status", "cancelled")
+        .lte("check_in", to)
+        .gt("check_out", from);
+      const stays = unwrapList(result, "Listar estadias do ano");
+      if (stays.length === 0) return [];
+      const sources = unwrapList(
+        await db.from("reservations").select("id, source").in("id", stays.map((stay) => stay.reservation_id)),
+        "Listar origem das reservas",
+      );
+      const sourceById = new Map(sources.map((row) => [row.id, row.source]));
+      return stays.map((stay) => ({ ...stay, source: sourceById.get(stay.reservation_id) ?? "other" }));
     },
 
     async listMonthlySummary(from: IsoDate, to: IsoDate): Promise<MonthSummaryRow[]> {
