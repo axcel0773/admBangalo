@@ -9,7 +9,7 @@ import { FieldRow, FormSection } from "@/components/ui/form-layout";
 import { SelectField } from "@/components/ui/select-field";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { TextareaField } from "@/components/ui/textarea-field";
-import { blockWarning, overlappingBlocks, type ChaletBlock } from "@/features/availability";
+import { blockWarning, overlappingBlocks, type ChaletBlock } from "@/features/availability/client";
 import { MAX_CHALET_GUESTS } from "@/features/chalets/domain";
 import {
   nightlyBreakdown,
@@ -20,7 +20,7 @@ import {
   validateDraft,
   type FeeForQuote,
   type SeasonRate,
-} from "@/features/reservations";
+} from "@/features/reservations/client";
 import { addDays, type IsoDate } from "@/lib/dates";
 import { fieldError, idleFormState } from "@/lib/forms";
 import { formatCurrency, formatMoneyInput, pluralize } from "@/lib/format";
