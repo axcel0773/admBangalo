@@ -26,7 +26,7 @@ export function QuoteDocumentCard({ doc }: { doc: QuoteDocument }) {
         {doc.items.map((item, index) => (
           <li key={`${index}-${item.description}`} className="flex items-start justify-between gap-4 py-2.5 text-sm">
             <span className="min-w-0 break-words">{item.description}</span>
-            <span className="shrink-0 font-semibold tabular-nums">{formatCurrency(item.amount)}</span>
+            <span className="shrink-0 font-semibold tabular-nums">{item.pending ? "A calcular" : formatCurrency(item.amount)}</span>
           </li>
         ))}
       </ul>

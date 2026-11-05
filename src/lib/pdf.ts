@@ -4,12 +4,18 @@ import type { PDFFont } from "pdf-lib";
  * Apoio aos PDFs gerados no aparelho (pdf-lib). As fontes padrão do PDF só têm o alfabeto latino (WinAnsi).
  */
 
-/** Troca o que a fonte padrão do PDF não consegue desenhar. */
+/**
+ * Troca o que a fonte padrão do PDF não consegue desenhar. Emojis e símbolos de figura somem
+ * (em vez de virar “??”) e o espaço que sobra é ajustado; outros caracteres fora do latim viram “?”.
+ */
 export function winAnsiSafe(text: string): string {
   return text
+    .replace(/(?![©®])[\p{Extended_Pictographic}\u{FE0F}\u{200D}\u{20E3}\u{1F3FB}-\u{1F3FF}]/gu, " ")
     .replace(/ /g, " ")
     .replace(/−/g, "-")
-    .replace(/[^ -~¡-ÿ–—‘’“”•…€]/g, "?");
+    .replace(/[^ -~¡-ÿ–—‘’“”•…€]/g, "?")
+    .replace(/ {2,}/g, " ")
+    .trim();
 }
 
 /** Quebra o texto em linhas que cabem em `maxWidth`. */

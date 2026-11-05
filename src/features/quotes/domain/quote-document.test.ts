@@ -46,6 +46,8 @@ describe("orçamento", () => {
     expect(lines[0]?.description).toContain("desconto");
     expect(lines[2]?.description).toContain("2 ×");
     expect(lines[3]?.description).toContain("calculada na saída");
+    expect(lines[3]?.pending).toBe(true);
+    expect(lines[1]?.pending).toBeUndefined();
   });
 
   it("calcula a validade", () => {
@@ -57,6 +59,8 @@ describe("orçamento", () => {
       { description: "A", amount: 1 },
     ]);
     expect(parseQuoteLines("nada")).toEqual([]);
+    // Orçamento antigo (sem a marca): a taxa medida continua aparecendo como “a calcular”.
+    expect(parseQuoteLines([{ description: "Energia (calculada na saída)", amount: 0 }])[0]?.pending).toBe(true);
   });
 
   it("marca como vencido depois da validade", () => {
@@ -68,6 +72,11 @@ describe("orçamento", () => {
     const doc = buildQuoteDocument({ ...base, today: "2026-11-05" });
     expect(doc.number).toBe("A1B2C3D4");
     expect(doc.stay).toContain("2 noites");
+    expect(doc.nights).toBe(2);
+    expect(doc.checkIn).toBe("20/12/2026 às 14:00");
+    expect(doc.checkOut).toBe("22/12/2026 às 12:00");
+    expect(doc.validUntil).toBe("12/11/2026");
+    expect(doc.issuedAt).toBe("05/11/2026");
     expect(doc.people).toBe("4 pessoas");
     expect(doc.total).toBe(980);
   });

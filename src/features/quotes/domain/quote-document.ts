@@ -1,4 +1,4 @@
-import { addDays, daysBetween, formatShortDate, type IsoDate } from "@/lib/dates";
+import { addDays, daysBetween, formatDate, formatShortDate, type IsoDate } from "@/lib/dates";
 import { formatCurrency, formatDecimal, pluralize } from "@/lib/format";
 
 /** Dias de validade oferecidos ao criar o orçamento (o primeiro é o padrão). */
@@ -6,7 +6,7 @@ export const VALIDITY_OPTIONS = [7, 3, 15, 30] as const;
 export const DEFAULT_VALIDITY_DAYS = VALIDITY_OPTIONS[0];
 
 // `type` (e não interface) para caber no jsonb do banco.
-export type QuoteLine = { description: string; amount: number };
+export type QuoteLine = { description: string; amount: number; pending?: boolean };
 
 /** Linha de taxa do cálculo (mesma forma que a reserva usa). */
 export interface QuoteChargeInput {
@@ -40,7 +40,12 @@ export function buildQuoteLines(input: {
   return [
     { description: lodgingLabel, amount: input.lodging },
     // Taxa medida (energia) ainda não tem valor: não entra no total, só aparece como aviso.
-    ...input.charges.map((charge) => ({ description: chargeLineLabel(charge), amount: charge.total })),
+    ...input.charges.map((charge) => ({
+      description: chargeLineLabel(charge),
+      amount: charge.total,
+      // Taxa medida (energia): o valor sai na saída, então aparece como “a calcular”.
+      ...(charge.mode === "metered" ? { pending: true } : {}),
+    })),
   ];
 }
 
@@ -53,8 +58,11 @@ export function parseQuoteLines(value: unknown): QuoteLine[] {
   if (!Array.isArray(value)) return [];
   return value.flatMap((item) => {
     if (typeof item !== "object" || item === null) return [];
-    const { description, amount } = item as Record<string, unknown>;
-    return typeof description === "string" && typeof amount === "number" ? [{ description, amount }] : [];
+    const { description, amount, pending } = item as Record<string, unknown>;
+    if (typeof description !== "string" || typeof amount !== "number") return [];
+    // Orçamentos antigos não tinham a marca; a frase da taxa medida a revela.
+    const isPending = pending === true || (amount === 0 && description.endsWith("(calculada na saída)"));
+    return [isPending ? { description, amount, pending: true } : { description, amount }];
   });
 }
 
@@ -68,6 +76,9 @@ export interface QuoteDocument {
   expired: boolean;
   guestName: string;
   chaletName: string;
+  checkIn: string;
+  checkOut: string;
+  nights: number;
   stay: string;
   people: string;
   items: QuoteLine[];
@@ -103,11 +114,14 @@ export function buildQuoteDocument({ quote, chalet, issuer, issuerPhone, pixKey,
     number: quote.id.slice(0, 8).toUpperCase(),
     issuer,
     issuerPhone,
-    issuedAt: formatShortDate(quote.created_at.slice(0, 10)),
-    validUntil: formatShortDate(quote.valid_until),
+    issuedAt: formatDate(quote.created_at.slice(0, 10)),
+    validUntil: formatDate(quote.valid_until),
     expired: quote.valid_until < today,
     guestName: quote.guest_name,
     chaletName: chalet.name,
+    checkIn: `${formatDate(quote.check_in)} às ${chalet.check_in_time.slice(0, 5)}`,
+    checkOut: `${formatDate(quote.check_out)} às ${chalet.check_out_time.slice(0, 5)}`,
+    nights,
     stay:
       `${chalet.name} · entrada ${formatShortDate(quote.check_in)} às ${chalet.check_in_time.slice(0, 5)}` +
       ` · saída ${formatShortDate(quote.check_out)} às ${chalet.check_out_time.slice(0, 5)} · ${pluralize(nights, "noite", "noites")}`,
