@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { createDashboardRepository, type DashboardRepository } from "../data/dashboard.repository";
 import { buildDashboard } from "../domain/build-dashboard";
+import { ACTION_HORIZON_DAYS } from "../domain/today-actions";
 import type { DashboardData, ScheduleRow } from "../domain/types";
 
 const UPCOMING_LIMIT = 5;
@@ -23,13 +24,14 @@ export async function getDashboard(
   const monthStart = startOfMonth(today);
   const monthEnd = addDays(monthStart, daysInMonth(today) - 1);
 
-  const [chalets, monthStays, openBalances, monthPayments, upcoming, guestCount] = await Promise.all([
+  const [chalets, monthStays, openBalances, monthPayments, upcoming, guestCount, quotes] = await Promise.all([
     repository.listActiveChalets(),
     repository.listStaysBetween(monthStart, monthEnd),
     repository.listOpenBalances(),
     repository.listPaymentsBetween(monthStart, monthEnd),
     repository.listUpcomingArrivals(today, UPCOMING_LIMIT),
     repository.countGuests(),
+    repository.listQuotesExpiring(today, addDays(today, ACTION_HORIZON_DAYS)),
   ]);
 
   const scheduleRows = await repository.listSchedulesFor(openBalances.map((stay) => stay.reservation_id));
@@ -42,5 +44,5 @@ export async function getDashboard(
     chalets.map((chalet) => chalet.photo_path).filter((path): path is string => Boolean(path)),
   );
 
-  return buildDashboard({ today, chalets, monthStays, openBalances, monthPayments, upcoming, schedules, photoUrls, guestCount });
+  return buildDashboard({ today, chalets, monthStays, openBalances, monthPayments, upcoming, schedules, photoUrls, guestCount, quotes });
 }

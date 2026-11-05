@@ -2,6 +2,7 @@ import { balanceDueDate, type Installment } from "@/features/billing/domain/sche
 import { paidAmount, roundMoney } from "@/features/reservations/domain";
 import { addDays, daysBetween, daysInMonth, startOfMonth, type IsoDate } from "@/lib/dates";
 
+import { buildTodayActions } from "./today-actions";
 import type {
   AgendaEvent,
   ChaletOverview,
@@ -9,6 +10,7 @@ import type {
   DashboardData,
   DashboardSummary,
   PaymentRow,
+  QuoteRow,
   Receivable,
   StayRow,
   UpcomingArrival,
@@ -189,6 +191,7 @@ export function buildDashboard(input: {
   photoUrls?: Record<string, string>;
   receivablesLimit?: number;
   guestCount?: number;
+  quotes?: QuoteRow[];
 }): DashboardData {
   const { today, chalets, monthStays, openBalances, monthPayments, upcoming, schedules } = input;
 
@@ -198,6 +201,12 @@ export function buildDashboard(input: {
     agenda: buildAgenda(monthStays, chalets, today),
     chalets: buildChaletOverview(chalets, monthStays, today, input.photoUrls),
     guestCount: input.guestCount ?? 0,
+    actions: buildTodayActions({
+      today,
+      receivables: buildReceivables(openBalances, today, schedules),
+      stays: [...monthStays, ...upcoming],
+      quotes: input.quotes ?? [],
+    }),
     receivables: buildReceivables(openBalances, today, schedules).slice(0, input.receivablesLimit ?? 4),
     upcoming: buildUpcoming(upcoming),
   };

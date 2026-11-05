@@ -9,6 +9,7 @@ import {
   ReceivablesCard,
   Shortcuts,
   SummaryCards,
+  TodayActions,
   TodayAgenda,
   UpcomingArrivals,
 } from "@/features/dashboard";
@@ -33,6 +34,7 @@ export default async function DashboardPage() {
       {/* No celular os cartões sobem sobre a faixa verde do cabeçalho. */}
       <PageBody className="relative -mt-7 md:mt-0">
         <SummaryCards summary={dashboard.summary} />
+        <TodayActions actions={dashboard.actions} />
         <TodayAgenda events={dashboard.agenda} />
         <ChaletList chalets={dashboard.chalets} />
         <div className="grid gap-4 md:gap-5 lg:grid-cols-2">
