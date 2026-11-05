@@ -2,6 +2,7 @@ import { Users } from "lucide-react";
 
 import { paths, routes } from "@/components/layout/navigation";
 import { Avatar } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ListCard, ListRow } from "@/components/ui/list-row";
@@ -23,7 +24,7 @@ function subtitleFor(guest: GuestSummary): string {
 export function GuestList({ guests, searched }: { guests: GuestSummary[]; searched: boolean }) {
   if (guests.length === 0) {
     return searched ? (
-      <p className="py-8 text-center text-sm text-ink-muted">Nenhum hóspede encontrado para essa busca.</p>
+      <p className="py-8 text-center text-sm text-ink-muted">Nenhum hóspede encontrado com esses filtros.</p>
     ) : (
       <EmptyState
         icon={<Users />}
@@ -43,6 +44,14 @@ export function GuestList({ guests, searched }: { guests: GuestSummary[]; search
           leading={<Avatar name={guest.full_name} size="lg" />}
           title={guest.full_name}
           subtitle={subtitleFor(guest)}
+          trailing={
+            guest.recurring || guest.birthdayThisMonth ? (
+              <span className="flex flex-col items-end gap-1">
+                {guest.recurring ? <Badge tone="success">Cliente fiel</Badge> : null}
+                {guest.birthdayThisMonth ? <Badge tone="warning">Aniversário</Badge> : null}
+              </span>
+            ) : undefined
+          }
         />
       ))}
     </ListCard>

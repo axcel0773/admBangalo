@@ -3,7 +3,9 @@ import "server-only";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { createGuestsRepository } from "./data/guests.repository";
-import { guestsCsv, type Guest, type GuestStay, type GuestSummary } from "./domain";
+import { todayIso } from "@/lib/dates";
+
+import { guestsCsv, isBirthdayMonth, isRecurringGuest, type Guest, type GuestStay, type GuestSummary } from "./domain";
 
 export async function guestsRepository() {
   return createGuestsRepository(await createSupabaseServerClient());
@@ -15,9 +17,17 @@ export async function searchGuests(term?: string): Promise<GuestSummary[]> {
   const guests = await repo.search(term);
   const stays = await repo.listStays(guests.map((guest) => guest.id));
 
+  const today = todayIso();
+
   return guests.map((guest) => {
     const own = stays.filter((stay) => stay.main_guest_id === guest.id);
-    return { ...guest, staysCount: own.length, lastStay: own[0] ?? null };
+    return {
+      ...guest,
+      staysCount: own.length,
+      lastStay: own[0] ?? null,
+      recurring: isRecurringGuest(own),
+      birthdayThisMonth: isBirthdayMonth(guest.birth_date, today),
+    };
   });
 }
 

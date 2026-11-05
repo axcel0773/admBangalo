@@ -48,6 +48,7 @@ const leaving = stay({
 });
 
 const data = buildDashboard({
+  guestCount: 12,
   today: TODAY,
   chalets,
   monthStays: [arriving, leaving],
@@ -75,6 +76,11 @@ describe("nightsInMonth", () => {
 });
 
 describe("buildDashboard", () => {
+  it("repassa o total de hóspedes e usa zero quando não informado", () => {
+    expect(data.guestCount).toBe(12);
+    expect(buildDashboard({ today: TODAY, chalets, monthStays: [], openBalances: [], monthPayments: [], upcoming: [] }).guestCount).toBe(0);
+  });
+
   it("ordena a agenda pelo horário: saída 12h antes da chegada 14h", () => {
     expect(data.agenda.map((e) => [e.type, e.time, e.guestName])).toEqual([
       ["check-out", "12:00", "Paulo Lima"],

@@ -188,6 +188,7 @@ export function buildDashboard(input: {
   /** Links assinados das fotos, por caminho no Storage. */
   photoUrls?: Record<string, string>;
   receivablesLimit?: number;
+  guestCount?: number;
 }): DashboardData {
   const { today, chalets, monthStays, openBalances, monthPayments, upcoming, schedules } = input;
 
@@ -196,6 +197,7 @@ export function buildDashboard(input: {
     summary: buildSummary({ chalets, monthStays, openBalances, monthPayments, today, schedules }),
     agenda: buildAgenda(monthStays, chalets, today),
     chalets: buildChaletOverview(chalets, monthStays, today, input.photoUrls),
+    guestCount: input.guestCount ?? 0,
     receivables: buildReceivables(openBalances, today, schedules).slice(0, input.receivablesLimit ?? 4),
     upcoming: buildUpcoming(upcoming),
   };

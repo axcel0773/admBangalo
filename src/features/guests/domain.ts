@@ -1,4 +1,5 @@
 import { csvDate, toCsv } from "@/lib/csv";
+import type { IsoDate } from "@/lib/dates";
 import type { Tables, Views } from "@/types/database";
 
 export type Guest = Tables<"guests">;
@@ -20,6 +21,41 @@ export type GuestStay = Pick<
 export interface GuestSummary extends Guest {
   staysCount: number;
   lastStay: GuestStay | null;
+  /** Voltou a se hospedar (2 ou mais estadias não canceladas). */
+  recurring: boolean;
+  /** Faz aniversário no mês atual. */
+  birthdayThisMonth: boolean;
+}
+
+/** Quantas estadias não canceladas fazem do hóspede um cliente recorrente. */
+export const RECURRING_MIN_STAYS = 2;
+
+export const GUEST_FILTERS = {
+  all: "Todos",
+  recurring: "Recorrentes",
+  birthdays: "Aniversariantes do mês",
+} as const;
+
+export type GuestFilter = keyof typeof GUEST_FILTERS;
+
+export function isGuestFilter(value: string | undefined): value is GuestFilter {
+  return value !== undefined && Object.hasOwn(GUEST_FILTERS, value);
+}
+
+/** Cliente recorrente: estadias canceladas não contam. */
+export function isRecurringGuest(stays: Pick<GuestStay, "status">[]): boolean {
+  return stays.filter((stay) => stay.status !== "cancelled").length >= RECURRING_MIN_STAYS;
+}
+
+/** Aniversário no mesmo mês de `today` (datas ISO "AAAA-MM-DD"). */
+export function isBirthdayMonth(birthDate: string | null, today: IsoDate): boolean {
+  return birthDate !== null && birthDate.slice(5, 7) === today.slice(5, 7);
+}
+
+export function filterGuests(guests: GuestSummary[], filter: GuestFilter): GuestSummary[] {
+  if (filter === "recurring") return guests.filter((guest) => guest.recurring);
+  if (filter === "birthdays") return guests.filter((guest) => guest.birthdayThisMonth);
+  return guests;
 }
 
 /** "São Paulo/SP" ou só a parte que existir. */

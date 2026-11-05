@@ -235,6 +235,28 @@ export function buildTrend(rows: MonthSummaryRow[], month: IsoDate, count = 6): 
   });
 }
 
+// ---- Comparativo com o mês anterior ---------------------------------------
+
+export interface MonthChange {
+  direction: "up" | "down" | "same";
+  /** Diferença em reais (atual − anterior). */
+  delta: number;
+  /** Variação sobre o mês anterior (0,12 = +12 %); `null` quando o mês anterior foi zero. */
+  ratio: number | null;
+}
+
+/** Compara um valor do mês com o do mês anterior. */
+export function compareWithPrevious(current: number, previous: number): MonthChange {
+  const delta = roundMoney(current - previous);
+  const direction = delta > 0 ? "up" : delta < 0 ? "down" : "same";
+  return { direction, delta, ratio: previous > 0 ? Math.abs(delta) / previous : null };
+}
+
+/** Mês anterior dentro da tendência (último ponto é o mês atual); `null` se não houver. */
+export function previousTrendPoint(points: TrendPoint[]): TrendPoint | null {
+  return points.length >= 2 ? (points[points.length - 2] ?? null) : null;
+}
+
 // ---- CSV ---------------------------------------------------------------------
 
 const CSV_HEADER = [
