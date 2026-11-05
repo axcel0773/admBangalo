@@ -2,6 +2,8 @@
 
 **Última atualização:** 05/11/2026 · Complementa `docs/etapas.md` (o que já foi feito), `docs/padroes.md` e `docs/arquitetura.md`.
 
+**Já feitas (05/11):** 2, 5, 11, 12 e a contagem de hóspedes do 17 — marcadas com ✅.
+
 **Esforço:** **P** = até meio dia · **M** = 1 a 2 dias · **G** = 3 dias ou mais. Considera código, testes, migração e documentação.
 **Restrição fixa:** tudo precisa continuar rodando no plano **gratuito** da Vercel e do Supabase.
 
@@ -12,22 +14,22 @@
 | # | Melhoria | Esforço | Banco (migração) | Prioridade |
 | --- | --- | --- | --- | --- |
 | 1 | Sinal (entrada) em orçamentos e reservas | M | sim | Alta |
-| 2 | Lembretes de WhatsApp prontos | P | não | Alta |
+| 2 | Lembretes de WhatsApp prontos ✅ | P | não | Alta |
 | 3 | "Ações de hoje" no Painel | M | não | Alta |
 | 4 | Orçamentos com status | M | sim | Média |
-| 5 | Duplicar reserva/orçamento e "reservar de novo" | P | não | Média |
+| 5 | Duplicar reserva/orçamento e "reservar de novo" ✅ | P | não | Média |
 | 6 | Controle de limpeza | M | sim | Média |
 | 7 | Leitura de medidor (kWh) no check-in/out | M | sim | Alta |
 | 8 | Despesas por bangalô | M | sim | Alta |
 | 9 | Tarifas sazonais e mínimo de noites | G | sim | Média |
 | 10 | Relatórios e exportação CSV/PDF | M | não | Média |
-| 11 | Hóspedes recorrentes (marcas e filtros) | P | sim | Baixa |
-| 12 | Comparativo de meses | P | não | Baixa |
+| 11 | Hóspedes recorrentes (marcas e filtros) ✅ | P | sim | Baixa |
+| 12 | Comparativo de meses ✅ | P | não | Baixa |
 | 13 | Notificações push (PWA) | G | sim | Média |
 | 14 | Modo offline (leitura) | G | não | Baixa |
 | 15 | Histórico de alterações e exportação de dados | G | sim | Média |
 | 16 | Acesso de equipe (perfil limitado) | G | sim | Baixa |
-| 17 | Refinos de interface (contagem nos atalhos, busca global, modo escuro) | P–M | não | Baixa |
+| 17 | Refinos de interface (contagem nos atalhos ✅, busca global, modo escuro) | P–M | não | Baixa |
 
 **Ordem recomendada:** 1 → 2 → 3 → 7 → 8 → 4 → 5 → 6 → 10 → 9 → demais.
 
