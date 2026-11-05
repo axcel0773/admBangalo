@@ -7,7 +7,7 @@ select ok((select relrowsecurity from pg_class where oid = 'public.expenses'::re
 select is((select count(*)::int from pg_policies where tablename = 'expenses'), 1, 'uma política (dono)');
 select is((select count(*)::int from information_schema.role_table_grants where table_name = 'expenses' and grantee = 'anon'), 0, 'anon sem acesso');
 select ok(
-  exists (select 1 from pg_constraint where conrelid = 'public.expenses'::regclass and contype = 'c' and pg_get_constraintdef(oid) like '%amount > 0%'),
+  exists (select 1 from pg_constraint where conrelid = 'public.expenses'::regclass and contype = 'c' and pg_get_constraintdef(oid) like '%amount > (0)::numeric%'),
   'valor da despesa precisa ser positivo'
 );
 select ok(
