@@ -68,6 +68,18 @@ export function ProfileForm({ profile }: { profile: Tables<"profiles"> | null })
           hint="Aparece para o hóspede no app do banco. O nome do recebedor é o nome do negócio."
           error={error("pix_city")}
         />
+        <Field
+          label="Sinal padrão (%)"
+          name="default_deposit_percent"
+          type="number"
+          inputMode="numeric"
+          min={0}
+          max={100}
+          step={1}
+          defaultValue={v("default_deposit_percent", profile?.default_deposit_percent ?? 30)}
+          hint="Percentual do total sugerido nos orçamentos para garantir a reserva. Use 0 para não sugerir sinal."
+          error={error("default_deposit_percent")}
+        />
       </FormSection>
 
       <FormActions>

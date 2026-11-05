@@ -36,6 +36,13 @@ export function QuoteDocumentCard({ doc }: { doc: QuoteDocument }) {
         <span className="font-display text-2xl font-semibold">{formatCurrency(doc.total)}</span>
       </div>
 
+      {doc.deposit > 0 ? (
+        <div className="flex items-center justify-between rounded-xl bg-primary-soft px-3 py-2.5 text-sm text-primary-ink">
+          <span className="font-semibold">Sinal para garantir a reserva</span>
+          <span className="font-semibold tabular-nums">{formatCurrency(doc.deposit)}</span>
+        </div>
+      ) : null}
+
       {doc.notes ? <p className="rounded-xl bg-subtle p-3 text-sm text-ink-soft">{doc.notes}</p> : null}
     </Card>
   );

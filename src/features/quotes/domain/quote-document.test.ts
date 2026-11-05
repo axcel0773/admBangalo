@@ -21,6 +21,7 @@ const quote = {
     { description: "Limpeza", amount: 80 },
   ],
   total: 980,
+  deposit_amount: 294,
   notes: null,
   valid_until: "2026-11-12",
   created_at: "2026-11-05T13:00:00Z",
@@ -88,5 +89,15 @@ describe("orçamento", () => {
     expect(message).toContain("Olá, Maria!");
     expect(message).toContain("Válido até");
     expect(message).not.toContain(" ");
+  });
+
+  it("sinal entra no documento e na mensagem; sem sinal, some", () => {
+    const withDeposit = buildQuoteDocument({ ...base, today: "2026-11-05" });
+    expect(withDeposit.deposit).toBe(294);
+    expect(quoteMessage(withDeposit)).toMatch(/Sinal para garantir a reserva: R\$ 294,00/);
+
+    const noDeposit = buildQuoteDocument({ quote: { ...base.quote, deposit_amount: 0 }, chalet: base.chalet, issuer: base.issuer, issuerPhone: base.issuerPhone, pixKey: base.pixKey, today: "2026-11-05" });
+    expect(noDeposit.deposit).toBe(0);
+    expect(quoteMessage(noDeposit)).not.toContain("Sinal");
   });
 });

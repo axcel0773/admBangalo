@@ -23,6 +23,7 @@ const doc: QuoteDocument = {
     { description: "Energia elétrica (calculada na saída)", amount: 0, pending: true },
   ],
   total: 980,
+  deposit: 294,
   notes: "Aceitamos pets de pequeno porte 🐶",
   pixKey: "chave@exemplo.com",
 };
