@@ -35,7 +35,10 @@ export const metadata: Metadata = {
  * Safari/PWA, deixando títulos e botões colados no relógio.
  */
 export const viewport: Viewport = {
-  themeColor: "#14508A",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#14508A" },
+    { media: "(prefers-color-scheme: dark)", color: "#14181c" },
+  ],
   width: "device-width",
   initialScale: 1,
 };

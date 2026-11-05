@@ -21,7 +21,7 @@ export function Sidebar({ businessName, ownerName, avatarUrl }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-1.5 border-r border-[#e2d6c2] bg-muted px-4.5 py-7 md:flex">
+    <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-1.5 border-r border-line-strong bg-muted px-4.5 py-7 md:flex">
       <Brand name={businessName} className="px-2 pb-7" />
 
       <nav aria-label="Menu principal" className="flex flex-col gap-1.5">

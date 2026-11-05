@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
+import { routes } from "@/components/layout/navigation";
 import { PageBody } from "@/components/layout/page-header";
+import { SearchForm } from "@/components/ui/search-form";
 import { requireOwner } from "@/features/auth/session";
 import {
   ChaletList,
@@ -33,6 +35,11 @@ export default async function DashboardPage() {
 
       {/* No celular os cartões sobem sobre a faixa verde do cabeçalho. */}
       <PageBody className="relative -mt-7 md:mt-0">
+        <SearchForm
+          action={routes.search}
+          placeholder="Buscar hóspede, reserva ou orçamento"
+          label="Buscar hóspedes, reservas e orçamentos"
+        />
         <SummaryCards summary={dashboard.summary} />
         <TodayActions actions={dashboard.actions} />
         <TodayAgenda events={dashboard.agenda} />
