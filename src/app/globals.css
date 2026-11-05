@@ -41,6 +41,10 @@
   --color-energy-ink: #6e500d;
 
   /* cor de cada bangalô (padrões; o banco guarda a cor escolhida) */
+  --color-tile-slate: #dce6ea;
+  --color-tile-slate-ink: #4d6b7a;
+  --color-peach-soft: #f9ede3;
+
   --color-chalet-moss: #1f6fb2;
   --color-chalet-slate: #5e7c8c;
   --color-chalet-plum: #8b5a6b;
@@ -58,7 +62,7 @@
  * continuam usando os nomes semânticos. Contrastes conferidos: texto ≥ 4,5:1 sobre as superfícies.
  */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     color-scheme: dark;
 
     --color-canvas: #14181c;
@@ -89,7 +93,53 @@
     --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 28px rgb(0 0 0 / 0.3);
     --shadow-raised: 0 12px 28px rgb(0 0 0 / 0.5);
     --shadow-primary: 0 8px 20px rgb(0 0 0 / 0.4);
+
+    --color-tile-slate: #26363d;
+    --color-tile-slate-ink: #9fc0cf;
+    --color-peach-soft: #33281f;
   }
+}
+
+/* Escolha manual do usuário (botão de tema): vale mesmo com o aparelho no outro modo. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-canvas: #14181c;
+  --color-surface: #1d2329;
+  --color-muted: #262e36;
+  --color-subtle: #181d22;
+  --color-line: #2c353e;
+  --color-line-strong: #3a4550;
+
+  --color-ink: #eceae5;
+  --color-ink-soft: #cfcbc3;
+  --color-ink-muted: #9aa3ab;
+
+  --color-primary: #2b78bd;
+  --color-primary-strong: #1d5a93;
+  --color-primary-soft: #1b3347;
+  --color-primary-ink: #8cc4f2;
+  --color-on-primary: #ffffff;
+
+  --color-accent-soft: #3a2a14;
+  --color-accent-ink: #f5b869;
+
+  --color-danger-soft: #3b1f1c;
+  --color-danger-ink: #f0a39a;
+  --color-energy-soft: #3a3114;
+  --color-energy-ink: #e6c872;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 28px rgb(0 0 0 / 0.3);
+  --shadow-raised: 0 12px 28px rgb(0 0 0 / 0.5);
+  --shadow-primary: 0 8px 20px rgb(0 0 0 / 0.4);
+
+  --color-tile-slate: #26363d;
+  --color-tile-slate-ink: #9fc0cf;
+  --color-peach-soft: #33281f;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
 }
 
 @layer base {
@@ -158,7 +208,9 @@
 
 /* Recibo: papel branco, sem sombras nem cor de fundo do app. */
 @media print {
-  :root {
+  :root,
+  :root[data-theme="dark"],
+  :root[data-theme="light"] {
     color-scheme: light;
     --color-surface: #fffdf9;
     --color-muted: #ece3d0;
@@ -179,6 +231,9 @@
     --color-danger-ink: #93352a;
     --color-energy-soft: #f7ebc9;
     --color-energy-ink: #6e500d;
+    --color-tile-slate: #dce6ea;
+    --color-tile-slate-ink: #4d6b7a;
+    --color-peach-soft: #f9ede3;
   }
   body {
     background: #fff;

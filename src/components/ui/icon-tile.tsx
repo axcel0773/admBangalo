@@ -12,7 +12,7 @@ const iconTileVariants = cva(
         accent: "bg-accent-soft text-accent-ink",
         neutral: "bg-muted text-ink-soft",
         energy: "bg-energy-soft text-energy-ink",
-        slate: "bg-[#dce6ea] text-[#4d6b7a] dark:bg-[#26363d] dark:text-[#9fc0cf]",
+        slate: "bg-tile-slate text-tile-slate-ink",
       },
       size: {
         sm: "size-8 rounded-[10px] [&_svg]:size-4",
