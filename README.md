@@ -1,6 +1,6 @@
 # admBangalo
 
-Gestão de chalés para o proprietário: hóspedes, calendário de reservas, valores a receber e recebidos, e taxas (energia, limpeza, pessoa extra).
+Gestão de bangalôs para o proprietário: hóspedes, calendário de reservas, valores a receber e recebidos, e taxas (energia, limpeza, pessoa extra).
 **Next.js 16 + TypeScript + Supabase**, PWA **mobile first**.
 
 ## Status
@@ -68,7 +68,7 @@ src/
 ├─ components/
 │  ├─ ui/               # design system: Button, Card, Badge, Avatar…
 │  ├─ layout/           # AppShell, Sidebar, BottomNav, PageHeader
-│  └─ illustrations/    # paisagem dos chalés
+│  └─ illustrations/    # paisagem (mar e coqueiro) dos bangalôs
 ├─ features/            # uma pasta por domínio do negócio
 │  ├─ auth/
 │  ├─ dashboard/        # data/ → domain/ → services/ → components/

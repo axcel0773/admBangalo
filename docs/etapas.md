@@ -1,10 +1,10 @@
 # Controle de etapas do desenvolvimento
 
-Acompanhamento do projeto **admBangalo** (gestão de chalés · Next.js + TypeScript + Supabase · PWA mobile first).
+Acompanhamento do projeto **admBangalo** (gestão de bangalôs · Next.js + TypeScript + Supabase · PWA mobile first).
 
 **Legenda:** `[x]` feito · `[ ]` a fazer · ⚠️ feito, mas falta validar
 
-**Última atualização:** 03/11/2026
+**Última atualização:** 05/11/2026
 
 ---
 
@@ -122,6 +122,19 @@ Boas práticas que valem para todas as etapas seguintes.
 - [x] **Botão + do celular** abre a escolha entre *Nova reserva* e *Novo orçamento*
 - [x] **Orçamentos** (migração `0012`): simulação com o mesmo cálculo da reserva (diárias de temporada, taxas, desconto), validade de 3 a 30 dias, cópia dos valores guardada, envio em PDF/WhatsApp e botão *Criar reserva* que já preenche a nova reserva
 - [x] **Foto de capa do chalé** (migração `0010`) e índices/política de perfil (migração `0011`)
+- [x] **Enquadrar a foto de capa**: ao escolher a foto, o usuário arrasta e dá zoom numa moldura 8:3 (mesma proporção do cartão do Painel); só o recorte (1280 px, JPEG) é enviado. Cálculo puro e testado em `src/lib/crop.ts`; componente `PhotoCropper`
+
+### Identidade visual e Painel (05/11)
+- [x] **PDF do orçamento**: emojis nas observações não viram mais "??" (`winAnsiSafe` os descarta, vale também para o recibo) e layout novo (faixa azul, quadro de entrada/saída/noites, validade com ano, tabela zebrada, total em destaque, bloco "Como reservar"); taxas por medição saem como "a calcular" (PR #34)
+- [x] **Painel**: seção *Atalhos* no fim (Bangalôs, Hóspedes, Configurações) (PR #35)
+- [x] **Identidade de praia** (PR #37): paleta azul-mar + laranja de pôr do sol (tokens em `globals.css`), ilustrações de mar/coqueiro (topo do Painel e capa padrão), novo ícone do app/PWA, Painel com ícone de sol e marca com coqueiro
+- [x] **Nome "Bangalôs"** no lugar de "Chalés" em todos os textos, PDFs e mensagens; URLs (`/configuracoes/chales`), banco e código continuam com `chalet`/`chales`, para não quebrar links nem dados
+
+### Pendências conhecidas
+- [ ] Sinal sugerido (percentual de entrada) nos orçamentos — a decidir
+- [ ] Aplicar a migração `0012` no banco de desenvolvimento (já está em produção)
+- [ ] Unificar o código de upload de foto (perfil × capa do bangalô)
+- [ ] Renomear internamente `chalet` → `bangalow` só se compensar (hoje só o texto muda)
 
 ### Hóspedes
 - [x] Lista com busca por nome, CPF ou telefone (`?q=` na URL)
