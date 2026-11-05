@@ -1,4 +1,4 @@
-import { House, LogOut, Receipt, UserRound } from "lucide-react";
+import { FileText, House, LogOut, UserRound, Users } from "lucide-react";
 import type { Metadata } from "next";
 
 import { routes } from "@/components/layout/navigation";
@@ -11,14 +11,12 @@ import { ListCard, ListRow } from "@/components/ui/list-row";
 import { signOut } from "@/features/auth/actions";
 import { requireOwner } from "@/features/auth/session";
 import { listChalets } from "@/features/chalets";
-import { listFees } from "@/features/fees";
 import { pluralize } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Configurações" };
 
 export default async function SettingsPage() {
-  const [owner, chalets, fees] = await Promise.all([requireOwner(), listChalets(), listFees()]);
-  const activeFees = fees.filter((fee) => fee.active).length;
+  const [owner, chalets] = await Promise.all([requireOwner(), listChalets()]);
 
   return (
     <>
@@ -39,12 +37,20 @@ export default async function SettingsPage() {
             title="Chalés"
             subtitle={`${pluralize(chalets.length, "chalé cadastrado", "chalés cadastrados")} · capacidade, diária, horários`}
           />
+          {/* Atalhos que no computador ficam no menu lateral; no celular moram aqui. */}
           <ListRow
-            href={routes.fees}
+            href={routes.guests}
             itemClassName="md:hidden"
-            leading={<IconTile tone="energy"><Receipt /></IconTile>}
-            title="Taxas"
-            subtitle={`${pluralize(activeFees, "taxa ativa", "taxas ativas")} · limpeza, energia e outras`}
+            leading={<IconTile tone="neutral"><Users /></IconTile>}
+            title="Hóspedes"
+            subtitle="Cadastro, histórico e contato"
+          />
+          <ListRow
+            href={routes.quotes}
+            itemClassName="md:hidden"
+            leading={<IconTile tone="neutral"><FileText /></IconTile>}
+            title="Orçamentos"
+            subtitle="Simulações enviadas aos hóspedes"
           />
           <ListRow
             href={routes.profile}

@@ -1,6 +1,7 @@
 import {
   CalendarDays,
   House,
+  FileText,
   NotebookTabs,
   Receipt,
   Settings,
@@ -21,6 +22,8 @@ export const routes = {
   calendar: "/calendario",
   reservations: "/reservas",
   newReservation: "/reservas/nova",
+  quotes: "/orcamentos",
+  newQuote: "/orcamentos/novo",
   guests: "/hospedes",
   finance: "/financeiro",
   settings: "/configuracoes",
@@ -40,13 +43,30 @@ export const paths = {
   guest: (id: string) => `${routes.guests}/${id}`,
   editGuest: (id: string) => `${routes.guests}/${id}/editar`,
   reservation: (id: string) => `${routes.reservations}/${id}`,
+  quote: (id: string) => `${routes.quotes}/${id}`,
   /** Recibo para imprimir/salvar em PDF (fora do app shell). */
   receipt: (id: string) => `/recibo/${id}`,
-  newReservation: (params: { chalet?: string; checkIn?: string; guest?: string } = {}) => {
+  newReservation: (
+    params: {
+      chalet?: string;
+      checkIn?: string;
+      checkOut?: string;
+      adults?: number;
+      children?: number;
+      guest?: string;
+      guestName?: string;
+      guestPhone?: string;
+    } = {},
+  ) => {
     const search = new URLSearchParams();
     if (params.chalet) search.set("chale", params.chalet);
     if (params.checkIn) search.set("entrada", params.checkIn);
+    if (params.checkOut) search.set("saida", params.checkOut);
+    if (params.adults) search.set("adultos", String(params.adults));
+    if (params.children) search.set("criancas", String(params.children));
     if (params.guest) search.set("hospede", params.guest);
+    if (params.guestName) search.set("nome", params.guestName);
+    if (params.guestPhone) search.set("telefone", params.guestPhone);
     const query = search.toString();
     return query ? `${routes.newReservation}?${query}` : routes.newReservation;
   },
@@ -63,21 +83,22 @@ export const sidebarItems: NavItem[] = [
   { href: routes.dashboard, label: "Painel", icon: House },
   { href: routes.calendar, label: "Calendário", icon: CalendarDays },
   { href: routes.reservations, label: "Reservas", icon: NotebookTabs },
+  { href: routes.quotes, label: "Orçamentos", icon: FileText },
   { href: routes.guests, label: "Hóspedes", icon: Users },
   { href: routes.finance, label: "Financeiro", icon: Wallet },
   { href: routes.fees, label: "Taxas", icon: Receipt },
   { href: routes.settings, label: "Configurações", icon: Settings },
 ];
 
-/** Barra inferior do celular: 4 destinos + botão central de nova reserva. */
+/** Barra inferior do celular: 4 destinos + botão central (nova reserva ou novo orçamento). */
 export const bottomNavItems: { left: NavItem[]; right: NavItem[] } = {
   left: [
     { href: routes.dashboard, label: "Painel", icon: House },
     { href: routes.calendar, label: "Calendário", icon: CalendarDays },
   ],
   right: [
-    { href: routes.guests, label: "Hóspedes", icon: Users },
     { href: routes.finance, label: "Financeiro", icon: Wallet },
+    { href: routes.fees, label: "Taxas", icon: Receipt },
   ],
 };
 

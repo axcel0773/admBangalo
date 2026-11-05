@@ -118,7 +118,10 @@ Boas práticas que valem para todas as etapas seguintes.
 - [x] **Foto de perfil** (Configurações › Perfil, migração `0009`): reduzida a 256 px no aparelho e enviada direto ao bucket privado `avatars`; aparece no menu lateral, no Painel e em Configurações; sem foto, mostra as iniciais
 - [x] **Botão de sair** no menu lateral (com confirmação); no celular segue em Configurações
 - [x] **Taxas: editar e excluir** na lista (botões em cada taxa, exclusão com confirmação em dois toques); reservas já criadas não mudam, pois guardam cópia da taxa
-- [x] **Taxas no menu lateral** (atalho direto); no celular continuam em Configurações
+- [x] **Taxas no menu lateral** (atalho direto) e **na barra inferior do celular** (Painel, Calendário, **+**, Financeiro, Taxas); Hóspedes e Orçamentos ficam em Configurações no celular
+- [x] **Botão + do celular** abre a escolha entre *Nova reserva* e *Novo orçamento*
+- [x] **Orçamentos** (migração `0012`): simulação com o mesmo cálculo da reserva (diárias de temporada, taxas, desconto), validade de 3 a 30 dias, cópia dos valores guardada, envio em PDF/WhatsApp e botão *Criar reserva* que já preenche a nova reserva
+- [x] **Foto de capa do chalé** (migração `0010`) e índices/política de perfil (migração `0011`)
 
 ### Hóspedes
 - [x] Lista com busca por nome, CPF ou telefone (`?q=` na URL)

@@ -118,6 +118,44 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["fees"]["Insert"]>;
         Relationships: [];
       };
+      quotes: {
+        Row: {
+          id: string;
+          owner_id: string;
+          chalet_id: string;
+          guest_name: string;
+          guest_phone: string | null;
+          check_in: string;
+          check_out: string;
+          adults: number;
+          children: number;
+          nightly_rate: number;
+          discount: number;
+          lines: Json;
+          total: number;
+          notes: string | null;
+          valid_until: string;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          owner_id?: string;
+          chalet_id: string;
+          guest_name: string;
+          guest_phone?: string | null;
+          check_in: string;
+          check_out: string;
+          adults: number;
+          children?: number;
+          nightly_rate: number;
+          discount?: number;
+          lines?: Json;
+          total: number;
+          notes?: string | null;
+          valid_until: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["quotes"]["Insert"]>;
+        Relationships: [];
+      };
       guests: {
         Row: {
           id: string;

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
+import { winAnsiSafe, wrapText } from "@/lib/pdf";
+
 import type { ReceiptData } from "../domain/receipt";
-import { buildReceiptPdf, winAnsiSafe, wrapText } from "./receipt-pdf";
+import { buildReceiptPdf } from "./receipt-pdf";
 
 const data: ReceiptData = {
   number: "A1B2C3D4",

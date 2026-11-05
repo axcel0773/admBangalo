@@ -55,7 +55,17 @@ interface NewReservationFormProps {
   seasons: SeasonRate[];
   blocks: ChaletBlock[];
   today: IsoDate;
-  prefill: { chaletId?: string; checkIn?: IsoDate; guestId?: string };
+  prefill: {
+    chaletId?: string;
+    checkIn?: IsoDate;
+    checkOut?: IsoDate;
+    adults?: number;
+    children?: number;
+    guestId?: string;
+    /** Responsável novo vindo de um orçamento. */
+    guestName?: string;
+    guestPhone?: string;
+  };
 }
 
 export function NewReservationForm({ chalets, fees, guests, seasons, blocks, today, prefill }: NewReservationFormProps) {
@@ -68,15 +78,21 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
   const [step, setStep] = useState(0);
   const [chaletId, setChaletId] = useState(initialChalet?.id ?? "");
   const [checkIn, setCheckIn] = useState<string>(initialCheckIn);
-  const [checkOut, setCheckOut] = useState<string>(addDays(initialCheckIn, 2));
-  const [adults, setAdults] = useState(Math.min(2, initialChalet?.max_guests ?? 2));
-  const [children, setChildren] = useState(0);
+  const maxGuests = initialChalet?.max_guests ?? MAX_CHALET_GUESTS;
+  const prefillCheckOut = prefill.checkOut && prefill.checkOut > initialCheckIn ? prefill.checkOut : undefined;
+  const [checkOut, setCheckOut] = useState<string>(prefillCheckOut ?? addDays(initialCheckIn, 2));
+  const [adults, setAdults] = useState(Math.min(Math.max(prefill.adults ?? 2, 1), maxGuests));
+  const [children, setChildren] = useState(Math.min(prefill.children ?? 0, Math.max(maxGuests - Math.max(prefill.adults ?? 2, 1), 0)));
   const [source, setSource] = useState("whatsapp");
   const [guestMode, setGuestMode] = useState<GuestMode>(
-    prefill.guestId || guests.length > 0 ? "existing" : "new",
+    prefill.guestName ? "new" : prefill.guestId || guests.length > 0 ? "existing" : "new",
   );
   const [guestId, setGuestId] = useState(prefill.guestId ?? "");
-  const [newGuest, setNewGuest] = useState<NewGuestDraft>({ full_name: "", phone: "", document: "" });
+  const [newGuest, setNewGuest] = useState<NewGuestDraft>({
+    full_name: prefill.guestName ?? "",
+    phone: prefill.guestPhone ?? "",
+    document: "",
+  });
   const [companions, setCompanions] = useState<CompanionDraft[]>([]);
   // Diária: segue a sugestão (base ou média da temporada) até o dono digitar outra.
   const [nightlyRate, setNightlyRate] = useState("");
