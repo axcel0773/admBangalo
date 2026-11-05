@@ -83,7 +83,7 @@ export function NewQuoteForm({ chalets, fees, seasons, blocks, today, prefill }:
     ? undefined
     : breakdown?.seasonal
       ? "Média das noites, com a tarifa de temporada."
-      : "Diária base do chalé.";
+      : "Diária base do bangalô.";
 
   const blocked = chalet && nights > 0 ? blockWarning(overlappingBlocks(blocks, chalet.id, checkIn, checkOut)) : null;
   const minNightsWarning = breakdown?.minNightsIssue
@@ -214,7 +214,7 @@ export function NewQuoteForm({ chalets, fees, seasons, blocks, today, prefill }:
                 seasonGroups={breakdown?.seasonal && !rateTouched ? breakdown.groups : undefined}
               />
             ) : (
-              <p className="text-sm text-ink-muted">Escolha chalé e datas para ver os valores.</p>
+              <p className="text-sm text-ink-muted">Escolha bangalô e datas para ver os valores.</p>
             )}
           </Card>
         </aside>

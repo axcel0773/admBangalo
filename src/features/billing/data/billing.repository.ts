@@ -61,7 +61,7 @@ export function createBillingRepository(db: DbClient) {
       return data;
     },
 
-    /** Taxa de energia ativa: a do chalé vence a geral. */
+    /** Taxa de energia ativa: a do bangalô vence a geral. */
     async findMeteredFee(chaletId: string): Promise<MeteredFee | null> {
       const result = await db
         .from("fees")

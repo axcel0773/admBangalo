@@ -101,7 +101,7 @@ export function buildIcs(input: { name: string; events: IcalEvent[]; stamp: Date
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//admBangalo//Chalés//PT-BR",
+    "PRODID:-//admBangalo//Bangalôs//PT-BR",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     `X-WR-CALNAME:${escapeText(input.name)}`,

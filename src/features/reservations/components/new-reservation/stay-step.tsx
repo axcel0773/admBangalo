@@ -37,7 +37,7 @@ interface StayStepProps {
   error: (name: string) => string | undefined;
 }
 
-/** Etapa 1 da nova reserva: chalé, datas, pessoas e origem. */
+/** Etapa 1 da nova reserva: bangalô, datas, pessoas e origem. */
 export function StayStep({
   chalets,
   chalet,

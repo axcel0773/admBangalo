@@ -29,7 +29,7 @@ export function ProfileForm({ profile }: { profile: Tables<"profiles"> | null })
           label="Nome do negócio"
           name="business_name"
           defaultValue={v("business_name", profile?.business_name)}
-          placeholder="Chalés da Serra"
+          placeholder="Bangalôs da Serra"
           hint="Aparece no topo do menu."
           error={error("business_name")}
         />

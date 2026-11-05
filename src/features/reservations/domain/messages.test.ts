@@ -4,8 +4,8 @@ import { confirmationMessage, receiptMessage, type ConfirmationInput, type Recei
 
 const base: ConfirmationInput = {
   guestName: "Maria Souza",
-  chaletName: "Chalé Ipê",
-  businessName: "Chalés da Serra",
+  chaletName: "Bangalô Ipê",
+  businessName: "Bangalôs da Serra",
   status: "confirmed",
   checkIn: "2026-12-10",
   checkOut: "2026-12-13",
@@ -23,14 +23,14 @@ describe("mensagem de confirmação", () => {
   it("traz datas, horários, pessoas e saldo", () => {
     expect(plain(confirmationMessage(base))).toBe(
       [
-        "Olá, Maria! Sua reserva no Chalé Ipê está confirmada ✅",
+        "Olá, Maria! Sua reserva no Bangalô Ipê está confirmada ✅",
         "",
         "📅 Entrada: quinta-feira, 10/12, a partir das 14:00",
         "📅 Saída: domingo, 13/12, até 12:00",
         "👥 3 pessoas · 3 noites",
         "💰 Total: R$ 1.284,50 · pago R$ 600,00 · falta R$ 684,50",
         "",
-        "Qualquer dúvida, é só chamar. Chalés da Serra",
+        "Qualquer dúvida, é só chamar. Bangalôs da Serra",
       ].join("\n"),
     );
   });
@@ -51,8 +51,8 @@ describe("mensagem de confirmação", () => {
 describe("mensagem do recibo", () => {
   const receipt: ReceiptInput = {
     guestName: "Maria Souza",
-    chaletName: "Chalé Ipê",
-    issuer: "Chalés da Serra",
+    chaletName: "Bangalô Ipê",
+    issuer: "Bangalôs da Serra",
     number: "A1B2C3D4",
     checkIn: "2026-12-10",
     checkOut: "2026-12-13",
@@ -68,7 +68,7 @@ describe("mensagem do recibo", () => {
     expect(plain(receiptMessage(receipt))).toBe(
       [
         "🧾 Recibo nº A1B2C3D4",
-        "Olá, Maria! Segue o recibo da sua hospedagem no Chalé Ipê.",
+        "Olá, Maria! Segue o recibo da sua hospedagem no Bangalô Ipê.",
         "",
         "📅 10/12 a 13/12",
         "💰 Total: R$ 1.284,50",
@@ -80,7 +80,7 @@ describe("mensagem do recibo", () => {
         "✅ Total pago: R$ 600,00",
         "⏳ Saldo a pagar: R$ 684,50",
         "",
-        "Chalés da Serra",
+        "Bangalôs da Serra",
       ].join("\n"),
     );
   });

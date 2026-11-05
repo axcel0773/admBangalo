@@ -59,7 +59,7 @@ export function AvatarUploader({ ownerId, name, avatarUrl }: AvatarUploaderProps
 
   return (
     <div className="flex items-center gap-4">
-      <Avatar name={name} src={avatarUrl} color="#C0643A" size="xl" />
+      <Avatar name={name} src={avatarUrl} color="#F29A3E" size="xl" />
       <div className="flex min-w-0 flex-col gap-2">
         <div className="flex flex-wrap gap-2">
           <label

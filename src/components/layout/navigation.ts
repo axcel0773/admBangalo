@@ -1,6 +1,6 @@
 import {
   CalendarDays,
-  House,
+  Sun,
   FileText,
   NotebookTabs,
   Receipt,
@@ -80,7 +80,7 @@ export const paths = {
 };
 
 export const sidebarItems: NavItem[] = [
-  { href: routes.dashboard, label: "Painel", icon: House },
+  { href: routes.dashboard, label: "Painel", icon: Sun },
   { href: routes.calendar, label: "Calendário", icon: CalendarDays },
   { href: routes.reservations, label: "Reservas", icon: NotebookTabs },
   { href: routes.quotes, label: "Orçamentos", icon: FileText },
@@ -93,7 +93,7 @@ export const sidebarItems: NavItem[] = [
 /** Barra inferior do celular: 4 destinos + botão central (nova reserva ou novo orçamento). */
 export const bottomNavItems: { left: NavItem[]; right: NavItem[] } = {
   left: [
-    { href: routes.dashboard, label: "Painel", icon: House },
+    { href: routes.dashboard, label: "Painel", icon: Sun },
     { href: routes.calendar, label: "Calendário", icon: CalendarDays },
   ],
   right: [

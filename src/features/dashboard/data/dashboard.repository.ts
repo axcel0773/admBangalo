@@ -18,7 +18,7 @@ export function createDashboardRepository(db: DbClient) {
         .select("id, name, color, max_guests, base_nightly_rate, check_in_time, check_out_time, photo_path")
         .eq("active", true)
         .order("name");
-      return unwrapList(result, "Listar chalés");
+      return unwrapList(result, "Listar bangalôs");
     },
 
     /** Links temporários (1 h) das fotos de capa, por caminho. */

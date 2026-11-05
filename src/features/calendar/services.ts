@@ -7,7 +7,7 @@ import { addDays, type IsoDate } from "@/lib/dates";
 
 import type { CalendarBlock, CalendarChalet, CalendarStay } from "./domain";
 
-/** Chalés ativos e estadias que cruzam o período [start, start + days). */
+/** Bangalôs ativos e estadias que cruzam o período [start, start + days). */
 export async function getCalendarData(
   start: IsoDate,
   days: number,

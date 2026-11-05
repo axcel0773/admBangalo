@@ -46,14 +46,17 @@ export function DashboardHeader({ greeting, ownerName, avatarUrl, today, agenda 
           aria-hidden="true"
           className="absolute inset-0 h-full w-full"
         >
-          <circle cx="318" cy="52" r="20" fill="#E8C98F" opacity="0.9" />
-          <path d="M0 150 80 92l60 44 76-62 86 70 58-34 30 20v66H0z" fill="#3F5F33" />
-          <path d="M0 172q100-30 200-12t190-6v42H0z" fill="#4A6B3A" />
-          <path d="M26 186l14-40 14 40zM52 186l10-28 10 28zM300 186l14-44 14 44zM330 186l10-30 10 30z" fill="#2A4021" />
+          <circle cx="250" cy="122" r="20" fill="#FFD98A" opacity="0.95" />
+          <path d="M0 148q50-14 100 0t100 0 100 0 90 0v48H0z" fill="#14508A" opacity="0.55" />
+          <path d="M0 166q50-14 100 0t100 0 100 0 90 0v30H0z" fill="#14508A" opacity="0.85" />
+          <path d="M342 190c0-30 2-60 10-96" stroke="#0E3A63" strokeWidth="5" fill="none" strokeLinecap="round" />
+          <g stroke="#0E3A63" strokeWidth="5" fill="none" strokeLinecap="round">
+            <path d="M352 94c-14-14-30-14-42-6M352 94c14-14 30-14 42-6M352 94c-10-20-26-24-38-20M352 94c10-20 26-24 38-20" />
+          </g>
         </svg>
         <div className="relative flex items-start justify-between p-5">
           <div>
-            <p className="text-[13px] text-[#cfdcc2] first-letter:uppercase">{dateLabel}</p>
+            <p className="text-[13px] text-[#cfe2f3] first-letter:uppercase">{dateLabel}</p>
             <h1 className="mt-1 font-display text-[30px] leading-tight font-semibold">
               {greeting},
               <br />
@@ -61,7 +64,7 @@ export function DashboardHeader({ greeting, ownerName, avatarUrl, today, agenda 
             </h1>
           </div>
           <Link href={routes.settings} aria-label="Configurações da conta">
-            <Avatar name={ownerName} src={avatarUrl} color="#C0643A" size="md" className="ring-3 ring-white/35" />
+            <Avatar name={ownerName} src={avatarUrl} color="#F29A3E" size="md" className="ring-3 ring-white/35" />
           </Link>
         </div>
       </header>

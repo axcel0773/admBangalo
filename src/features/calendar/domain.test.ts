@@ -14,8 +14,8 @@ import {
 } from "./domain";
 
 const chalets = [
-  { id: "ipe", name: "Chalé Ipê", color: "#4A6B3A", max_guests: 4 },
-  { id: "jabu", name: "Chalé Jabuticaba", color: "#8B5A6B", max_guests: 2 },
+  { id: "ipe", name: "Bangalô Ipê", color: "#4A6B3A", max_guests: 4 },
+  { id: "jabu", name: "Bangalô Jabuticaba", color: "#8B5A6B", max_guests: 2 },
 ];
 
 const stay = (overrides: Partial<CalendarStay>): CalendarStay => ({
@@ -67,7 +67,7 @@ describe("toSegment", () => {
 });
 
 describe("buildCalendarGrid", () => {
-  it("monta linhas por chalé e soma a ocupação, sem canceladas", () => {
+  it("monta linhas por bangalô e soma a ocupação, sem canceladas", () => {
     const grid = buildCalendarGrid({
       chalets,
       stays: [stay({}), stay({ reservation_id: "r2", status: "cancelled", check_in: "2026-11-07", check_out: "2026-11-09" })],
@@ -100,7 +100,7 @@ describe("buildDayAgenda", () => {
     expect(buildDayAgenda(chalets, stays, "2026-11-06").map((e) => e.state)).toEqual(["leaving", "free"]);
   });
 
-  it("mostra o chalé bloqueado quando não há hóspede", () => {
+  it("mostra o bangalô bloqueado quando não há hóspede", () => {
     const block: CalendarBlock = {
       id: "b1",
       chalet_id: "jabu",
@@ -122,7 +122,7 @@ describe("buildDayAgenda", () => {
     expect(grid.rows.find((row) => row.chalet.id === "jabu")?.blocks).toEqual([{ block, startIndex: 4, span: 3 }]);
   });
 
-  it("lista chalés ocupados na noite", () => {
+  it("lista bangalôs ocupados na noite", () => {
     expect(occupiedChaletIds(stays, "2026-11-03")).toEqual(["ipe", "jabu"]);
   });
 });

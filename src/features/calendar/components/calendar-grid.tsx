@@ -91,13 +91,13 @@ function DayHeader({ day, column }: { day: CalendarDay; column: number }) {
   );
 }
 
-/** Desktop/tablet: chalés nas linhas, dias nas colunas, reservas como barras. */
+/** Desktop/tablet: bangalôs nas linhas, dias nas colunas, reservas como barras. */
 export function CalendarGrid({ grid }: { grid: Grid }) {
   const columns = `${LABEL_COLUMN} repeat(${grid.days.length}, minmax(44px, 1fr))`;
   const todayIndex = grid.days.findIndex((day) => day.isToday);
 
   return (
-    <section aria-label="Ocupação por chalé" className="overflow-x-auto rounded-card bg-surface p-2 shadow-card">
+    <section aria-label="Ocupação por bangalô" className="overflow-x-auto rounded-card bg-surface p-2 shadow-card">
       <div
         className="grid min-w-[900px]"
         style={{ gridTemplateColumns: columns, gridTemplateRows: `72px repeat(${grid.rows.length}, 96px)` }}
@@ -120,7 +120,7 @@ export function CalendarGrid({ grid }: { grid: Grid }) {
         {todayIndex >= 0 ? (
           <div
             aria-hidden="true"
-            className="pointer-events-none ml-[50%] border-l-2 border-dashed border-[#9db28a]"
+            className="pointer-events-none ml-[50%] border-l-2 border-dashed border-[#7fa9d1]"
             style={{ gridRow: `2 / span ${grid.rows.length}`, gridColumn: todayIndex + 2 }}
           />
         ) : null}
@@ -141,7 +141,7 @@ export function CalendarGrid({ grid }: { grid: Grid }) {
                 <House className="size-5" />
               </span>
               <span>
-                <span className="block font-display font-semibold">{row.chalet.name.replace(/^Chalé\s+/i, "")}</span>
+                <span className="block font-display font-semibold">{row.chalet.name.replace(/^(Chalé|Bangalô)\s+/i, "")}</span>
                 <span className="block text-xs text-ink-muted">até {row.chalet.max_guests} pessoas</span>
               </span>
             </div>,

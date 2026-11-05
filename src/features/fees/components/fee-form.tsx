@@ -81,7 +81,7 @@ export function FeeForm({ action, chaletOptions, fee }: FeeFormProps) {
           label="Vale para"
           name="chalet_id"
           options={chaletOptions}
-          placeholder="Todos os chalés"
+          placeholder="Todos os bangalôs"
           defaultValue={v("chalet_id", fee?.chalet_id)}
           error={error("chalet_id")}
         />

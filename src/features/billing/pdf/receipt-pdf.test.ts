@@ -7,7 +7,7 @@ import { buildReceiptPdf } from "./receipt-pdf";
 
 const data: ReceiptData = {
   number: "A1B2C3D4",
-  issuer: "Chalés da Serra",
+  issuer: "Bangalôs da Serra",
   issuerPhone: "(12) 99999-0000",
   issuedAt: "04/11",
   guestName: "Maria Souza 🙂",

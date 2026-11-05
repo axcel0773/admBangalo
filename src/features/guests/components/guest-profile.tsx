@@ -29,7 +29,7 @@ export function GuestProfile({ guest, stays }: { guest: Guest; stays: GuestStay[
     <div className="grid gap-4 md:gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
       <div className="flex flex-col gap-4">
         <Card className="overflow-hidden">
-          <div className="h-16 bg-[#e3ead6]" />
+          <div className="h-16 bg-[#d9e9f7]" />
           <div className="flex flex-col gap-4 px-5 pb-5">
             <Avatar name={guest.full_name} size="xl" className="-mt-9 ring-4 ring-surface" />
             <div>

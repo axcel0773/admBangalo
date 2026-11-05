@@ -16,7 +16,7 @@ import {
 function stay(overrides: Partial<FinanceStay>): FinanceStay {
   return {
     reservation_id: "r1",
-    chalet_name: "Chalé Ipê",
+    chalet_name: "Bangalô Ipê",
     main_guest_name: "Maria Souza",
     check_in: "2026-11-10",
     check_out: "2026-11-13",
@@ -131,7 +131,7 @@ describe("tendência e CSV", () => {
     const csv = financeCsv({ stays: [stay({ main_guest_name: 'Ana "Nina"; Lima' })] });
     const [header, line] = csv.split("\r\n");
     expect(header?.startsWith("Check-in;Check-out;Noites")).toBe(true);
-    expect(line).toBe('10/11/2026;13/11/2026;3;2;Chalé Ipê;"Ana ""Nina""; Lima";1050,00;150,00;84,50;0,00;1284,50;600,00;684,50');
+    expect(line).toBe('10/11/2026;13/11/2026;3;2;Bangalô Ipê;"Ana ""Nina""; Lima";1050,00;150,00;84,50;0,00;1284,50;600,00;684,50');
   });
 });
 
@@ -139,26 +139,26 @@ describe("por bangalô", () => {
   const rows = buildChaletBreakdown({
     month: "2026-11-01",
     chalets: [
-      { name: "Chalé Ipê", color: "#4A6B3A" },
-      { name: "Chalé Jabuticaba", color: "#8B5A6B" },
+      { name: "Bangalô Ipê", color: "#4A6B3A" },
+      { name: "Bangalô Jabuticaba", color: "#8B5A6B" },
     ],
     stays: [
       stay({}),
       stay({ reservation_id: "r2", check_in: "2026-10-30", check_out: "2026-11-02", nights: 3, grand_total: 900 }),
       stay({ reservation_id: "r3", status: "cancelled" }),
-      stay({ reservation_id: "r4", chalet_name: "Chalé Antigo", grand_total: 200 }),
+      stay({ reservation_id: "r4", chalet_name: "Bangalô Antigo", grand_total: 200 }),
     ],
   });
 
   it("soma receita pelo check-in e noites dentro do mês", () => {
-    const ipe = rows.find((row) => row.name === "Chalé Ipê");
+    const ipe = rows.find((row) => row.name === "Bangalô Ipê");
     expect(ipe?.reservations).toBe(1);
     expect(ipe?.revenue).toBe(1284.5);
     expect(ipe?.nights).toBe(4); // 3 de r1 + a noite de 1º de novembro de r2
   });
 
   it("mostra bangalô parado com zero e ordena pela receita", () => {
-    expect(rows.map((row) => row.name)).toEqual(["Chalé Ipê", "Chalé Antigo", "Chalé Jabuticaba"]);
+    expect(rows.map((row) => row.name)).toEqual(["Bangalô Ipê", "Bangalô Antigo", "Bangalô Jabuticaba"]);
     expect(rows.at(-1)).toMatchObject({ revenue: 0, nights: 0, occupancy: 0 });
   });
 });

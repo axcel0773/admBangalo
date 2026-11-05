@@ -17,7 +17,7 @@ interface SelectFieldProps extends Omit<ComponentProps<"select">, "children"> {
   options: SelectOption[];
   error?: string;
   hint?: string;
-  /** Primeira opção vazia (ex.: "Todos os chalés"). */
+  /** Primeira opção vazia (ex.: "Todos os bangalôs"). */
   placeholder?: string;
 }
 

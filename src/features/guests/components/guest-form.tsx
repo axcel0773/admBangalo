@@ -83,7 +83,7 @@ export function GuestForm({ action, cancelHref, guest }: GuestFormProps) {
           label="Preferências e anotações"
           name="notes"
           defaultValue={v("notes", guest?.notes)}
-          placeholder="Alergias, pedidos especiais, chalé preferido…"
+          placeholder="Alergias, pedidos especiais, bangalô preferido…"
           error={error("notes")}
         />
       </FormSection>

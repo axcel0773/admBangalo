@@ -26,7 +26,7 @@ const quote = {
   created_at: "2026-11-05T13:00:00Z",
 };
 const chalet = { name: "Bangalô Asahi", check_in_time: "14:00:00", check_out_time: "12:00:00" };
-const base = { quote, chalet, issuer: "Chalés Guaratiba", issuerPhone: null, pixKey: "chave@exemplo.com" };
+const base = { quote, chalet, issuer: "Bangalôs Guaratiba", issuerPhone: null, pixKey: "chave@exemplo.com" };
 
 describe("orçamento", () => {
   it("monta as linhas de hospedagem e taxas", () => {

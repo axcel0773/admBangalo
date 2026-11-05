@@ -20,11 +20,11 @@ interface ChaletPickerProps {
   error?: string;
 }
 
-/** Cartões de chalé como radio (um toque escolhe; teclado navega com as setas). */
+/** Cartões de bangalô como radio (um toque escolhe; teclado navega com as setas). */
 export function ChaletPicker({ chalets, value, onChange, error }: ChaletPickerProps) {
   return (
     <fieldset>
-      <legend className="mb-2 text-[13px] font-semibold text-ink-soft">Chalé</legend>
+      <legend className="mb-2 text-[13px] font-semibold text-ink-soft">Bangalô</legend>
       <div className="grid grid-cols-[repeat(auto-fill,minmax(104px,1fr))] gap-2.5">
         {chalets.map((chalet) => {
           const selected = chalet.id === value;
@@ -33,7 +33,7 @@ export function ChaletPicker({ chalets, value, onChange, error }: ChaletPickerPr
               key={chalet.id}
               className={cn(
                 "flex cursor-pointer flex-col items-center gap-1.5 rounded-[18px] border-2 bg-surface px-2 py-3 text-center transition has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary",
-                selected ? "border-primary shadow-[0_8px_18px_rgb(74_107_58/0.15)]" : "border-transparent shadow-card",
+                selected ? "border-primary shadow-[0_8px_18px_rgb(31_111_178/0.15)]" : "border-transparent shadow-card",
               )}
             >
               <input
@@ -51,7 +51,7 @@ export function ChaletPicker({ chalets, value, onChange, error }: ChaletPickerPr
               >
                 <House className="size-5" />
               </span>
-              <span className="text-[13px] leading-tight font-bold">{chalet.name.replace(/^Chalé\s+/i, "")}</span>
+              <span className="text-[13px] leading-tight font-bold">{chalet.name.replace(/^(Chalé|Bangalô)\s+/i, "")}</span>
               <span className="text-[11px] text-ink-muted">
                 até {chalet.max_guests} · {formatCurrencyRounded(chalet.base_nightly_rate)}
               </span>

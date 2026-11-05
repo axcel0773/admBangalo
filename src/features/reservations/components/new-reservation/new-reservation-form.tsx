@@ -124,7 +124,7 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
     ? undefined
     : breakdown?.seasonal
       ? "Média das noites, com a tarifa de temporada."
-      : "Diária base do chalé.";
+      : "Diária base do bangalô.";
   const discountValue = parseMoney(discount) ?? 0;
 
   const draft = { chalet, checkIn, checkOut, adults, children, nightlyRate: rate, discount: discountValue };
@@ -172,7 +172,7 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
   /** Validação leve por etapa; a validação completa é no servidor e no banco. */
   function stepProblem(index: number): string | null {
     if (index === 0) {
-      if (!chalet) return "Escolha o chalé.";
+      if (!chalet) return "Escolha o bangalô.";
       if (!checkIn || !checkOut) return "Informe as datas de entrada e saída.";
       return issues.dates ?? issues.capacity ?? (blocked?.blocking ? blocked.message : null);
     }
@@ -304,7 +304,7 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
             {quote ? (
               <QuoteSummary quote={quote} nights={nights} nightlyRate={rate} discount={discountValue} seasonGroups={breakdown?.seasonal && !rateTouched ? breakdown.groups : undefined} />
             ) : (
-              <p className="text-sm text-ink-muted">Escolha chalé e datas para ver os valores.</p>
+              <p className="text-sm text-ink-muted">Escolha bangalô e datas para ver os valores.</p>
             )}
           </Card>
         </aside>

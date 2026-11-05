@@ -82,7 +82,7 @@ describe("buildDashboard", () => {
     ]);
   });
 
-  it("define o status do dia de cada chalé", () => {
+  it("define o status do dia de cada bangalô", () => {
     expect(data.chalets.map((c) => [c.name, c.status])).toEqual([
       ["Ipê", "arriving"],
       ["Jabuticaba", "leaving"],

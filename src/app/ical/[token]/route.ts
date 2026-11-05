@@ -5,7 +5,7 @@ import { getIcalFeed } from "@/features/availability";
 const TOKEN = /^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(\.ics)?$/i;
 
 /**
- * GET /ical/<token>.ics — calendário público do chalé para Airbnb/Booking importarem.
+ * GET /ical/<token>.ics — calendário público do bangalô para Airbnb/Booking importarem.
  * Sem login (quem chama é o servidor da plataforma); só datas ocupadas, nunca dados de hóspedes.
  */
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ token: string }> }) {

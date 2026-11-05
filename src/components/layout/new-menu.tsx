@@ -32,7 +32,7 @@ export function NewMenu() {
         aria-haspopup="dialog"
         aria-expanded={open}
         onClick={() => setOpen(true)}
-        className="-mt-8 flex size-[58px] items-center justify-center justify-self-center rounded-[20px] bg-primary text-on-primary shadow-[0_10px_22px_rgb(74_107_58/0.35)] active:scale-95"
+        className="-mt-8 flex size-[58px] items-center justify-center justify-self-center rounded-[20px] bg-primary text-on-primary shadow-[0_10px_22px_rgb(31_111_178/0.35)] active:scale-95"
       >
         <Plus className="size-6" strokeWidth={2.4} aria-hidden="true" />
       </button>

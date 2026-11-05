@@ -24,11 +24,11 @@ interface ChaletPhotoCardProps {
   photoUrl: string | null;
 }
 
-/** Mesma proporção do topo do cartão em “Seus chalés” (o recorte já sai no tamanho final). */
+/** Mesma proporção do topo do cartão em “Seus bangalôs” (o recorte já sai no tamanho final). */
 export const COVER_ASPECT = 8 / 3;
 const COVER_WIDTH = 1280;
 
-/** Foto de capa do chalé: o usuário enquadra a foto, o recorte (1280 px) vai direto ao Storage e é registrado no chalé. */
+/** Foto de capa do bangalô: o usuário enquadra a foto, o recorte (1280 px) vai direto ao Storage e é registrado no bangalô. */
 export function ChaletPhotoCard({ ownerId, chaletId, color, photoUrl }: ChaletPhotoCardProps) {
   const inputId = useId();
   const [pending, startTransition] = useTransition();
@@ -89,7 +89,7 @@ export function ChaletPhotoCard({ ownerId, chaletId, color, photoUrl }: ChaletPh
       <div className="aspect-[8/3] overflow-hidden rounded-2xl bg-muted">
         {photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- URL assinada do Storage, já reduzida no envio
-          <img src={photoUrl} alt="Foto do chalé" className="size-full object-cover" />
+          <img src={photoUrl} alt="Foto do bangalô" className="size-full object-cover" />
         ) : (
           <ChaletLandscape tone={toneFromColor(color)} />
         )}
@@ -121,7 +121,7 @@ export function ChaletPhotoCard({ ownerId, chaletId, color, photoUrl }: ChaletPh
         />
       </div>
       <p className="mt-2 text-xs text-ink-muted">
-        Aparece como capa em “Seus chalés”, no Painel. Depois de escolher a foto você enquadra do jeito que quiser.
+        Aparece como capa em “Seus bangalôs”, no Painel. Depois de escolher a foto você enquadra do jeito que quiser.
       </p>
       </>
       )}

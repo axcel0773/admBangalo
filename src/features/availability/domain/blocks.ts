@@ -19,7 +19,7 @@ export function rangesOverlap(aStart: IsoDate, aEnd: IsoDate, bStart: IsoDate, b
   return aStart < bEnd && bStart < aEnd;
 }
 
-/** Bloqueios do chalé que cruzam a estadia. */
+/** Bloqueios do bangalô que cruzam a estadia. */
 export function overlappingBlocks<T extends ChaletBlock>(
   blocks: T[],
   chaletId: string,

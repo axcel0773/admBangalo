@@ -27,7 +27,7 @@ const companionsField = z
 
 export const newReservationSchema = z
   .object({
-    chalet_id: z.string({ required_error: "Escolha o chalé" }).uuid("Escolha o chalé"),
+    chalet_id: z.string({ required_error: "Escolha o bangalô" }).uuid("Escolha o bangalô"),
     check_in: isoDate("Data de entrada"),
     check_out: isoDate("Data de saída"),
     adults: integer("Adultos", 1, MAX_CHALET_GUESTS),

@@ -4,7 +4,7 @@ import { roundMoney } from "./pricing";
 
 /**
  * Tarifas por temporada (tabela chalet_rates). Cada noite usa a diária da temporada
- * em que cai; fora delas, a diária base do chalé. A reserva guarda uma diária só,
+ * em que cai; fora delas, a diária base do bangalô. A reserva guarda uma diária só,
  * então a prévia sugere a média das noites.
  */
 

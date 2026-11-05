@@ -41,7 +41,7 @@ export async function updateChalet(id: string, _prev: FormState, formData: FormD
   return save(id, formData);
 }
 
-/** Nova temporada do chalé. Use com `.bind(null, chaletId)`. */
+/** Nova temporada do bangalô. Use com `.bind(null, chaletId)`. */
 export async function createSeasonRate(chaletId: string, _prev: FormState, formData: FormData): Promise<FormState> {
   if (!isUuid(chaletId)) return errorFormState(INVALID_ID_MESSAGE, formData);
   const parsed = seasonRateSchema.safeParse(formDataToObject(formData));

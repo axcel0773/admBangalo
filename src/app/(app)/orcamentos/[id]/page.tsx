@@ -30,7 +30,7 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
   const doc = buildQuoteDocument({
     quote,
     chalet,
-    issuer: profile?.business_name || profile?.full_name || "Chalés",
+    issuer: profile?.business_name || profile?.full_name || "Bangalôs",
     issuerPhone: profile?.phone ?? null,
     pixKey: profile?.pix_key ?? null,
     today: todayIso(),

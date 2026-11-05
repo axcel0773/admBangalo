@@ -39,9 +39,9 @@ export default async function NewReservationPage({ searchParams }: NewReservatio
         {context.chalets.length === 0 ? (
           <EmptyState
             icon={<House />}
-            title="Cadastre um chalé primeiro"
-            description="As reservas precisam de um chalé ativo com capacidade e diária."
-            action={<ButtonLink href={routes.newChalet}>Cadastrar chalé</ButtonLink>}
+            title="Cadastre um bangalô primeiro"
+            description="As reservas precisam de um bangalô ativo com capacidade e diária."
+            action={<ButtonLink href={routes.newChalet}>Cadastrar bangalô</ButtonLink>}
           />
         ) : (
           <NewReservationForm

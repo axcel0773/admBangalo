@@ -41,7 +41,7 @@ export function FeeList({ fees, chaletNames }: FeeListProps) {
     <ul className="flex flex-col gap-3">
       {fees.map((fee) => {
         const { icon, tone } = KIND_ICON[fee.kind];
-        const scope = fee.chalet_id ? (chaletNames[fee.chalet_id] ?? "Chalé removido") : "Todos os chalés";
+        const scope = fee.chalet_id ? (chaletNames[fee.chalet_id] ?? "Bangalô removido") : "Todos os bangalôs";
         return (
           <li key={fee.id} className="flex flex-col gap-3 rounded-card bg-surface p-4 shadow-card">
             <div className="flex items-center gap-3">

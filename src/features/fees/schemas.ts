@@ -11,12 +11,12 @@ export const feeSchema = z.object({
     errorMap: () => ({ message: "Escolha como a taxa é cobrada" }),
   }),
   amount: money("Valor"),
-  // "" = vale para todos os chalés
+  // "" = vale para todos os bangalôs
   chalet_id: z
     .string()
     .optional()
     .transform((value) => (value ? value : null))
-    .pipe(z.string().uuid("Chalé inválido").nullable()),
+    .pipe(z.string().uuid("Bangalô inválido").nullable()),
   auto_apply: checkbox,
   active: checkbox,
 });

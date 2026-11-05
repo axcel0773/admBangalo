@@ -14,9 +14,9 @@ export function ChaletList({ chalets }: { chalets: Chalet[] }) {
     return (
       <EmptyState
         icon={<House />}
-        title="Nenhum chalé cadastrado"
-        description="Cadastre os chalés para começar a receber reservas."
-        action={<ButtonLink href={routes.newChalet}>Cadastrar chalé</ButtonLink>}
+        title="Nenhum bangalô cadastrado"
+        description="Cadastre os bangalôs para começar a receber reservas."
+        action={<ButtonLink href={routes.newChalet}>Cadastrar bangalô</ButtonLink>}
       />
     );
   }

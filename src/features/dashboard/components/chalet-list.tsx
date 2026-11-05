@@ -15,9 +15,9 @@ export function ChaletList({ chalets }: { chalets: ChaletOverview[] }) {
     return (
       <EmptyState
         icon={<House />}
-        title="Cadastre seu primeiro chalé"
-        description="Com os chalés cadastrados, o painel mostra ocupação, chegadas e valores."
-        action={<ButtonLink href={routes.newChalet}>Cadastrar chalé</ButtonLink>}
+        title="Cadastre seu primeiro bangalô"
+        description="Com os bangalôs cadastrados, o painel mostra ocupação, chegadas e valores."
+        action={<ButtonLink href={routes.newChalet}>Cadastrar bangalô</ButtonLink>}
       />
     );
   }
@@ -26,7 +26,7 @@ export function ChaletList({ chalets }: { chalets: ChaletOverview[] }) {
     <section aria-labelledby="chalets-title">
       <div className="mb-3 flex items-baseline justify-between">
         <h2 id="chalets-title" className="font-display text-xl font-semibold md:text-2xl">
-          Seus chalés
+          Seus bangalôs
         </h2>
         <Link href={routes.calendar} className="text-sm font-semibold">
           Ver ocupação

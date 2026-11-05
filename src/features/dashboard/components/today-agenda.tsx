@@ -10,7 +10,7 @@ import { pluralize } from "@/lib/format";
 import type { AgendaEvent } from "../domain/types";
 
 const eventCopy = {
-  "check-in": { label: "Chegada", rowClass: "bg-[#eef2e6]", hint: "text-[#4d6340]" },
+  "check-in": { label: "Chegada", rowClass: "bg-[#e8f1fa]", hint: "text-[#2a5d8f]" },
   "check-out": { label: "Saída", rowClass: "bg-[#f9ede3]", hint: "text-accent-ink" },
 } as const;
 

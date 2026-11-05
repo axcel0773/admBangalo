@@ -34,7 +34,7 @@ export function ChaletForm({ action, chalet }: ChaletFormProps) {
       <FormAlert state={state} />
 
       <FormSection title="Identificação">
-        <Field label="Nome" name="name" defaultValue={v("name", chalet?.name)} placeholder="Chalé Ipê" maxLength={60} required error={error("name")} />
+        <Field label="Nome" name="name" defaultValue={v("name", chalet?.name)} placeholder="Bangalô Ipê" maxLength={60} required error={error("name")} />
         <TextareaField
           label="Descrição (opcional)"
           name="description"
@@ -99,7 +99,7 @@ export function ChaletForm({ action, chalet }: ChaletFormProps) {
       <SwitchField
         name="active"
         label="Disponível para reservas"
-        description="Desligue para esconder o chalé do calendário e das novas reservas."
+        description="Desligue para esconder o bangalô do calendário e das novas reservas."
         defaultChecked={checkedOf(state, "active", chalet?.active ?? true)}
       />
 
@@ -107,7 +107,7 @@ export function ChaletForm({ action, chalet }: ChaletFormProps) {
         <ButtonLink href={routes.chalets} variant="secondary">
           Cancelar
         </ButtonLink>
-        <SubmitButton>{chalet ? "Salvar alterações" : "Cadastrar chalé"}</SubmitButton>
+        <SubmitButton>{chalet ? "Salvar alterações" : "Cadastrar bangalô"}</SubmitButton>
       </FormActions>
     </form>
   );

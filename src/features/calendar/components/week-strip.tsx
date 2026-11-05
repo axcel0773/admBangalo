@@ -14,7 +14,7 @@ interface WeekStripProps {
   stays: CalendarStay[];
 }
 
-/** Celular: 7 dias para tocar, com um ponto por chalé ocupado na noite. */
+/** Celular: 7 dias para tocar, com um ponto por bangalô ocupado na noite. */
 export function WeekStrip({ days, start, selected, chalets, stays }: WeekStripProps) {
   const colorById = new Map(chalets.map((chalet) => [chalet.id, chalet.color]));
 
@@ -28,16 +28,16 @@ export function WeekStrip({ days, start, selected, chalets, stays }: WeekStripPr
             key={day.date}
             href={paths.calendar({ start, day: day.date })}
             aria-current={active ? "date" : undefined}
-            aria-label={`${day.weekday} ${day.dayNumber}, ${occupied.length} de ${chalets.length} chalés ocupados`}
+            aria-label={`${day.weekday} ${day.dayNumber}, ${occupied.length} de ${chalets.length} bangalôs ocupados`}
             className={cn(
               "flex h-16 flex-col items-center justify-center gap-1 rounded-2xl",
-              active ? "bg-primary text-on-primary shadow-[0_8px_18px_rgb(74_107_58/0.3)]" : day.isWeekend && "bg-subtle",
+              active ? "bg-primary text-on-primary shadow-[0_8px_18px_rgb(31_111_178/0.3)]" : day.isWeekend && "bg-subtle",
             )}
           >
             <span
               className={cn(
                 "text-[10px] tracking-wide uppercase",
-                active ? "text-[#cfdcc2]" : day.isWeekend ? "text-accent-ink" : "text-ink-muted",
+                active ? "text-[#cfe2f3]" : day.isWeekend ? "text-accent-ink" : "text-ink-muted",
               )}
             >
               {day.weekday}
@@ -50,7 +50,7 @@ export function WeekStrip({ days, start, selected, chalets, stays }: WeekStripPr
                 <span
                   key={`${chaletId}-${index}`}
                   className="size-1.5 rounded-full"
-                  style={{ backgroundColor: active ? "#fffdf8" : (colorById.get(chaletId) ?? "#4A6B3A") }}
+                  style={{ backgroundColor: active ? "#fffdf9" : (colorById.get(chaletId) ?? "#1F6FB2") }}
                 />
               ))}
             </span>

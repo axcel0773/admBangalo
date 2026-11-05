@@ -35,7 +35,7 @@ export function createAvailabilityRepository(db: DbClient) {
         .eq("chalet_id", chaletId)
         .gte("ends_on", from)
         .order("starts_on");
-      return unwrapList(result, "Listar bloqueios do chalé");
+      return unwrapList(result, "Listar bloqueios do bangalô");
     },
 
     async createBlock(chaletId: string, input: BlockInput): Promise<void> {
@@ -75,7 +75,7 @@ export function createAvailabilityRepository(db: DbClient) {
       if (error || !data) {
         throw new MutationError(
           error?.code === "23505"
-            ? "Esse link já está cadastrado neste chalé."
+            ? "Esse link já está cadastrado neste bangalô."
             : friendlyDbMessage(error ?? {}, "Não foi possível salvar o calendário."),
         );
       }
@@ -120,7 +120,7 @@ export function createAvailabilityRepository(db: DbClient) {
         .eq("id", sourceId);
     },
 
-    // ---- Link iCal do chalé -------------------------------------------------
+    // ---- Link iCal do bangalô -------------------------------------------------
 
     async findToken(chaletId: string): Promise<string | null> {
       const { data } = await db.from("chalets").select("ical_token").eq("id", chaletId).maybeSingle();
@@ -134,7 +134,7 @@ export function createAvailabilityRepository(db: DbClient) {
       );
     },
 
-    /** Datas ocupadas do chalé dono do token (função ical_feed; funciona sem login). */
+    /** Datas ocupadas do bangalô dono do token (função ical_feed; funciona sem login). */
     async feed(token: string) {
       const { data, error } = await db.rpc("ical_feed", { p_token: token });
       if (error) throw new MutationError(friendlyDbMessage(error, "Calendário indisponível."));

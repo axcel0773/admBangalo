@@ -100,7 +100,7 @@ export interface MonthReport {
   energy: number;
   otherCharges: number;
   nightsSold: number;
-  /** Noites ocupadas ÷ noites disponíveis (chalés ativos × dias do mês). */
+  /** Noites ocupadas ÷ noites disponíveis (bangalôs ativos × dias do mês). */
   occupancy: number;
   /** Entradas de caixa no mês (pagamentos − estornos), por data de pagamento. */
   cashIn: number;
@@ -242,7 +242,7 @@ const CSV_HEADER = [
   "Check-out",
   "Noites",
   "Pessoas",
-  "Chalé",
+  "Bangalô",
   "Hóspede",
   "Hospedagem",
   "Limpeza",

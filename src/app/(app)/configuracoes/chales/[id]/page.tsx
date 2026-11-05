@@ -16,7 +16,7 @@ import {
 } from "@/features/chalets";
 import { todayIso } from "@/lib/dates";
 
-export const metadata: Metadata = { title: "Editar chalé" };
+export const metadata: Metadata = { title: "Editar bangalô" };
 
 export default async function EditChaletPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -31,7 +31,7 @@ export default async function EditChaletPage({ params }: { params: Promise<{ id:
 
   return (
     <>
-      <PageHeader title={chalet.name} back={{ href: routes.chalets, label: "Chalés" }} />
+      <PageHeader title={chalet.name} back={{ href: routes.chalets, label: "Bangalôs" }} />
       <PageBody className="flex max-w-3xl flex-col gap-6">
         <ChaletPhotoCard ownerId={owner.id} chaletId={chalet.id} color={chalet.color} photoUrl={photoUrl} />
         <ChaletForm action={updateChalet.bind(null, chalet.id)} chalet={chalet} />
