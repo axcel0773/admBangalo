@@ -44,7 +44,14 @@ interface NewQuoteFormProps {
   seasons: SeasonRate[];
   blocks: ChaletBlock[];
   today: IsoDate;
-  prefill: { chaletId?: string; checkIn?: IsoDate };
+  prefill: {
+    chaletId?: string;
+    checkIn?: IsoDate;
+    adults?: number;
+    children?: number;
+    guestName?: string;
+    guestPhone?: string;
+  };
 }
 
 /** Novo orçamento: mesma estadia e mesmo cálculo da reserva, mas sem criar nada no calendário. */
@@ -57,8 +64,9 @@ export function NewQuoteForm({ chalets, fees, seasons, blocks, today, prefill }:
   const [chaletId, setChaletId] = useState(initialChalet?.id ?? "");
   const [checkIn, setCheckIn] = useState<string>(initialCheckIn);
   const [checkOut, setCheckOut] = useState<string>(addDays(initialCheckIn, 2));
-  const [adults, setAdults] = useState(Math.min(2, initialChalet?.max_guests ?? 2));
-  const [children, setChildren] = useState(0);
+  const maxGuests = initialChalet?.max_guests ?? 2;
+  const [adults, setAdults] = useState(Math.min(Math.max(prefill.adults ?? 2, 1), maxGuests));
+  const [children, setChildren] = useState(Math.min(prefill.children ?? 0, Math.max(maxGuests - 1, 0)));
   // Diária: segue a sugestão (base ou média da temporada) até o dono digitar outra.
   const [nightlyRate, setNightlyRate] = useState("");
   const [rateTouched, setRateTouched] = useState(false);
@@ -134,10 +142,19 @@ export function NewQuoteForm({ chalets, fees, seasons, blocks, today, prefill }:
 
           <FormSection title="Para quem é o orçamento">
             <FieldRow>
-              <Field label="Nome do hóspede" name="guest_name" placeholder="Maria Souza" required autoComplete="off" error={error("guest_name")} />
+              <Field
+                label="Nome do hóspede"
+                name="guest_name"
+                placeholder="Maria Souza"
+                required
+                autoComplete="off"
+                defaultValue={prefill.guestName}
+                error={error("guest_name")}
+              />
               <Field
                 label="WhatsApp (opcional)"
                 name="guest_phone"
+                defaultValue={prefill.guestPhone}
                 type="tel"
                 inputMode="tel"
                 mask="phone"

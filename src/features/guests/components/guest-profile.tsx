@@ -1,4 +1,4 @@
-import { CalendarPlus, Mail, MessageCircle, Pencil } from "lucide-react";
+import { CalendarPlus, Mail, MessageCircle, Pencil, Repeat } from "lucide-react";
 
 import { paths } from "@/components/layout/navigation";
 import { Avatar } from "@/components/ui/avatar";
@@ -23,6 +23,7 @@ function InfoItem({ label, value }: { label: string; value: string | null }) {
 
 export function GuestProfile({ guest, stays }: { guest: Guest; stays: GuestStay[] }) {
   const whatsapp = whatsappUrl(guest.phone, `Olá, ${guest.full_name.split(" ")[0]}!`);
+  const lastStay = stays.find((stay) => stay.status !== "cancelled");
   const totalSpent = stays.filter((s) => s.status !== "cancelled").reduce((sum, s) => sum + s.grand_total, 0);
 
   return (
@@ -70,9 +71,9 @@ export function GuestProfile({ guest, stays }: { guest: Guest; stays: GuestStay[
                 <Pencil aria-hidden="true" />
                 Editar
               </ButtonLink>
-              <ButtonLink href={paths.newReservation({ guest: guest.id })}>
-                <CalendarPlus aria-hidden="true" />
-                Reservar
+              <ButtonLink href={paths.newReservation({ guest: guest.id, chalet: lastStay?.chalet_id })}>
+                {lastStay ? <Repeat aria-hidden="true" /> : <CalendarPlus aria-hidden="true" />}
+                {lastStay ? "Reservar de novo" : "Reservar"}
               </ButtonLink>
             </div>
           </div>

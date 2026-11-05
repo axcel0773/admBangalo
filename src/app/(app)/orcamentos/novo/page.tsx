@@ -8,15 +8,23 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { NewQuoteForm } from "@/features/quotes";
 import { getNewReservationContext } from "@/features/reservations";
 import { isIsoDate, todayIso } from "@/lib/dates";
+import { toCount } from "@/lib/search-params";
 
 export const metadata: Metadata = { title: "Novo orçamento" };
 
 interface NewQuotePageProps {
-  searchParams: Promise<{ chale?: string; entrada?: string }>;
+  searchParams: Promise<{
+    chale?: string;
+    entrada?: string;
+    adultos?: string;
+    criancas?: string;
+    nome?: string;
+    telefone?: string;
+  }>;
 }
 
 export default async function NewQuotePage({ searchParams }: NewQuotePageProps) {
-  const [{ chale, entrada }, context] = await Promise.all([searchParams, getNewReservationContext()]);
+  const [{ chale, entrada, adultos, criancas, nome, telefone }, context] = await Promise.all([searchParams, getNewReservationContext()]);
 
   return (
     <>
@@ -36,7 +44,14 @@ export default async function NewQuotePage({ searchParams }: NewQuotePageProps) 
             seasons={context.seasons}
             blocks={context.blocks}
             today={todayIso()}
-            prefill={{ chaletId: chale, checkIn: entrada && isIsoDate(entrada) ? entrada : undefined }}
+            prefill={{
+              chaletId: chale,
+              checkIn: entrada && isIsoDate(entrada) ? entrada : undefined,
+              adults: toCount(adultos),
+              children: toCount(criancas),
+              guestName: nome?.slice(0, 120),
+              guestPhone: telefone?.slice(0, 20),
+            }}
           />
         )}
       </PageBody>

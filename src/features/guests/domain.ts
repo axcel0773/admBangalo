@@ -6,6 +6,7 @@ export type Guest = Tables<"guests">;
 export type GuestStay = Pick<
   Views<"reservation_financials">,
   | "reservation_id"
+  | "chalet_id"
   | "chalet_name"
   | "check_in"
   | "check_out"

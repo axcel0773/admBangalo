@@ -70,6 +70,18 @@ export const paths = {
     const query = search.toString();
     return query ? `${routes.newReservation}?${query}` : routes.newReservation;
   },
+  newQuote: (
+    params: { chalet?: string; adults?: number; children?: number; guestName?: string; guestPhone?: string } = {},
+  ) => {
+    const search = new URLSearchParams();
+    if (params.chalet) search.set("chale", params.chalet);
+    if (params.adults) search.set("adultos", String(params.adults));
+    if (params.children) search.set("criancas", String(params.children));
+    if (params.guestName) search.set("nome", params.guestName);
+    if (params.guestPhone) search.set("telefone", params.guestPhone);
+    const query = search.toString();
+    return query ? `${routes.newQuote}?${query}` : routes.newQuote;
+  },
   calendar: (params: { start?: string; day?: string } = {}) => {
     const search = new URLSearchParams();
     if (params.start) search.set("inicio", params.start);
