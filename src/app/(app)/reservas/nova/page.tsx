@@ -11,11 +11,26 @@ import { isIsoDate, todayIso } from "@/lib/dates";
 export const metadata: Metadata = { title: "Nova reserva" };
 
 interface NewReservationPageProps {
-  searchParams: Promise<{ chale?: string; entrada?: string; hospede?: string }>;
+  searchParams: Promise<{
+    chale?: string;
+    entrada?: string;
+    saida?: string;
+    adultos?: string;
+    criancas?: string;
+    hospede?: string;
+    nome?: string;
+    telefone?: string;
+  }>;
+}
+
+/** Número de pessoas vindo da URL (por exemplo, de um orçamento); inválido vira indefinido. */
+function toCount(value: string | undefined): number | undefined {
+  const count = Number(value);
+  return Number.isInteger(count) && count >= 0 && count <= 6 ? count : undefined;
 }
 
 export default async function NewReservationPage({ searchParams }: NewReservationPageProps) {
-  const [{ chale, entrada, hospede }, context] = await Promise.all([searchParams, getNewReservationContext()]);
+  const [{ chale, entrada, saida, adultos, criancas, hospede, nome, telefone }, context] = await Promise.all([searchParams, getNewReservationContext()]);
 
   return (
     <>
@@ -39,7 +54,12 @@ export default async function NewReservationPage({ searchParams }: NewReservatio
             prefill={{
               chaletId: chale,
               checkIn: entrada && isIsoDate(entrada) ? entrada : undefined,
+              checkOut: saida && isIsoDate(saida) ? saida : undefined,
+              adults: toCount(adultos),
+              children: toCount(criancas),
               guestId: hospede,
+              guestName: nome?.slice(0, 120),
+              guestPhone: telefone?.slice(0, 20),
             }}
           />
         )}

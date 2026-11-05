@@ -1,6 +1,7 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 
 import { formatCurrency } from "@/lib/format";
+import { winAnsiSafe, wrapText } from "@/lib/pdf";
 
 import type { ReceiptData } from "../domain/receipt";
 
@@ -15,31 +16,6 @@ const INK = rgb(0.114, 0.165, 0.122);
 const MUTED = rgb(0.4, 0.43, 0.4);
 const LINE = rgb(0.82, 0.84, 0.8);
 const PANEL = rgb(0.95, 0.95, 0.92);
-
-/** Troca o que a fonte padrão do PDF não consegue desenhar. */
-export function winAnsiSafe(text: string): string {
-  return text
-    .replace(/ /g, " ")
-    .replace(/−/g, "-")
-    .replace(/[^ -~¡-ÿ–—‘’“”•…€]/g, "?");
-}
-
-/** Quebra o texto em linhas que cabem em `maxWidth`. */
-export function wrapText(text: string, font: Pick<PDFFont, "widthOfTextAtSize">, size: number, maxWidth: number): string[] {
-  const lines: string[] = [];
-  let current = "";
-  for (const word of text.split(/\s+/).filter(Boolean)) {
-    const candidate = current ? `${current} ${word}` : word;
-    if (current && font.widthOfTextAtSize(candidate, size) > maxWidth) {
-      lines.push(current);
-      current = word;
-    } else {
-      current = candidate;
-    }
-  }
-  if (current) lines.push(current);
-  return lines.length > 0 ? lines : [""];
-}
 
 const money = (value: number, refund = false) => `${refund ? "-" : ""}${formatCurrency(value)}`;
 

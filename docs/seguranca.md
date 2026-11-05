@@ -25,6 +25,7 @@ Se uma chave secreta vazar: Supabase → Project Settings → API Keys → **rev
 | Função `ical_feed(token)` (link iCal público) | `security definer` liberada para `anon` **de propósito**: o Airbnb/Booking lê sem login. Devolve só datas ocupadas e o nome do chalé, nunca hóspedes; o token (UUID aleatório) limita a um chalé e pode ser trocado |
 | `handle_new_user` (trigger) | `security definer` com `search_path` fixo; sem permissão de execução pela API |
 | Papel `anon` (visitante sem login) | sem nenhum privilégio em tabelas, views e sequências do `public` (migração 0005) |
+| `quotes` (orçamentos) | RLS com política do dono (`owner_id = auth.uid()`), `anon` sem acesso; o servidor recalcula os valores com as taxas e a capacidade do banco (o navegador só sugere); limite de 6 pessoas por constraint |
 | Storage `avatars` | bucket privado (1 MB, só JPG/PNG/WebP); ler, enviar e apagar só na pasta `<owner_id>/`; link assinado de 1 h; o servidor só aceita caminho da própria pasta (`isOwnAvatarPath`) e apaga a foto antiga na troca |
 | Storage `receipts` | bucket privado; ler, enviar e apagar só na pasta `<owner_id>/`; links assinados de 1 h; o banco confere o caminho salvo no pagamento |
 

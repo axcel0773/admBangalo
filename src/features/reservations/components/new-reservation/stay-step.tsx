@@ -31,8 +31,9 @@ interface StayStepProps {
   childCount: number;
   onAdultsChange: (value: number) => void;
   onChildrenChange: (value: number) => void;
-  source: string;
-  onSourceChange: (value: string) => void;
+  /** Sem `onSourceChange` o campo “Como chegou a reserva” não aparece (o orçamento não tem origem). */
+  source?: string;
+  onSourceChange?: (value: string) => void;
   error: (name: string) => string | undefined;
 }
 
@@ -131,13 +132,15 @@ export function StayStep({
           />
         </div>
         {capacityIssue ? <p className="text-xs font-semibold text-danger-ink">{capacityIssue}</p> : null}
-        <SelectField
-          label="Como chegou a reserva"
-          name="source"
-          value={source}
-          onChange={(event) => onSourceChange(event.target.value)}
-          options={Object.entries(SOURCE_LABELS).map(([value, label]) => ({ value, label }))}
-        />
+        {onSourceChange ? (
+          <SelectField
+            label="Como chegou a reserva"
+            name="source"
+            value={source ?? "direct"}
+            onChange={(event) => onSourceChange(event.target.value)}
+            options={Object.entries(SOURCE_LABELS).map(([value, label]) => ({ value, label }))}
+          />
+        ) : null}
       </FormSection>
     </>
   );

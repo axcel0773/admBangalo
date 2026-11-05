@@ -1,12 +1,12 @@
 "use client";
 
-import { Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/cn";
 
-import { bottomNavItems, isActivePath, routes, type NavItem } from "./navigation";
+import { NewMenu } from "./new-menu";
+import { bottomNavItems, isActivePath, type NavItem } from "./navigation";
 
 function BottomNavLink({ item, pathname }: { item: NavItem; pathname: string }) {
   const { href, label, icon: Icon } = item;
@@ -39,13 +39,7 @@ export function BottomNav() {
         <BottomNavLink key={item.href} item={item} pathname={pathname} />
       ))}
 
-      <Link
-        href={routes.newReservation}
-        aria-label="Nova reserva"
-        className="-mt-8 flex size-[58px] items-center justify-center justify-self-center rounded-[20px] bg-primary text-on-primary shadow-[0_10px_22px_rgb(74_107_58/0.35)] active:scale-95"
-      >
-        <Plus className="size-6" strokeWidth={2.4} aria-hidden="true" />
-      </Link>
+      <NewMenu />
 
       {bottomNavItems.right.map((item) => (
         <BottomNavLink key={item.href} item={item} pathname={pathname} />
