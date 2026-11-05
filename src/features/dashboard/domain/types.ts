@@ -29,6 +29,8 @@ export type PaymentRow = Pick<Tables<"payments">, "amount" | "kind" | "method">;
 
 export type ScheduleRow = Pick<Tables<"payment_schedule">, "id" | "reservation_id" | "description" | "amount" | "due_date">;
 
+export type QuoteRow = Pick<Tables<"quotes">, "id" | "guest_name" | "valid_until">;
+
 /* ---------- Saída (o que as telas recebem) ---------- */
 
 export type AgendaEventType = "check-in" | "check-out";
@@ -96,6 +98,20 @@ export interface DashboardSummary {
   guestsToday: number;
 }
 
+export type TodayActionType = "overdue-balance" | "arrival-unpaid" | "quote-expiring";
+
+/** Algo que precisa de atenção hoje; o `target` diz para onde o toque leva. */
+export interface TodayAction {
+  id: string;
+  type: TodayActionType;
+  severity: "danger" | "warning" | "info";
+  title: string;
+  subtitle: string;
+  target: { kind: "reservation" | "quote"; id: string };
+  /** Data que ordena a lista (vencimento, chegada ou validade). */
+  date: IsoDate;
+}
+
 export interface DashboardData {
   today: IsoDate;
   summary: DashboardSummary;
@@ -103,6 +119,7 @@ export interface DashboardData {
   chalets: ChaletOverview[];
   /** Total de hóspedes cadastrados (atalhos do Painel). */
   guestCount: number;
+  actions: TodayAction[];
   receivables: Receivable[];
   upcoming: UpcomingArrival[];
 }

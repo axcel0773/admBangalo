@@ -4,6 +4,7 @@ export { DashboardHeader } from "./components/dashboard-header";
 export { ReceivablesCard } from "./components/receivables-card";
 export { Shortcuts } from "./components/shortcuts";
 export { SummaryCards } from "./components/summary-cards";
+export { TodayActions } from "./components/today-actions";
 export { TodayAgenda } from "./components/today-agenda";
 export { UpcomingArrivals } from "./components/upcoming-arrivals";
 export { getDashboard } from "./services/get-dashboard";

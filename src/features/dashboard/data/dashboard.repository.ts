@@ -4,7 +4,7 @@ import type { IsoDate } from "@/lib/dates";
 import { unwrapList } from "@/lib/supabase/result";
 import type { DbClient } from "@/lib/supabase/server";
 
-import type { ChaletRow, PaymentRow, ScheduleRow, StayRow } from "../domain/types";
+import type { ChaletRow, PaymentRow, QuoteRow, ScheduleRow, StayRow } from "../domain/types";
 
 /**
  * Acesso a dados do Painel. Só consultas — nenhuma regra de negócio.
@@ -19,6 +19,17 @@ export function createDashboardRepository(db: DbClient) {
         .eq("active", true)
         .order("name");
       return unwrapList(result, "Listar bangalôs");
+    },
+
+    /** Orçamentos que vencem entre `from` e `to` (inclusive), do que vence primeiro. */
+    async listQuotesExpiring(from: IsoDate, to: IsoDate): Promise<QuoteRow[]> {
+      const result = await db
+        .from("quotes")
+        .select("id, guest_name, valid_until")
+        .gte("valid_until", from)
+        .lte("valid_until", to)
+        .order("valid_until");
+      return unwrapList(result, "Listar orçamentos a vencer");
     },
 
     /** Quantos hóspedes (não removidos) o proprietário tem; só conta, não traz linhas. */
