@@ -4,7 +4,7 @@ Acompanhamento do projeto **admBangalo** (gestão de bangalôs · Next.js + Type
 
 **Legenda:** `[x]` feito · `[ ]` a fazer · ⚠️ feito, mas falta validar
 
-**Última atualização:** 05/11/2026
+**Última atualização:** 05/11/2026 (noite)
 
 ---
 
@@ -129,6 +129,13 @@ Boas práticas que valem para todas as etapas seguintes.
 - [x] **Painel**: seção *Atalhos* no fim (Bangalôs, Hóspedes, Configurações) (PR #35)
 - [x] **Identidade de praia** (PR #37): paleta azul-mar + laranja de pôr do sol (tokens em `globals.css`), ilustrações de mar/coqueiro (topo do Painel e capa padrão), novo ícone do app/PWA, Painel com ícone de sol e marca com coqueiro
 - [x] **Nome "Bangalôs"** no lugar de "Chalés" em todos os textos, PDFs e mensagens; URLs (`/configuracoes/chales`), banco e código continuam com `chalet`/`chales`, para não quebrar links nem dados
+
+### Melhorias de esforço P (docs/melhorias.md) — 05/11
+- [x] **Lembretes de WhatsApp** (#2, PR #40): na reserva, botões *Lembrar da chegada*, *Cobrar saldo* e *Agradecer* aparecem conforme a situação (antes da estadia, com saldo, depois da saída); textos em `reservations/domain/messages.ts`, testados
+- [x] **Duplicar e reservar de novo** (#5, PR #41): *Duplicar* no orçamento (mantém bangalô, pessoas e hóspede; datas em branco), *Reservar de novo* na reserva e na ficha do hóspede; `paths.newQuote` e helper `toCount` em `src/lib/search-params.ts`
+- [x] **Hóspedes recorrentes e aniversariantes** (#11, PR #42): selo "Cliente fiel" (2+ estadias não canceladas) e "Aniversário", filtros `?filtro=recorrentes|aniversariantes` — sem migração
+- [x] **Comparativo com o mês anterior** (#12, PR #42): setas e % nos cartões Previsto e Recebido do Financeiro
+- [x] **Contagem de hóspedes nos atalhos do Painel** (#17, parte P, PR #42): consulta `count` exata, sem listar linhas
 
 ### Pendências conhecidas
 - [ ] Sinal sugerido (percentual de entrada) nos orçamentos — a decidir
