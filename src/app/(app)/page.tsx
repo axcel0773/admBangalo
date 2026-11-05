@@ -7,6 +7,7 @@ import {
   DashboardHeader,
   getDashboard,
   ReceivablesCard,
+  Shortcuts,
   SummaryCards,
   TodayAgenda,
   UpcomingArrivals,
@@ -38,6 +39,7 @@ export default async function DashboardPage() {
           <ReceivablesCard receivables={dashboard.receivables} />
           <UpcomingArrivals arrivals={dashboard.upcoming} />
         </div>
+        <Shortcuts chaletCount={dashboard.chalets.length} />
       </PageBody>
     </>
   );
