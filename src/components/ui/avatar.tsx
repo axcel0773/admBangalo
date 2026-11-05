@@ -19,7 +19,7 @@ const avatarVariants = cva(
 );
 
 /** Paleta quente; a cor sai do nome para ser estável entre telas. */
-const AVATAR_COLORS = ["#C0643A", "#5E7C8C", "#8B5A6B", "#7A8C52", "#6B4E36", "#4A6B3A"] as const;
+const AVATAR_COLORS = ["#E07B39", "#1F6FB2", "#2A9D8F", "#8B5A6B", "#6B4E36", "#14508A"] as const;
 
 export function avatarColor(name: string): string {
   let hash = 0;

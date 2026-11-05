@@ -154,7 +154,7 @@ export type ChaletDayState = "arriving" | "leaving" | "turnover" | "staying" | "
 export interface ChaletDayEntry {
   chalet: CalendarChalet;
   state: ChaletDayState;
-  /** Hóspede que chega ou está hospedado (ou quem sai, se o chalé fica livre). */
+  /** Hóspede que chega ou está hospedado (ou quem sai, se o bangalô fica livre). */
   stay: CalendarStay | null;
   /** Quem sai no mesmo dia em que outro chega. */
   leavingStay: CalendarStay | null;
@@ -187,7 +187,7 @@ export function buildDayAgenda(
   });
 }
 
-/** Chalés ocupados na noite de `day`, para os pontinhos da semana. */
+/** Bangalôs ocupados na noite de `day`, para os pontinhos da semana. */
 export function occupiedChaletIds(stays: CalendarStay[], day: IsoDate): string[] {
   return stays
     .filter((stay) => stay.status !== "cancelled" && stay.check_in <= day && day < stay.check_out)

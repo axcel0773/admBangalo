@@ -32,7 +32,7 @@ function nightsLabel(startsOn: string, endsOn: string): string {
   return startsOn === last ? formatShortDate(startsOn) : `${formatShortDate(startsOn)} a ${formatShortDate(last)}`;
 }
 
-/** Bloqueios, calendários de outras plataformas e o link iCal deste chalé. */
+/** Bloqueios, calendários de outras plataformas e o link iCal deste bangalô. */
 export function AvailabilityCard({ chaletId, availability }: { chaletId: string; availability: ChaletAvailability }) {
   const manual = availability.blocks.filter((block) => block.source === "manual");
   const imported = availability.blocks.filter((block) => block.source === "ical");
@@ -130,7 +130,7 @@ export function AvailabilityCard({ chaletId, availability }: { chaletId: string;
         <div className="mt-6 flex flex-col gap-3 border-t border-line pt-5">
           <h3 className="text-sm font-bold">Levar estas reservas para o Airbnb/Booking</h3>
           <CopyField
-            label="Link iCal deste chalé"
+            label="Link iCal deste bangalô"
             value={availability.feedUrl}
             hint="Cole em “Importar calendário” na outra plataforma. Só mostra datas ocupadas, sem dados de hóspedes."
           />

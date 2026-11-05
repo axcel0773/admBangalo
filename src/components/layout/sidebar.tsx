@@ -45,7 +45,7 @@ export function Sidebar({ businessName, ownerName, avatarUrl }: SidebarProps) {
       </nav>
 
       <div className="mt-auto flex items-center gap-3 rounded-[18px] bg-subtle p-3.5">
-        <Avatar name={ownerName} src={avatarUrl} color="#C0643A" />
+        <Avatar name={ownerName} src={avatarUrl} color="#F29A3E" />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold">{ownerName}</p>
           <p className="text-xs text-ink-muted">Proprietário</p>

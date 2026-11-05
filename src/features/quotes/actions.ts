@@ -23,7 +23,7 @@ export async function createQuote(_prev: FormState, formData: FormData): Promise
   // Os valores são recalculados aqui, com as taxas e a capacidade do banco: o navegador só sugere.
   const context = await getNewReservationContext();
   const chalet = context.chalets.find((candidate) => candidate.id === input.chalet_id);
-  if (!chalet) return errorFormState("Chalé não encontrado.", formData);
+  if (!chalet) return errorFormState("Bangalô não encontrado.", formData);
 
   const draft = {
     chalet,

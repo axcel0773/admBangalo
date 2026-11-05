@@ -5,7 +5,7 @@ import { buildQuotePdf } from "./quote-pdf";
 
 const doc: QuoteDocument = {
   number: "A1B2C3D4",
-  issuer: "Chalés da Serra",
+  issuer: "Bangalôs da Serra",
   issuerPhone: "(11) 98765-4321",
   issuedAt: "05/11/2026",
   validUntil: "12/11/2026",

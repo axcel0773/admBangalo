@@ -43,7 +43,7 @@ export function SummaryCards({ summary }: { summary: DashboardSummary }) {
         icon={<Users />}
         iconTone="neutral"
         value={summary.guestsToday}
-        footer="dormindo nos chalés"
+        footer="dormindo nos bangalôs"
       />
     </section>
   );

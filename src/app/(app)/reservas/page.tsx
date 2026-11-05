@@ -39,7 +39,7 @@ export default async function ReservationsPage({ searchParams }: ReservationsPag
   }));
 
   const chaletChips = [
-    { href: hrefFor(view), label: "Todos os chalés", active: !chale },
+    { href: hrefFor(view), label: "Todos os bangalôs", active: !chale },
     ...chalets.map((chalet) => ({
       href: hrefFor(view, chalet.id),
       label: chalet.name,
@@ -61,7 +61,7 @@ export default async function ReservationsPage({ searchParams }: ReservationsPag
       <PageBody className="max-w-4xl">
         <div className="flex flex-col gap-2.5">
           <FilterChips label="Situação" chips={viewChips} />
-          {chalets.length > 1 ? <FilterChips label="Chalé" chips={chaletChips} /> : null}
+          {chalets.length > 1 ? <FilterChips label="Bangalô" chips={chaletChips} /> : null}
         </div>
         <ReservationList reservations={reservations} />
       </PageBody>

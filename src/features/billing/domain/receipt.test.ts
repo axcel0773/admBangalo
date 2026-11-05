@@ -6,7 +6,7 @@ const plain = (text: string) => text.replace(/ /g, " ");
 
 const input: ReceiptInput = {
   reservationId: "a1b2c3d4-0000-4000-8000-000000000001",
-  issuer: "Chalés da Serra",
+  issuer: "Bangalôs da Serra",
   issuerPhone: "(12) 99999-0000",
   today: "2026-11-04",
   guest: { full_name: "Maria Souza", document: "529.982.247-25" },

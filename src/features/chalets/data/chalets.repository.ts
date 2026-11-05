@@ -12,24 +12,24 @@ export function createChaletsRepository(db: DbClient) {
     async list(options: { onlyActive?: boolean } = {}): Promise<Chalet[]> {
       let query = db.from("chalets").select("*").order("name");
       if (options.onlyActive) query = query.eq("active", true);
-      return unwrapList(await query, "Listar chalés");
+      return unwrapList(await query, "Listar bangalôs");
     },
 
     async findById(id: string): Promise<Chalet | null> {
       const result = await db.from("chalets").select("*").eq("id", id).maybeSingle();
-      if (result.error) return unwrap(result, "Buscar chalé");
+      if (result.error) return unwrap(result, "Buscar bangalô");
       return result.data;
     },
 
     async create(input: ChaletInput): Promise<string> {
       const result = await db.from("chalets").insert(input).select("id").single();
-      assertMutation(result, "Não foi possível cadastrar o chalé.");
-      return unwrap(result, "Cadastrar chalé").id;
+      assertMutation(result, "Não foi possível cadastrar o bangalô.");
+      return unwrap(result, "Cadastrar bangalô").id;
     },
 
     async update(id: string, input: ChaletInput): Promise<void> {
       const result = await db.from("chalets").update(input).eq("id", id);
-      assertMutation(result, "Não foi possível salvar o chalé.");
+      assertMutation(result, "Não foi possível salvar o bangalô.");
     },
 
     /** Grava o caminho da foto (ou null) e devolve o caminho anterior. */
@@ -37,7 +37,7 @@ export function createChaletsRepository(db: DbClient) {
       const { data: before } = await db.from("chalets").select("photo_path").eq("id", id).maybeSingle();
       const result = await db.from("chalets").update({ photo_path: path }).eq("id", id).select("id");
       assertMutation(result, "Não foi possível salvar a foto.");
-      if (!result.data || result.data.length === 0) throw new MutationError("Chalé não encontrado.");
+      if (!result.data || result.data.length === 0) throw new MutationError("Bangalô não encontrado.");
       return before?.photo_path ?? null;
     },
 

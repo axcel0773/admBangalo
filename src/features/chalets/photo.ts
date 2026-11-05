@@ -9,7 +9,7 @@ export function chaletPhotoPath(input: { ownerId: string; chaletId: string; cont
   return `${input.ownerId}/${input.chaletId}/photo-${input.id}.${EXTENSIONS[input.contentType] ?? "jpg"}`;
 }
 
-/** Só aceita caminhos da pasta do próprio dono e deste chalé, no formato de `chaletPhotoPath`. */
+/** Só aceita caminhos da pasta do próprio dono e deste bangalô, no formato de `chaletPhotoPath`. */
 export function isOwnChaletPhotoPath(path: string, ownerId: string, chaletId: string): boolean {
   return new RegExp(`^${ownerId}/${chaletId}/photo-[0-9a-f-]{36}\\.(jpg|png|webp)$`).test(path);
 }

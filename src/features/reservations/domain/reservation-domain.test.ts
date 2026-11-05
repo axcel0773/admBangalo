@@ -25,7 +25,7 @@ const draft = {
 } as const;
 
 describe("autoFeesFor", () => {
-  it("só aplica taxas ativas, automáticas e deste chalé (ou gerais)", () => {
+  it("só aplica taxas ativas, automáticas e deste bangalô (ou gerais)", () => {
     expect(autoFeesFor("c1", fees).map((fee) => fee.name)).toEqual(["Limpeza", "Pessoa extra", "Energia"]);
   });
 });
@@ -46,7 +46,7 @@ describe("validateDraft", () => {
   it("aponta datas invertidas e excesso de pessoas", () => {
     expect(validateDraft({ ...draft, checkOut: "2026-11-19", adults: 4, children: 1 })).toEqual({
       dates: "A saída precisa ser depois da entrada.",
-      capacity: "Este chalé recebe até 4 pessoas.",
+      capacity: "Este bangalô recebe até 4 pessoas.",
     });
     expect(validateDraft({ ...draft })).toEqual({});
   });

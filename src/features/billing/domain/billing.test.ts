@@ -106,7 +106,7 @@ describe("Pix copia e cola", () => {
   });
 
   it("inclui o valor com duas casas e termina com CRC válido", () => {
-    const payload = buildPixPayload({ key: "maria@exemplo.com", name: "Chalés da Serra", city: "Gonçalves", amount: 470 });
+    const payload = buildPixPayload({ key: "maria@exemplo.com", name: "Bangalôs da Serra", city: "Gonçalves", amount: 470 });
     expect(payload).toContain("5406470.00");
     expect(payload).toContain("5915Chales da Serra");
     expect(payload).toContain("6009Goncalves");

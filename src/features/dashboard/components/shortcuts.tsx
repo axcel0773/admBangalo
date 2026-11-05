@@ -38,7 +38,7 @@ function Shortcut({ href, icon, title, description, className }: ShortcutProps) 
   );
 }
 
-/** Atalhos no fim do Painel: Chalés, Hóspedes e Configurações. */
+/** Atalhos no fim do Painel: Bangalôs, Hóspedes e Configurações. */
 export function Shortcuts({ chaletCount }: { chaletCount: number }) {
   return (
     <section aria-labelledby="shortcuts-title">
@@ -49,7 +49,7 @@ export function Shortcuts({ chaletCount }: { chaletCount: number }) {
         <Shortcut
           href={routes.chalets}
           icon={<House />}
-          title="Chalés"
+          title="Bangalôs"
           description={pluralize(chaletCount, "cadastrado", "cadastrados")}
         />
         <Shortcut href={routes.guests} icon={<Users />} title="Hóspedes" description="Contatos e histórico" />

@@ -65,7 +65,7 @@ export interface NewReservationContext {
   chalets: (ChaletForQuote & { name: string; color: string })[];
   fees: FeeForQuote[];
   guests: { id: string; full_name: string; phone: string | null }[];
-  /** Temporadas que ainda não acabaram, de todos os chalés. */
+  /** Temporadas que ainda não acabaram, de todos os bangalôs. */
   seasons: SeasonRate[];
   /** Datas bloqueadas do próximo ano (manuais e de outras plataformas). */
   blocks: ChaletBlock[];

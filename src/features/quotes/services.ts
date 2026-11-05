@@ -13,11 +13,11 @@ export interface QuoteListItem extends Quote {
   chaletName: string;
 }
 
-/** Orçamentos do mais novo para o mais antigo, com o nome do chalé. */
+/** Orçamentos do mais novo para o mais antigo, com o nome do bangalô. */
 export async function listQuotes(): Promise<QuoteListItem[]> {
   const [quotes, chalets] = await Promise.all([(await quotesRepository()).list(), listChalets()]);
   const names = new Map(chalets.map((chalet) => [chalet.id, chalet.name]));
-  return quotes.map((quote) => ({ ...quote, chaletName: names.get(quote.chalet_id) ?? "Chalé removido" }));
+  return quotes.map((quote) => ({ ...quote, chaletName: names.get(quote.chalet_id) ?? "Bangalô removido" }));
 }
 
 export async function getQuote(id: string): Promise<Quote | null> {

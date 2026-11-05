@@ -25,9 +25,9 @@ export default async function NewQuotePage({ searchParams }: NewQuotePageProps) 
         {context.chalets.length === 0 ? (
           <EmptyState
             icon={<House />}
-            title="Cadastre um chalé primeiro"
-            description="Os orçamentos usam a diária, a capacidade e as taxas do chalé."
-            action={<ButtonLink href={routes.newChalet}>Cadastrar chalé</ButtonLink>}
+            title="Cadastre um bangalô primeiro"
+            description="Os orçamentos usam a diária, a capacidade e as taxas do bangalô."
+            action={<ButtonLink href={routes.newChalet}>Cadastrar bangalô</ButtonLink>}
           />
         ) : (
           <NewQuoteForm

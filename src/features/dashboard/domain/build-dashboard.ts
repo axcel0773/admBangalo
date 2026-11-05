@@ -49,7 +49,7 @@ export function buildAgenda(stays: StayRow[], chalets: ChaletRow[], today: IsoDa
       reservationId: stay.reservation_id,
       guestName: stay.main_guest_name,
       chaletName: stay.chalet_name,
-      chaletColor: chalet?.color ?? "#4A6B3A",
+      chaletColor: chalet?.color ?? "#1F6FB2",
       guests: stay.guests_count,
     };
     if (stay.check_out === today) {

@@ -30,7 +30,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
 
   const receipt = buildReceiptData({
     reservationId: id,
-    issuer: profile?.business_name || profile?.full_name || "Chalés",
+    issuer: profile?.business_name || profile?.full_name || "Bangalôs",
     issuerPhone: profile?.phone ?? null,
     today: todayIso(),
     guest: mainGuest,

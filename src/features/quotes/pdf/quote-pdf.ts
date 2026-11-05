@@ -14,11 +14,11 @@ const PAGE = { width: 595.28, height: 841.89, margin: 44 };
 const INK = rgb(0.17, 0.15, 0.125);
 const MUTED = rgb(0.42, 0.38, 0.34);
 const LINE = rgb(0.9, 0.86, 0.8);
-const GREEN = rgb(0.29, 0.42, 0.23);
-const GREEN_SOFT = rgb(0.9, 0.93, 0.85);
+const GREEN = rgb(0.122, 0.435, 0.698);
+const GREEN_SOFT = rgb(0.86, 0.92, 0.97);
 const CREAM = rgb(0.976, 0.957, 0.925);
 const WHITE = rgb(1, 1, 1);
-const ON_GREEN_MUTED = rgb(0.85, 0.9, 0.8);
+const ON_GREEN_MUTED = rgb(0.84, 0.91, 0.96);
 
 const BAND_HEIGHT = 92;
 

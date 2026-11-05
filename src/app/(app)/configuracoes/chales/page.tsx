@@ -6,7 +6,7 @@ import { PageBody, PageHeader } from "@/components/layout/page-header";
 import { ButtonLink } from "@/components/ui/button";
 import { ChaletList, listChalets } from "@/features/chalets";
 
-export const metadata: Metadata = { title: "Chalés" };
+export const metadata: Metadata = { title: "Bangalôs" };
 
 export default async function ChaletsPage() {
   const chalets = await listChalets();
@@ -14,13 +14,13 @@ export default async function ChaletsPage() {
   return (
     <>
       <PageHeader
-        title="Chalés"
+        title="Bangalôs"
         back={{ href: routes.settings, label: "Configurações" }}
         actions={
           chalets.length > 0 ? (
             <ButtonLink href={routes.newChalet} size="sm">
               <Plus aria-hidden="true" />
-              Novo chalé
+              Novo bangalô
             </ButtonLink>
           ) : null
         }

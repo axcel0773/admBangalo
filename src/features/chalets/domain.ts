@@ -10,7 +10,7 @@ export interface ChaletColor {
   label: string;
 }
 
-/** Cores sugeridas para identificar cada chalé no calendário. */
+/** Cores sugeridas para identificar cada bangalô no calendário. */
 export const CHALET_COLORS: ChaletColor[] = [
   { value: "#4A6B3A", label: "Musgo" },
   { value: "#5E7C8C", label: "Ardósia" },

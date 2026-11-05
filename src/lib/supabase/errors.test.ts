@@ -9,7 +9,7 @@ describe("friendlyDbMessage", () => {
         { code: "23P01", message: 'conflicting key value violates exclusion constraint "reservations_no_overlap"' },
         "x",
       ),
-    ).toBe("Já existe uma reserva neste chalé para essas datas.");
+    ).toBe("Já existe uma reserva neste bangalô para essas datas.");
   });
 
   it("traduz temporadas sobrepostas sem confundir com reservas", () => {
@@ -18,13 +18,13 @@ describe("friendlyDbMessage", () => {
         { code: "23P01", message: 'conflicting key value violates exclusion constraint "chalet_rates_chalet_id_period_excl"' },
         "x",
       ),
-    ).toBe("Já existe uma temporada neste chalé que cruza essas datas.");
+    ).toBe("Já existe uma temporada neste bangalô que cruza essas datas.");
   });
 
   it("mantém mensagens em português dos triggers", () => {
     expect(
-      friendlyDbMessage({ code: "23514", message: "Capacidade do chalé excedida: 6 hóspedes para máximo de 4" }, "x"),
-    ).toBe("Capacidade do chalé excedida: 6 hóspedes para máximo de 4");
+      friendlyDbMessage({ code: "23514", message: "Capacidade do bangalô excedida: 6 hóspedes para máximo de 4" }, "x"),
+    ).toBe("Capacidade do bangalô excedida: 6 hóspedes para máximo de 4");
   });
 
   it("esconde mensagens técnicas do Postgres", () => {

@@ -34,8 +34,8 @@ export default async function SettingsPage() {
           <ListRow
             href={routes.chalets}
             leading={<IconTile><House /></IconTile>}
-            title="Chalés"
-            subtitle={`${pluralize(chalets.length, "chalé cadastrado", "chalés cadastrados")} · capacidade, diária, horários`}
+            title="Bangalôs"
+            subtitle={`${pluralize(chalets.length, "bangalô cadastrado", "bangalôs cadastrados")} · capacidade, diária, horários`}
           />
           {/* Atalhos que no computador ficam no menu lateral; no celular moram aqui. */}
           <ListRow

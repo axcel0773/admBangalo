@@ -45,7 +45,7 @@ export function createFinanceRepository(db: DbClient) {
 
     async listActiveChalets(): Promise<ChaletRef[]> {
       const result = await db.from("chalets").select("name, color").eq("active", true).order("name");
-      return unwrapList(result, "Listar chalés");
+      return unwrapList(result, "Listar bangalôs");
     },
   };
 }

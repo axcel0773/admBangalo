@@ -64,12 +64,12 @@ describe("leitura de iCal (Airbnb/Booking)", () => {
 describe("geração de iCal", () => {
   it("gera calendário válido que lemos de volta", () => {
     const ics = buildIcs({
-      name: "Chalé Ipê; Serra",
+      name: "Bangalô Ipê; Serra",
       stamp: new Date("2026-11-03T12:00:00Z"),
       events: [{ uid: "r1@admbangalo", start: "2026-12-10", end: "2026-12-13", summary: "Reservado" }],
     });
     expect(ics.startsWith("BEGIN:VCALENDAR\r\n")).toBe(true);
-    expect(ics).toContain("X-WR-CALNAME:Chalé Ipê\\; Serra");
+    expect(ics).toContain("X-WR-CALNAME:Bangalô Ipê\\; Serra");
     expect(ics).toContain("DTSTART;VALUE=DATE:20261210");
     expect(ics).toContain("DTSTAMP:20261103T120000Z");
     expect(parseIcs(ics)).toEqual([{ uid: "r1@admbangalo", start: "2026-12-10", end: "2026-12-13", summary: "Reservado" }]);
@@ -109,7 +109,7 @@ describe("bloqueios de datas", () => {
     expect(rangesOverlap("2026-12-01", "2026-12-05", "2026-12-04", "2026-12-07")).toBe(true);
   });
 
-  it("acha os bloqueios do chalé na estadia", () => {
+  it("acha os bloqueios do bangalô na estadia", () => {
     expect(overlappingBlocks(blocks, "c1", "2026-12-04", "2026-12-11").map((b) => b.id)).toEqual(["b1", "b2"]);
     expect(overlappingBlocks(blocks, "c2", "2026-12-04", "2026-12-11")).toEqual([]);
     expect(overlappingBlocks(blocks, "c1", "2026-12-07", "2026-12-07")).toEqual([]);

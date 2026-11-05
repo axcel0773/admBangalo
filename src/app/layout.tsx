@@ -14,12 +14,12 @@ const fraunces = Fraunces({
   display: "swap",
 });
 
-const APP_NAME = "Chalés";
+const APP_NAME = "Bangalôs";
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,
   title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
-  description: "Gestão de chalés: reservas, hóspedes, calendário e financeiro.",
+  description: "Gestão de bangalôs: reservas, hóspedes, calendário e financeiro.",
   appleWebApp: { capable: true, title: APP_NAME, statusBarStyle: "default" },
   formatDetection: { telephone: false },
   icons: {
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
  * Safari/PWA, deixando títulos e botões colados no relógio.
  */
 export const viewport: Viewport = {
-  themeColor: "#34502A",
+  themeColor: "#14508A",
   width: "device-width",
   initialScale: 1,
 };

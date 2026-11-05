@@ -14,7 +14,7 @@ export interface CurrentOwner {
   avatarUrl: string | null;
 }
 
-const FALLBACK_BUSINESS_NAME = "Meus Chalés";
+const FALLBACK_BUSINESS_NAME = "Meus Bangalôs";
 
 /**
  * Usuário logado + perfil. `cache` evita repetir a consulta

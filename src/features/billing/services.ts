@@ -27,7 +27,7 @@ export interface PaymentWithReceipt extends Payment {
 export interface ReservationBilling {
   ownerId: string;
   payments: PaymentWithReceipt[];
-  /** Taxa de energia por medidor do chalé (null = não cadastrada). */
+  /** Taxa de energia por medidor do bangalô (null = não cadastrada). */
   meteredFee: MeteredFee | null;
   /** Pix do saldo; null sem chave cadastrada ou sem saldo. */
   pix: PixCharge | null;

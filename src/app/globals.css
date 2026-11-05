@@ -10,29 +10,29 @@
   --font-display: var(--font-fraunces), Georgia, serif;
 
   /* superfícies */
-  --color-canvas: #f5efe6;
-  --color-surface: #fffdf8;
-  --color-muted: #ede3d2;
-  --color-subtle: #f9f4ec;
-  --color-line: #efe7da;
-  --color-line-strong: #dccfbb;
+  --color-canvas: #f7f1e6;
+  --color-surface: #fffdf9;
+  --color-muted: #ece3d0;
+  --color-subtle: #faf5ec;
+  --color-line: #e9dfca;
+  --color-line-strong: #d6c8ae;
 
   /* texto */
   --color-ink: #2b2620;
   --color-ink-soft: #4d453c;
   --color-ink-muted: #6b6157;
 
-  /* ação principal: verde-musgo */
-  --color-primary: #4a6b3a;
-  --color-primary-strong: #34502a;
-  --color-primary-soft: #e6edda;
-  --color-primary-ink: #3e5c30;
-  --color-on-primary: #fffdf8;
+  /* ação principal: azul-mar */
+  --color-primary: #1f6fb2;
+  --color-primary-strong: #14508a;
+  --color-primary-soft: #dcebf8;
+  --color-primary-ink: #174f82;
+  --color-on-primary: #fffdf9;
 
-  /* valores pendentes: terracota */
-  --color-accent: #c0643a;
-  --color-accent-soft: #f7e2d4;
-  --color-accent-ink: #9a4523;
+  /* valores pendentes: laranja pôr do sol */
+  --color-accent: #f29a3e;
+  --color-accent-soft: #fbe5c8;
+  --color-accent-ink: #9a5309;
 
   /* estados */
   --color-danger-soft: #f6deda;
@@ -40,8 +40,8 @@
   --color-energy-soft: #f7ebc9;
   --color-energy-ink: #6e500d;
 
-  /* cor de cada chalé (padrões; o banco guarda a cor escolhida) */
-  --color-chalet-moss: #4a6b3a;
+  /* cor de cada bangalô (padrões; o banco guarda a cor escolhida) */
+  --color-chalet-moss: #1f6fb2;
   --color-chalet-slate: #5e7c8c;
   --color-chalet-plum: #8b5a6b;
 
@@ -50,7 +50,7 @@
 
   --shadow-card: 0 1px 2px rgb(80 55 30 / 0.05), 0 10px 28px rgb(80 55 30 / 0.06);
   --shadow-raised: 0 12px 28px rgb(80 55 30 / 0.12);
-  --shadow-primary: 0 8px 20px rgb(74 107 58 / 0.28);
+  --shadow-primary: 0 8px 20px rgb(31 111 178 / 0.28);
 }
 
 @layer base {

@@ -18,7 +18,7 @@ export interface FeeRule {
 export interface StayContext {
   nights: number;
   guests: number;
-  /** Hóspedes já incluídos na diária do chalé. */
+  /** Hóspedes já incluídos na diária do bangalô. */
   includedGuests: number;
 }
 

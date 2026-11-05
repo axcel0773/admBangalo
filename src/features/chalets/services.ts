@@ -29,7 +29,7 @@ export async function listSeasonRates(chaletId: string): Promise<SeasonRate[]> {
   return (await seasonRatesRepository()).listByChalet(chaletId);
 }
 
-/** Temporadas de todos os chalés que ainda não terminaram. */
+/** Temporadas de todos os bangalôs que ainda não terminaram. */
 export async function listCurrentSeasonRates(): Promise<SeasonRate[]> {
   return (await seasonRatesRepository()).listCurrent(todayIso());
 }

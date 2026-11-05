@@ -9,10 +9,10 @@ interface PostgresLikeError {
 }
 
 const MESSAGES_BY_CONSTRAINT: Record<string, string> = {
-  reservations_no_overlap: "Já existe uma reserva neste chalé para essas datas.",
+  reservations_no_overlap: "Já existe uma reserva neste bangalô para essas datas.",
   guests_owner_document_uq: "Já existe um hóspede com esse documento.",
   reservation_guests_one_main: "A reserva só pode ter um hóspede responsável.",
-  chalet_rates_chalet_id_period_excl: "Já existe uma temporada neste chalé que cruza essas datas.",
+  chalet_rates_chalet_id_period_excl: "Já existe uma temporada neste bangalô que cruza essas datas.",
   chalets_max_guests_limit: "Regra do condomínio: cada bangalô recebe no máximo 6 pessoas.",
   reservations_guests_limit: "Regra do condomínio: no máximo 6 pessoas por bangalô.",
 };
@@ -28,7 +28,7 @@ export function friendlyDbMessage(error: PostgresLikeError, fallback: string): s
     case "23P01": // exclusion_violation
       return MESSAGES_BY_CONSTRAINT.reservations_no_overlap ?? fallback;
     case "23514": // check_violation
-      // Mensagens dos nossos triggers/funções já vêm em português (ex.: capacidade do chalé);
+      // Mensagens dos nossos triggers/funções já vêm em português (ex.: capacidade do bangalô);
       // as automáticas do Postgres começam com "new row".
       return error.message && !error.message.startsWith("new row")
         ? error.message

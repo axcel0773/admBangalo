@@ -21,10 +21,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
       <div className="-mt-8 flex flex-1 items-start justify-center rounded-t-[28px] bg-canvas px-5 pt-8 pb-10 md:mt-0 md:items-center md:rounded-none md:px-12" style={{ paddingBottom: "max(2.5rem, env(safe-area-inset-bottom))" }}>
         <div className="w-full max-w-sm">
-          <Brand name="Chalés" className="mb-8" />
+          <Brand name="Bangalôs" className="mb-8" />
           <h1 className="font-display text-3xl font-semibold">Bem-vindo de volta</h1>
           <p className="mt-2 mb-6 text-[15px] text-ink-muted">
-            Entre para ver reservas, hóspedes e valores dos seus chalés.
+            Entre para ver reservas, hóspedes e valores dos seus bangalôs.
           </p>
 
           {erro === "link" ? (

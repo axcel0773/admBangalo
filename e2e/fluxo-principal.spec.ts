@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import { createTestOwner, hasLocalSupabase, type TestOwner } from "./support/owner";
 
 /**
- * Fluxo principal no celular: login → chalé → nova reserva → pagamento.
+ * Fluxo principal no celular: login → bangalô → nova reserva → pagamento.
  * Precisa do Supabase local com as migrações (`supabase start`) e das variáveis
  * NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY e SUPABASE_SERVICE_ROLE_KEY.
  */
@@ -18,7 +18,7 @@ test.describe("fluxo principal", () => {
     await owner?.remove();
   });
 
-  test("login → chalé → reserva → pagamento quita o saldo", async ({ page }) => {
+  test("login → bangalô → reserva → pagamento quita o saldo", async ({ page }) => {
     // Login com senha
     await page.goto("/login");
     await page.getByLabel("E-mail").fill(owner.email);
@@ -26,15 +26,15 @@ test.describe("fluxo principal", () => {
     await page.getByRole("button", { name: "Entrar", exact: true }).click();
     await expect(page).toHaveURL(/\/$/);
 
-    // Chalé
+    // Bangalô
     await page.goto("/configuracoes/chales/novo");
-    await page.getByLabel("Nome", { exact: true }).fill("Chalé E2E");
+    await page.getByLabel("Nome", { exact: true }).fill("Bangalô E2E");
     await page.getByLabel("Diária base (R$)").fill("350,00");
-    await page.getByRole("button", { name: "Cadastrar chalé" }).click();
+    await page.getByRole("button", { name: "Cadastrar bangalô" }).click();
     await expect(page).toHaveURL(/\/configuracoes\/chales$/);
-    await expect(page.getByText("Chalé E2E")).toBeVisible();
+    await expect(page.getByText("Bangalô E2E")).toBeVisible();
 
-    // Nova reserva: chalé e datas vêm preenchidos (hoje + 2 noites)
+    // Nova reserva: bangalô e datas vêm preenchidos (hoje + 2 noites)
     await page.goto("/reservas/nova");
     await page.getByRole("button", { name: "Continuar" }).click();
     await page.getByRole("radio", { name: "Novo hóspede" }).click();

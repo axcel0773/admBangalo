@@ -17,7 +17,7 @@ export interface ChaletForQuote {
   base_nightly_rate: number;
 }
 
-/** Taxas que o banco aplicaria automaticamente neste chalé. */
+/** Taxas que o banco aplicaria automaticamente neste bangalô. */
 export function autoFeesFor(chaletId: string, fees: FeeForQuote[]): FeeRule[] {
   return fees
     .filter((fee) => fee.active && fee.auto_apply && (fee.chalet_id === null || fee.chalet_id === chaletId))
@@ -51,7 +51,7 @@ export function validateDraft(draft: ReservationDraft): DraftIssues {
     issues.dates = "A saída precisa ser depois da entrada.";
   }
   if (draft.chalet && draft.adults + draft.children > draft.chalet.max_guests) {
-    issues.capacity = `Este chalé recebe até ${draft.chalet.max_guests} pessoas.`;
+    issues.capacity = `Este bangalô recebe até ${draft.chalet.max_guests} pessoas.`;
   }
   return issues;
 }

@@ -9,32 +9,11 @@ export interface LandscapePalette {
   roof: string;
 }
 
-/** Paletas por cor de chalé; a cor do chalé no banco escolhe a mais próxima. */
+/** Paletas por cor de bangalô; a cor do bangalô no banco escolhe a mais próxima. */
 export const landscapePalettes = {
-  moss: {
-    sky: "#E3EAD6",
-    hills: "#C8D5B5",
-    meadow: "#98AE84",
-    pines: "#4A6B3A",
-    cabin: "#B9774E",
-    roof: "#5A3A26",
-  },
-  slate: {
-    sky: "#DCE6EA",
-    hills: "#B9CBD2",
-    meadow: "#8FA9A0",
-    pines: "#3F5F55",
-    cabin: "#A86C46",
-    roof: "#4E3322",
-  },
-  plum: {
-    sky: "#EFDFE0",
-    hills: "#D9C2C2",
-    meadow: "#A99A86",
-    pines: "#55663F",
-    cabin: "#9C5F4A",
-    roof: "#4A2C24",
-  },
+  moss: { sky: "#DCEBF8", hills: "#A9C8E6", meadow: "#1F6FB2", pines: "#0E3A63", cabin: "#FFFDF9", roof: "#F29A3E" },
+  slate: { sky: "#D8F2F1", hills: "#9ED5D3", meadow: "#0B9096", pines: "#07505A", cabin: "#FFFDF9", roof: "#E8606A" },
+  plum: { sky: "#FBE5C8", hills: "#F5C98F", meadow: "#E07B39", pines: "#7A3E12", cabin: "#FFFDF9", roof: "#14508A" },
 } satisfies Record<string, LandscapePalette>;
 
 export type LandscapeTone = keyof typeof landscapePalettes;
@@ -44,7 +23,7 @@ interface ChaletLandscapeProps {
   className?: string;
 }
 
-/** Ilustração decorativa (montanha, pinheiros, chalé) usada até haver foto real. */
+/** Ilustração decorativa (montanha, pinheiros, bangalô) usada até haver foto real. */
 export function ChaletLandscape({ tone = "moss", className }: ChaletLandscapeProps) {
   const p = landscapePalettes[tone];
   return (
@@ -55,26 +34,33 @@ export function ChaletLandscape({ tone = "moss", className }: ChaletLandscapePro
       className={cn("block h-full w-full", className)}
     >
       <rect width="320" height="140" fill={p.sky} />
-      <circle cx="262" cy="36" r="15" fill="#F4DCA6" />
-      <path d="M0 100 60 52l50 36 60-48 70 52 50-30 30 18v60H0z" fill={p.hills} />
-      <path d="M0 118q80-22 160-6t160-6v34H0z" fill={p.meadow} />
-      <path d="M34 124l12-36 12 36zM58 124l10-28 10 28zM250 124l12-38 12 38zM276 124l9-26 9 26z" fill={p.pines} />
+      <circle cx="262" cy="36" r="15" fill="#FFD98A" />
+      <path d="M0 96q40-10 80 0t80 0 80 0 80 0v44H0z" fill={p.hills} />
+      <path d="M0 112q40-10 80 0t80 0 80 0 80 0v28H0z" fill={p.meadow} opacity="0.75" />
+      <path d="M0 126q40-8 80 0t80 0 80 0 80 0v14H0z" fill="#F3E3C3" />
       <path d="M138 124V98l28-24 28 24v26z" fill={p.cabin} />
       <path
-        d="M132 100l34-30 34 30"
+        d="M130 100l36-32 36 32"
         fill="none"
         stroke={p.roof}
-        strokeWidth="6"
+        strokeWidth="7"
         strokeLinejoin="round"
         strokeLinecap="round"
       />
-      <rect x="158" y="104" width="16" height="20" rx="2" fill="#F6D58E" />
-      <rect x="178" y="74" width="8" height="16" fill={p.roof} />
+      <rect x="158" y="104" width="16" height="20" rx="2" fill={p.pines} />
+      <path d="M58 128c0-18 2-34 8-50" stroke={p.pines} strokeWidth="4" fill="none" strokeLinecap="round" />
+      <path
+        d="M66 78c-10-10-22-10-30-4M66 78c10-10 22-10 30-4M66 78c-8-14-20-16-28-12M66 78c8-14 20-16 28-12"
+        stroke={p.pines}
+        strokeWidth="4"
+        fill="none"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
 
-/** Escolhe a paleta pelo tom dominante da cor hex do chalé. */
+/** Escolhe a paleta pelo tom dominante da cor hex do bangalô. */
 export function toneFromColor(hex: string): LandscapeTone {
   const value = hex.replace("#", "");
   const r = parseInt(value.slice(0, 2), 16);
