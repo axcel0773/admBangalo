@@ -190,3 +190,18 @@ describe("comparativo com o mês anterior", () => {
     expect(previousTrendPoint([])).toBeNull();
   });
 });
+
+describe("despesas e lucro no relatório do mês", () => {
+  const input = { month: "2026-11-01", stays: [], payments: [{ amount: 750, kind: "deposit" as const, method: "pix" as const, paid_at: "2026-11-02" }], activeChalets: 1 };
+
+  it("sem despesas o lucro é o caixa", () => {
+    const report = buildMonthReport(input);
+    expect(report.expenses).toBe(0);
+    expect(report.profit).toBe(750);
+  });
+
+  it("subtrai as despesas do caixa e aceita lucro negativo", () => {
+    expect(buildMonthReport({ ...input, expenses: 250.25 }).profit).toBe(499.75);
+    expect(buildMonthReport({ ...input, expenses: 900 }).profit).toBe(-150);
+  });
+});

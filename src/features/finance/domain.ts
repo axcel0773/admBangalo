@@ -105,6 +105,10 @@ export interface MonthReport {
   /** Entradas de caixa no mês (pagamentos − estornos), por data de pagamento. */
   cashIn: number;
   cashByMethod: Partial<Record<Enums<"payment_method">, number>>;
+  /** Despesas lançadas no mês (por data da despesa). */
+  expenses: number;
+  /** Lucro de caixa: entradas do mês menos despesas; pode ser negativo. */
+  profit: number;
 }
 
 const sum = <T>(items: T[], pick: (item: T) => number) => roundMoney(items.reduce((total, item) => total + pick(item), 0));
@@ -115,6 +119,8 @@ export function buildMonthReport(input: {
   stays: FinanceStay[];
   payments: CashPayment[];
   activeChalets: number;
+  /** Total de despesas do mês (padrão: 0). */
+  expenses?: number;
 }): MonthReport {
   const { month } = input;
   const active = input.stays.filter((stay) => stay.status !== "cancelled");
@@ -136,6 +142,9 @@ export function buildMonthReport(input: {
     cashByMethod[payment.method] = roundMoney((cashByMethod[payment.method] ?? 0) + signed);
   }
 
+  const cashIn = sum(input.payments, (payment) => (payment.kind === "refund" ? -payment.amount : payment.amount));
+  const expenses = roundMoney(input.expenses ?? 0);
+
   return {
     month,
     stays,
@@ -148,8 +157,10 @@ export function buildMonthReport(input: {
     otherCharges: roundMoney(charges - energy - cleaning),
     nightsSold,
     occupancy: available > 0 ? Math.min(nightsSold / available, 1) : 0,
-    cashIn: sum(input.payments, (payment) => (payment.kind === "refund" ? -payment.amount : payment.amount)),
+    cashIn,
     cashByMethod,
+    expenses,
+    profit: roundMoney(cashIn - expenses),
   };
 }
 
