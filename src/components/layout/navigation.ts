@@ -29,6 +29,7 @@ export const routes = {
   search: "/busca",
   finance: "/financeiro",
   cleaning: "/limpeza",
+  reports: "/financeiro/relatorios",
   expenses: "/financeiro/despesas",
   newExpense: "/financeiro/despesas/nova",
   settings: "/configuracoes",

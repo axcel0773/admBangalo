@@ -1,5 +1,6 @@
-import { Download } from "lucide-react";
+import { ChartColumn, Download } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { routes } from "@/components/layout/navigation";
 import { PageBody, PageHeader } from "@/components/layout/page-header";
@@ -36,15 +37,21 @@ export default async function FinancePage({ searchParams }: FinancePageProps) {
         title="Financeiro"
         description="Receita pelo mês de entrada do hóspede; caixa pela data do pagamento."
         actions={
-          // <a> comum: é um download, não uma navegação do Next.
-          <a
-            href={`${routes.finance}/exportar?mes=${monthParam(month)}`}
-            download
-            className={buttonVariants({ variant: "secondary" })}
-          >
-            <Download aria-hidden="true" />
-            Exportar CSV
-          </a>
+          <>
+            <Link href={routes.reports} className={buttonVariants({ variant: "secondary" })}>
+              <ChartColumn aria-hidden="true" />
+              Relatórios
+            </Link>
+            {/* <a> comum: é um download, não uma navegação do Next. */}
+            <a
+              href={`${routes.finance}/exportar?mes=${monthParam(month)}`}
+              download
+              className={buttonVariants({ variant: "secondary" })}
+            >
+              <Download aria-hidden="true" />
+              Exportar CSV
+            </a>
+          </>
         }
       />
       <PageBody className="flex flex-col gap-4 md:gap-6">
