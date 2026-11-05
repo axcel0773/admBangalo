@@ -1,6 +1,6 @@
 # Melhorias sugeridas — backlog com esforço e guia de implementação
 
-**Última atualização:** 05/11/2026 (lote M entregue) · Complementa `docs/etapas.md` (o que já foi feito), `docs/padroes.md` e `docs/arquitetura.md`.
+**Última atualização:** 05/11/2026 (lote M entregue + ajustes de busca e aparência) · Complementa `docs/etapas.md` (o que já foi feito), `docs/padroes.md` e `docs/arquitetura.md`.
 
 **Já feitas (05/11):** todas as de esforço **P** e **M** — 1, 2, 3, 4, 5, 6, 7 (já existia), 8, 10, 11, 12 e 17 (✅). **Faltam** só as de esforço G: 9, 13, 14, 15 e 16. Migrações novas: `0013` (sinal), `0014` (despesas), `0015` (status do orçamento), `0016` (limpeza).
 
@@ -29,7 +29,7 @@
 | 14 | Modo offline (leitura) | G | não | Baixa |
 | 15 | Histórico de alterações e exportação de dados | G | sim | Média |
 | 16 | Acesso de equipe (perfil limitado) | G | sim | Baixa |
-| 17 | Refinos de interface (contagem nos atalhos, busca global, modo escuro) ✅ | P–M | não | Baixa |
+| 17 | Refinos de interface (contagem nos atalhos, busca global ao vivo, modo escuro com escolha manual) ✅ | P–M | não | Baixa |
 
 **Ordem recomendada:** 1 → 2 → 3 → 7 → 8 → 4 → 5 → 6 → 10 → 9 → demais. (Feitas até a 10; segue a 9.)
 
@@ -215,8 +215,10 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 ## 17. Refinos de interface — esforço **P a M** ✅
 
 - **Contagem de hóspedes nos atalhos do Painel (P) — ✅ feito (PR #42):** adicionar `guestCount` ao `buildDashboard` (consulta `count` exata, sem listar linhas) e usar em `shortcuts.tsx`.
-- **Busca global (M) — ✅ feito:** `/busca?q=` (feature `search/`), campo no Painel e item "Buscar" no menu lateral; busca por GET (sem JS), mínimo de 2 letras e 8 resultados por grupo. Original:  campo no topo que consulta hóspedes, reservas e orçamentos; usar `?q=` e uma action de busca com limite de resultados; debounce no cliente.
-- **Modo escuro (M) — ✅ feito:** tokens em `@media (prefers-color-scheme: dark)` no `globals.css` (contrastes conferidos ≥ 4,5:1), `themeColor` por esquema e impressão do recibo de volta ao claro. Original:  novos valores dos tokens de `globals.css` em `@media (prefers-color-scheme: dark)`; revisar contraste (WCAG AA) e ilustrações/PDFs (PDF continua claro).
+- **Busca global (M) — ✅ feito (PRs #51 e #55):** tela `/busca` (feature `search/`) que busca **ao vivo** enquanto se digita (espera 200 ms, ação `searchSuggest`, só a última resposta vale). Mostra, nesta ordem: atalhos de **páginas** ("Ir para": Painel, Calendário, Reservas, Orçamentos, Hóspedes, Financeiro, Despesas, Relatórios, Limpeza, Bangalôs, Taxas e Configurações, com palavras-chave como "clientes" e "faxina"), e **conteúdos**: hóspedes (nome, documento, telefone), reservas (hóspede ou bangalô) e orçamentos (hóspede). A palavra é **completada em cinza** no campo ("ho" → "Hóspedes"; Tab ou seta direita aceitam). Mínimo de 2 letras, 8 resultados por grupo, sem acento e sem diferenciar maiúsculas. O campo do Painel agora só leva a esta tela (já com o teclado aberto) e há o item "Buscar" no menu lateral. Regras de páginas e de completar em `search/domain.ts` (testadas); lista de páginas em `search/pages.ts`. A primeira versão (busca por GET com botão) foi substituída.
+- **Modo escuro (M) — ✅ feito (PRs #51, #53, #54 e #56):** tokens em `globals.css` para o aparelho escuro (`prefers-color-scheme`) **e** para a escolha manual (`data-theme="dark"|"light"` no `<html>`), contrastes conferidos (≥ 4,5:1), `themeColor` por esquema e impressão do recibo de volta ao claro. A escolha **Claro / Escuro / Automático** fica em **Configurações → Aparência** (`components/layout/theme-chooser.tsx`), guardada no aparelho (`localStorage`, chave `tema`) e aplicada por um script no `<head>` antes da primeira pintura (sem piscar); no automático segue o aparelho, inclusive se ele mudar com o app aberto. Regras em `lib/theme.ts` (testadas).
+  - **Lição aprendida:** o botão de tema foi tentado primeiro no cabeçalho do Painel e no menu lateral (#53/#54) e **quebrou o layout do Painel** (para o menu abrir sem ser cortado, o cabeçalho precisou de `z-20` e cobriu os cartões que sobem sobre a faixa azul). Foi desfeito (#56) e a escolha foi para Configurações. Regra: **não mexer no empilhamento (`z-index`/`overflow`) do cabeçalho do Painel**; controles novos de preferência vão em Configurações.
+  - Cores fixas no código devem virar token (ex.: `bg-tile-slate`, `bg-peach-soft`); evitar `dark:` do Tailwind, que só segue o aparelho e ignora a escolha manual.
 
 ---
 
