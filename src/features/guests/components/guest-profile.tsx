@@ -15,8 +15,9 @@ import { GuestRemoveCard } from "./guest-remove-card";
 function InfoItem({ label, value }: { label: string; value: string | null }) {
   return (
     <div className="flex justify-between gap-4 py-2.5 text-sm">
-      <dt className="text-ink-muted">{label}</dt>
-      <dd className="text-right font-medium">{value ?? "—"}</dd>
+      <dt className="shrink-0 text-ink-muted">{label}</dt>
+      {/* min-w-0 + break-words: e-mail ou cidade longos quebram em vez de empurrar a tela para o lado. */}
+      <dd className="min-w-0 text-right font-medium break-words">{value ?? "—"}</dd>
     </div>
   );
 }
@@ -27,19 +28,19 @@ export function GuestProfile({ guest, stays }: { guest: Guest; stays: GuestStay[
   const totalSpent = stays.filter((s) => s.status !== "cancelled").reduce((sum, s) => sum + s.grand_total, 0);
 
   return (
-    <div className="grid gap-4 md:gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
-      <div className="flex flex-col gap-4">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
+      <div className="flex min-w-0 flex-col gap-4">
         <Card className="overflow-hidden">
-          <div className="h-16 bg-[#d9e9f7]" />
+          <div className="h-16 bg-primary-soft" />
           <div className="flex flex-col gap-4 px-5 pb-5">
             <Avatar name={guest.full_name} size="xl" className="-mt-9 ring-4 ring-surface" />
-            <div>
-              <p className="font-display text-2xl font-semibold">{guest.full_name}</p>
+            <div className="min-w-0">
+              <p className="font-display text-2xl font-semibold break-words">{guest.full_name}</p>
               <p className="text-sm text-ink-muted">
                 {pluralize(stays.length, "estadia", "estadias")} · {formatCurrency(totalSpent)} em reservas
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 [&>*:only-child]:col-span-2">
               {whatsapp ? (
                 <a href={whatsapp} target="_blank" rel="noreferrer" className={buttonVariants({ variant: "soft", size: "md" })}>
                   <MessageCircle aria-hidden="true" />
@@ -61,12 +62,12 @@ export function GuestProfile({ guest, stays }: { guest: Guest; stays: GuestStay[
               <InfoItem label="Cidade" value={formatCityState(guest)} />
             </dl>
             {guest.notes ? (
-              <p className="rounded-2xl bg-[#f9ede3] px-4 py-3 text-sm leading-relaxed text-ink-soft">
+              <p className="rounded-2xl bg-peach-soft px-4 py-3 text-sm leading-relaxed break-words text-ink-soft">
                 <b className="text-accent-ink">Observações: </b>
                 {guest.notes}
               </p>
             ) : null}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 [&>*:only-child]:col-span-2">
               <ButtonLink href={paths.editGuest(guest.id)} variant="secondary">
                 <Pencil aria-hidden="true" />
                 Editar
@@ -81,7 +82,7 @@ export function GuestProfile({ guest, stays }: { guest: Guest; stays: GuestStay[
         <GuestRemoveCard guestId={guest.id} hasStays={stays.length > 0} removed={guest.deleted_at !== null} />
       </div>
 
-      <CardSection title="Estadias" titleId="guest-stays">
+      <CardSection title="Estadias" titleId="guest-stays" className="min-w-0">
         {stays.length === 0 ? (
           <p className="py-4 text-sm text-ink-muted">Nenhuma estadia ainda.</p>
         ) : (
