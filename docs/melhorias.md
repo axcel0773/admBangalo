@@ -2,7 +2,7 @@
 
 **Última atualização:** 05/11/2026 (lote M entregue + ajustes de busca e aparência) · Complementa `docs/etapas.md` (o que já foi feito), `docs/padroes.md` e `docs/arquitetura.md`.
 
-**Já feitas (05/11):** todas as de esforço **P** e **M** — 1, 2, 3, 4, 5, 6, 7 (já existia), 8, 10, 11, 12 e 17 (✅). **Faltam** só as de esforço G: 9, 13, 14, 15 e 16. Migrações novas: `0013` (sinal), `0014` (despesas), `0015` (status do orçamento), `0016` (limpeza).
+**Já feitas (05/11):** todas as de esforço **P** e **M** — 1, 2, 3, 4, 5, 6, 7 (já existia), 8, 10, 11, 12 e 17 (✅). **Faltam** só as de esforço G: 9, 13, 14 e 15. A sugestão 16 (acesso de equipe) foi retirada do backlog a pedido do dono. Migrações novas: `0013` (sinal), `0014` (despesas), `0015` (status do orçamento), `0016` (limpeza).
 
 **Esforço:** **P** = até meio dia · **M** = 1 a 2 dias · **G** = 3 dias ou mais. Considera código, testes, migração e documentação.
 **Restrição fixa:** tudo precisa continuar rodando no plano **gratuito** da Vercel e do Supabase.
@@ -28,7 +28,6 @@
 | 13 | Notificações push (PWA) | G | sim | Média |
 | 14 | Modo offline (leitura) | G | não | Baixa |
 | 15 | Histórico de alterações e exportação de dados | G | sim | Média |
-| 16 | Acesso de equipe (perfil limitado) | G | sim | Baixa |
 | 17 | Refinos de interface (contagem nos atalhos, busca global ao vivo, modo escuro com escolha manual) ✅ | P–M | não | Baixa |
 
 **Ordem recomendada:** 1 → 2 → 3 → 7 → 8 → 4 → 5 → 6 → 10 → 9 → demais. (Feitas até a 10; segue a 9.)
@@ -207,10 +206,6 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 - Migração `audit_log` (`table_name`, `row_id`, `action`, `old`, `new`, `changed_at`) alimentada por **triggers** nas tabelas críticas (reservas, pagamentos, taxas), RLS só leitura para o dono, retenção (ex.: 12 meses) para caber no plano gratuito. pgTAP para as triggers.
 - Tela "Histórico" na ficha da reserva (linha do tempo).
 - **Exportação completa** (JSON/CSV zip) em Configurações › Dados, gerada no servidor por uma action autenticada — serve de backup manual, já que o plano gratuito não guarda backups longos.
-
-## 16. Acesso de equipe — esforço **G**
-
-**Onde mexer:** novo papel (`member`) em `profiles`/tabela `team_members`; **todas** as políticas RLS precisam passar a considerar o papel (revisar migração por migração) e a UI esconder Financeiro/Configurações. É a melhoria que mais mexe em segurança: exige revisão em `docs/seguranca.md`, testes pgTAP de "membro não lê financeiro" e E2E com dois usuários. Só fazer depois de 6 (limpeza), que é o caso de uso.
 
 ## 17. Refinos de interface — esforço **P a M** ✅
 
