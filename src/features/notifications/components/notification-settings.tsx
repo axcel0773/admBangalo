@@ -1,7 +1,7 @@
 "use client";
 
 import { Bell, BellOff, Send } from "lucide-react";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useSyncExternalStore, useTransition } from "react";
 
 import { ActionForm } from "@/components/ui/action-form";
 import { Button } from "@/components/ui/button";
@@ -37,20 +37,23 @@ async function readyRegistration(): Promise<ServiceWorkerRegistration> {
 
 /** Notificações push: ativar neste aparelho, escolher o que avisar e mandar um teste. */
 export function NotificationSettings({ settings }: { settings: Settings }) {
-  const [support, setSupport] = useState<Support>("checking");
+  // Capacidades do navegador não mudam durante a visita; no servidor ainda não dá para saber.
+  const support = useSyncExternalStore(
+    () => () => undefined,
+    detectSupport,
+    (): Support => "checking",
+  );
   const [subscribed, setSubscribed] = useState(false);
   const [message, setMessage] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
-    const found = detectSupport();
-    setSupport(found);
-    if (found !== "ready") return;
+    if (support !== "ready") return;
     readyRegistration()
       .then((registration) => registration.pushManager.getSubscription())
       .then((subscription) => setSubscribed(subscription !== null))
       .catch(() => undefined);
-  }, []);
+  }, [support]);
 
   function run(task: () => Promise<void>) {
     setMessage(null);
