@@ -11,7 +11,7 @@ export default function OfflinePage() {
       <EmptyState
         icon={<WifiOff />}
         title="Você está sem conexão"
-        description="As telas que você já abriu continuam disponíveis. Para salvar reservas e pagamentos, conecte-se de novo."
+        description="Esta tela ainda não foi aberta com internet neste aparelho. As telas que você já abriu aparecem sem conexão; para salvar reservas e pagamentos, conecte-se de novo."
       />
     </main>
   );

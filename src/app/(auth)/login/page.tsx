@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { ChaletLandscape } from "@/components/illustrations/chalet-landscape";
 import { Brand } from "@/components/layout/brand";
+import { ClearOfflineCache } from "@/components/layout/clear-offline-cache";
 import { LoginForm } from "@/features/auth/components/login-form";
 
 export const metadata: Metadata = { title: "Entrar" };
@@ -15,6 +16,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <main className="px-safe flex min-h-dvh flex-col md:flex-row">
+      <ClearOfflineCache />
       <div className="h-56 md:h-auto md:flex-1">
         <ChaletLandscape />
       </div>
