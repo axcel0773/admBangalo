@@ -6,7 +6,8 @@ import type { Database } from "@/types/database";
 
 /** Rotas abertas sem login. */
 // /ical: link de calendário lido pelo Airbnb/Booking, sem login (só datas ocupadas).
-const PUBLIC_PATHS = ["/login", "/auth", "/offline", "/ical"];
+// /api/cron: chamado pelo cron da Vercel; a própria rota confere o segredo (CRON_SECRET).
+const PUBLIC_PATHS = ["/login", "/auth", "/offline", "/ical", "/api/cron"];
 
 function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));

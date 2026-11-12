@@ -24,6 +24,8 @@ export type Database = {
           pix_city: string | null;
           avatar_path: string | null;
           default_deposit_percent: number;
+          notify_arrivals: boolean;
+          notify_overdue: boolean;
         } & Timestamps;
         Insert: {
           id: string;
@@ -34,6 +36,8 @@ export type Database = {
           pix_city?: string | null;
           avatar_path?: string | null;
           default_deposit_percent?: number;
+          notify_arrivals?: boolean;
+          notify_overdue?: boolean;
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
         Relationships: [];
@@ -160,6 +164,12 @@ export type Database = {
           status?: "draft" | "sent" | "accepted" | "declined";
         };
         Update: Partial<Database["public"]["Tables"]["quotes"]["Insert"]>;
+        Relationships: [];
+      };
+      push_subscriptions: {
+        Row: { id: string; owner_id: string; endpoint: string; p256dh: string; auth: string; created_at: string };
+        Insert: { id?: string; owner_id?: string; endpoint: string; p256dh: string; auth: string; created_at?: string };
+        Update: Partial<Database["public"]["Tables"]["push_subscriptions"]["Insert"]>;
         Relationships: [];
       };
       cleaning_tasks: {
@@ -466,6 +476,22 @@ export type Database = {
       };
     };
     Functions: {
+      push_digest: {
+        Args: { p_secret: string; p_today: string };
+        Returns: {
+          endpoint: string;
+          p256dh: string;
+          auth: string;
+          arrivals: number;
+          departures: number;
+          overdue_count: number;
+          overdue_amount: number;
+        }[];
+      };
+      push_forget: {
+        Args: { p_secret: string; p_endpoint: string };
+        Returns: undefined;
+      };
       anonymize_guest: {
         Args: { p_guest_id: string };
         Returns: undefined;

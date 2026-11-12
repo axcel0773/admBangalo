@@ -12,12 +12,13 @@ import { ListCard, ListRow } from "@/components/ui/list-row";
 import { signOut } from "@/features/auth/actions";
 import { requireOwner } from "@/features/auth/session";
 import { listChalets } from "@/features/chalets";
+import { getNotificationSettings, NotificationSettings } from "@/features/notifications";
 import { pluralize } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Configurações" };
 
 export default async function SettingsPage() {
-  const [owner, chalets] = await Promise.all([requireOwner(), listChalets()]);
+  const [owner, chalets, notifications] = await Promise.all([requireOwner(), listChalets(), getNotificationSettings()]);
 
   return (
     <>
@@ -64,6 +65,10 @@ export default async function SettingsPage() {
         <CardSection title="Aparência" titleId="settings-theme">
           <ThemeChooser />
           <p className="mt-3 text-xs text-ink-muted">Automático segue o modo claro ou escuro do aparelho. A escolha vale só neste aparelho.</p>
+        </CardSection>
+
+        <CardSection title="Notificações" titleId="settings-notifications">
+          <NotificationSettings settings={notifications} />
         </CardSection>
 
         <form action={signOut}>
