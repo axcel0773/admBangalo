@@ -2,7 +2,7 @@ import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import { ExpirationPlugin, NetworkFirst, Serwist, type RuntimeCaching } from "serwist";
 
-import { isCacheablePath } from "../lib/offline";
+import { isCacheablePath, isCacheableResponse } from "../lib/offline";
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -23,7 +23,11 @@ const readCache: RuntimeCaching = {
   handler: new NetworkFirst({
     cacheName: "leitura-offline",
     networkTimeoutSeconds: 4,
-    plugins: [new ExpirationPlugin({ maxEntries: 60, maxAgeSeconds: 7 * 24 * 60 * 60 })],
+    plugins: [
+      // Sem isto, o padrão guardaria também redirecionamentos (login) no lugar da tela.
+      { cacheWillUpdate: async ({ response }) => (isCacheableResponse(response) ? response : null) },
+      new ExpirationPlugin({ maxEntries: 60, maxAgeSeconds: 7 * 24 * 60 * 60 }),
+    ],
   }),
 };
 

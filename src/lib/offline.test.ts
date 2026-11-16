@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatCachedTime, isCacheablePath, offlineMessage } from "./offline";
+import { formatCachedTime, isCacheablePath, isCacheableResponse, offlineMessage } from "./offline";
 
 describe("modo offline", () => {
   it("formata a hora e rejeita data inválida", () => {
@@ -22,5 +22,12 @@ describe("modo offline", () => {
     expect(isCacheablePath("/ical/x.ics")).toBe(false);
     expect(isCacheablePath("/recibo/1")).toBe(false);
     expect(isCacheablePath("/autorizacoes")).toBe(true);
+  });
+
+  it("só guarda resposta 200 direta, nunca redirecionamento", () => {
+    expect(isCacheableResponse({ status: 200, redirected: false, type: "basic" })).toBe(true);
+    expect(isCacheableResponse({ status: 200, redirected: true, type: "basic" })).toBe(false);
+    expect(isCacheableResponse({ status: 0, redirected: false, type: "opaqueredirect" })).toBe(false);
+    expect(isCacheableResponse({ status: 500, redirected: false, type: "basic" })).toBe(false);
   });
 });
