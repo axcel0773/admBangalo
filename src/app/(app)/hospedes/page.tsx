@@ -6,27 +6,33 @@ import { PageBody, PageHeader } from "@/components/layout/page-header";
 import { ButtonLink, buttonVariants } from "@/components/ui/button";
 import { FilterChips } from "@/components/ui/filter-chips";
 import { SearchForm } from "@/components/ui/search-form";
+import { ShowMore } from "@/components/ui/show-more";
 import { filterGuests, GUEST_FILTERS, GuestList, isGuestFilter, searchGuests, type GuestFilter } from "@/features/guests";
 import { pluralize } from "@/lib/format";
+import { PAGE_MAX, toPageSize } from "@/lib/search-params";
 
 export const metadata: Metadata = { title: "Hóspedes" };
 
 interface GuestsPageProps {
-  searchParams: Promise<{ q?: string; filtro?: string }>;
+  searchParams: Promise<{ q?: string; filtro?: string; n?: string }>;
 }
 
-function hrefFor(filter: GuestFilter, q?: string): string {
+function hrefFor(filter: GuestFilter, q?: string, size?: number): string {
   const params = new URLSearchParams();
   if (filter !== "all") params.set("filtro", filter);
   if (q) params.set("q", q);
+  if (size) params.set("n", String(size));
   const query = params.toString();
   return query ? `${routes.guests}?${query}` : routes.guests;
 }
 
 export default async function GuestsPage({ searchParams }: GuestsPageProps) {
-  const { q, filtro } = await searchParams;
+  const { q, filtro, n } = await searchParams;
   const filter: GuestFilter = isGuestFilter(filtro) ? filtro : "all";
-  const guests = filterGuests(await searchGuests(q), filter);
+  // Com filtro, busca todos: recorrentes e aniversariantes não podem depender da página.
+  const page = await searchGuests(q, filter === "all" ? toPageSize(n) : PAGE_MAX);
+  const guests = filterGuests(page.guests, filter);
+  const nextSize = filter === "all" ? page.nextSize : null;
   const chips = (Object.keys(GUEST_FILTERS) as GuestFilter[]).map((key) => ({
     href: hrefFor(key, q),
     label: GUEST_FILTERS[key],
@@ -66,6 +72,7 @@ export default async function GuestsPage({ searchParams }: GuestsPageProps) {
         />
         <FilterChips label="Filtrar hóspedes" chips={chips} />
         <GuestList guests={guests} searched={Boolean(q) || filter !== "all"} />
+        {nextSize ? <ShowMore href={hrefFor(filter, q, nextSize)} shown={guests.length} /> : null}
       </PageBody>
     </>
   );

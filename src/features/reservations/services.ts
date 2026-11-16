@@ -6,6 +6,7 @@ import { listChalets, listCurrentSeasonRates } from "@/features/chalets/services
 import { listFees } from "@/features/fees/services";
 import { guestsRepository } from "@/features/guests/services";
 import { addDays, todayIso, type IsoDate } from "@/lib/dates";
+import { PAGE_STEP, paginate } from "@/lib/search-params";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import {
@@ -54,9 +55,17 @@ function filtersFor(view: ReservationView, today: IsoDate): ReservationFilters {
   }
 }
 
-export async function listReservations(view: ReservationView, chaletId?: string): Promise<ReservationListItem[]> {
+export interface ReservationPage {
+  reservations: ReservationListItem[];
+  /** Tamanho da próxima página para o link "Ver mais"; null quando já está tudo na tela. */
+  nextSize: number | null;
+}
+
+export async function listReservations(view: ReservationView, chaletId?: string, size = PAGE_STEP): Promise<ReservationPage> {
   const filters = filtersFor(view, todayIso());
-  return (await reservationsRepository()).list({ ...filters, chaletId });
+  const rows = await (await reservationsRepository()).list({ ...filters, chaletId, limit: size + 1 });
+  const { items, nextSize } = paginate(rows, size);
+  return { reservations: items, nextSize };
 }
 
 /* ---------- Nova reserva ---------- */
