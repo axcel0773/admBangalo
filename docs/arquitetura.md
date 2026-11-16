@@ -1,7 +1,9 @@
 # admBangalo — Arquitetura (parte 1)
 
-Gestão de chalés para o proprietário: desktop + PWA no celular.
-Stack: TypeScript, Next.js 15 (App Router), Supabase (Postgres, Auth, Storage).
+Gestão de bangalôs para o proprietário: desktop + PWA no celular.
+Stack: TypeScript, Next.js 16 (App Router), Supabase (Postgres, Auth, Storage).
+
+> **Atualizado em 15/11/2026.** Este documento nasceu na parte 1 (quando o app se chamava "chalés" e era verde). O que mudou desde então está marcado abaixo; o banco continua usando os nomes `chalets`/`chalet_*` nas tabelas.
 
 ## Decisões assumidas
 
@@ -14,11 +16,12 @@ Stack: TypeScript, Next.js 15 (App Router), Supabase (Postgres, Auth, Storage).
 
 ## Diretrizes de UI
 
-- Estilo "natural acolhedor": fundo areia `#F5EFE6`, cartões `#FFFDF8`, verde-musgo `#4A6B3A` (ação principal), terracota `#C0643A` (valores pendentes).
+- Identidade de praia: fundo areia, cartões claros, azul-mar (ação principal) e laranja pôr do sol (destaques). As cores são **tokens** em `src/app/globals.css`; nunca use hex solto em componente.
+- Modo claro, escuro ou automático (segue o aparelho), escolhido em Configurações → Aparência.
 - Tipografia: Fraunces (títulos e números grandes) + Inter (texto e tabelas, `tabular-nums`).
-- Cor por chalé no calendário e nos ícones: Ipê musgo, Araucária azul-ardósia `#5E7C8C`, Jabuticaba ameixa `#8B5A6B`.
+- Cor por bangalô no calendário e nos ícones (escolhida no cadastro do bangalô).
 - Cantos 16–24 px, sombras suaves, alvos de toque ≥ 44 px, ações principais fixas no rodapé do celular.
-- Barra inferior no celular: Painel · Calendário · **+ Nova reserva** (botão central) · Hóspedes · Financeiro.
+- Barra inferior no celular: Painel · Calendário · **+** (novo) · Financeiro · Taxas. Hóspedes, Bangalôs, Limpeza e Configurações ficam nos atalhos do Painel; a busca (`/busca`) acha páginas e conteúdos.
 
 ## Arquitetura
 
@@ -75,7 +78,7 @@ admBangalo/
 └─ supabase/migrations/0001_init.sql
 ```
 
-Bibliotecas: `@supabase/ssr`, shadcn/ui + Tailwind, `react-hook-form` + `zod`, `date-fns`, TanStack Query, Serwist, Recharts.
+Bibliotecas em uso hoje: `@supabase/ssr`, Tailwind v4 (design system próprio em `components/ui`, com `class-variance-authority`), `zod`, `date-fns`, Serwist (PWA), `pdf-lib` (recibo e orçamento), `lucide-react`. O plano original citava shadcn/ui, react-hook-form, TanStack Query e Recharts; **nenhuma delas é usada**: formulários são Server Actions + `zod`, e o gráfico é SVG próprio.
 
 | Rota | Tela | Dados |
 | --- | --- | --- |
@@ -128,3 +131,18 @@ Testado em Postgres 16: 3 noites × R$ 350, 3 hóspedes (2 inclusos), limpeza R$
 3. Hóspedes, reservas e calendário.
 4. Cobranças, pagamentos e financeiro.
 5. Extras: recibo PDF, confirmação por WhatsApp, iCal Airbnb/Booking.
+
+## O que entrou depois da parte 1
+
+| Tema | Onde | Observação |
+| --- | --- | --- |
+| Orçamentos (PDF, status, sinal) | `features/quotes`, migrações `0012`, `0013`, `0015` | reservar a partir do orçamento marca como aceito |
+| Despesas e lucro | `features/expenses`, `0014` | Financeiro mostra recebido − despesas |
+| Limpeza | `features/cleaning`, `0016` | uma faxina por saída |
+| Relatórios anuais | `features/finance/reports.ts` | ocupação, diária média, origem; CSV |
+| Busca ao vivo | `features/search` | páginas + hóspedes, reservas, orçamentos |
+| Bloqueios e iCal | `features/availability`, `0006` | link público por token; importação com proteção contra SSRF |
+| Notificações push | `features/notifications`, `0017`, `docs/notificacoes.md` | cron diário; função do banco protegida por segredo, sem `service_role` |
+| Modo offline (leitura) | `src/app/sw.ts`, `src/lib/offline.ts` | rede primeiro; só resposta 200 direta entra no cache |
+
+Rotas públicas (sem login): `/login`, `/auth/*`, `/offline`, `/ical/*` e `/api/cron/*` (esta confere `CRON_SECRET`).

@@ -2,7 +2,7 @@
   "name": "adm-bangalo",
   "version": "0.1.0",
   "private": true,
-  "description": "Gestão de chalés: hóspedes, reservas, calendário e financeiro (Next.js + Supabase, PWA mobile first).",
+  "description": "Gestão de bangalôs: hóspedes, reservas, calendário e financeiro (Next.js + Supabase, PWA mobile first).",
   "engines": {
     "node": ">=20.11"
   },

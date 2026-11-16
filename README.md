@@ -13,6 +13,7 @@ Gestão de bangalôs para o proprietário: hóspedes, calendário de reservas, v
 | 4 | Cobranças, pagamentos, parcelas, comprovantes, temporadas, financeiro | ✅ |
 | 5 | Testes (componentes, E2E, banco), segurança, CI e deploy | ✅ produção em https://admbangalo.vercel.app |
 | 6 | Bloqueios, iCal Airbnb/Booking, confirmação e recibo (PDF) no WhatsApp, excluir hóspede/reserva/taxa, foto de perfil | ✅ |
+| 7 | Melhorias (`docs/melhorias.md`): orçamentos, despesas, limpeza, relatórios, busca, modo escuro, offline e notificações | ✅ |
 
 ## Como rodar
 
@@ -28,7 +29,7 @@ cp .env.example .env.local      # no Windows: copy .env.example .env.local
 
 # 3. banco (uma vez)
 #    cole, em ordem, os arquivos de supabase/migrations/ no SQL Editor do Supabase
-#    (0001_init.sql … 0012_quotes.sql)
+#    (0001_init.sql … 0017_push.sql)
 #    ou: npx supabase link --project-ref <ref> && npx supabase db push
 
 # 4. crie seu usuário
@@ -72,13 +73,18 @@ src/
 ├─ features/            # uma pasta por domínio do negócio
 │  ├─ auth/
 │  ├─ dashboard/        # data/ → domain/ → services/ → components/
-│  ├─ chalets/ fees/ profile/   # configurações (chalés com temporadas)
+│  ├─ chalets/ fees/ profile/   # configurações (bangalôs com temporadas)
 │  ├─ guests/           # hóspedes
 │  ├─ reservations/     # nova reserva, lista, detalhe, status
 │  ├─ billing/          # energia, taxas, pagamentos, parcelas, comprovantes, Pix
 │  ├─ finance/          # tela Financeiro, gráfico e CSV
 │  ├─ availability/     # bloqueios de datas e iCal (Airbnb/Booking)
-│  └─ calendar/         # semana (celular) e grade (desktop)
+│  ├─ calendar/         # semana (celular) e grade (desktop)
+│  ├─ quotes/           # orçamentos (PDF, status, sinal)
+│  ├─ expenses/         # despesas e lucro
+│  ├─ cleaning/         # controle de limpeza por saída
+│  ├─ search/           # busca ao vivo (páginas e conteúdos)
+│  └─ notifications/    # aviso diário por push (ver docs/notificacoes.md)
 ├─ lib/                 # infraestrutura: supabase, env, datas, formatação
 └─ types/database.ts    # tipos do banco
 ```

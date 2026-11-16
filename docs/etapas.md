@@ -4,7 +4,7 @@ Acompanhamento do projeto **admBangalo** (gestão de bangalôs · Next.js + Type
 
 **Legenda:** `[x]` feito · `[ ]` a fazer · ⚠️ feito, mas falta validar
 
-**Última atualização:** 05/11/2026 (noite)
+**Última atualização:** 15/11/2026
 
 ---
 
@@ -18,7 +18,7 @@ Acompanhamento do projeto **admBangalo** (gestão de bangalôs · Next.js + Type
 | 3 | Chalés, taxas, hóspedes, reservas, calendário | ✅ validada; merge da `feat/parte-3` via PR |
 | 4 | Cobranças, pagamentos e financeiro | 🟡 4a e 4b prontas na branch `feat/parte-4`, falta validar |
 | 5 | Qualidade, segurança e deploy em produção | ✅ em produção: https://admbangalo.vercel.app (faltam: URLs de login no Supabase e seu usuário) |
-| 6 | Extras (bloqueios, iCal Airbnb/Booking, WhatsApp, recibo) | ✅ na `main` e em produção (push, offline, fotos e equipe ficaram para depois) |
+| 6 | Extras (bloqueios, iCal Airbnb/Booking, WhatsApp, recibo) | ✅ na `main` e em produção (push e offline entregues em 12/11; equipe saiu do backlog) |
 
 ---
 
@@ -323,6 +323,26 @@ Boas práticas que valem para todas as etapas seguintes.
 
 ---
 
+## Entregas de 12 a 15/11/2026 ✅
+
+- [x] **Modo offline (leitura)** (#60): cache de telas visitadas, faixa "Sem conexão", limpeza ao sair
+- [x] **Notificações push** (#61, migração `0017`): aviso diário; configuração em `docs/notificacoes.md`
+- [x] Ficha do hóspede se encaixa no celular (#62)
+- [x] **Revisão geral (15/11):** paginação em Hóspedes e Reservas, cores fixas viram tokens, Sair em dois toques, relatório anual por período, cache offline sem redirecionamentos, funções em São Paulo (`gru1`), teste E2E de telas no celular, documentação atualizada
+
+### Pendências conhecidas (da revisão de 15/11)
+
+- [ ] **Migrações de produção são coladas à mão** no SQL Editor: não há registro de quais rodaram. Ideal: `supabase link` + `supabase db push`.
+- [ ] **Projeto de teste do Supabase está pausado** e parado na migração 0011: tudo é validado direto em produção.
+- [ ] **Backup:** o plano gratuito não faz backup automático; rodar o dump semanal de `docs/deploy.md`.
+- [ ] **Formatação:** o CI não roda `prettier --check`; há arquivos fora do padrão de 100 colunas.
+- [ ] **Limites entre features** valem por convenção; o ESLint não bloqueia import direto de arquivo interno de outra feature.
+- [ ] **`src/types/database.ts`** vem sendo editado à mão; regenerar com `npm run db:types` quando o projeto estiver ligado pela CLI.
+- [ ] "Cobrança vencida" do aviso diário usa regra mais simples que a do Painel.
+- [ ] No Supabase: conferir "Allow new users to sign up" desligado.
+
+---
+
 ## Decisões tomadas
 
 - **Energia:** leitura do medidor na entrada e na saída, R$ 1,00 por kWh (taxa `metered`).
@@ -333,7 +353,6 @@ Boas práticas que valem para todas as etapas seguintes.
 | --- | --- | --- |
 | Bloqueio de datas | tabela nova × reserva com status especial | calendário e disponibilidade |
 | Integração de pagamento | manual (atual) × Pix automático (Mercado Pago, Asaas) | etapa 4 e custos |
-| Acesso de equipe | só o dono × funcionário com acesso limitado | RLS e telas |
 
 ---
 
