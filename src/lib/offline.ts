@@ -22,6 +22,14 @@ export function isCacheablePath(pathname: string): boolean {
   return !NEVER_CACHED.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
 
+/**
+ * Só respostas completas e diretas entram no cache. Um redirecionamento (ex.: sessão vencida
+ * mandando para o login) não pode ficar guardado no lugar da tela, senão é ele que aparece offline.
+ */
+export function isCacheableResponse(response: Pick<Response, "status" | "redirected" | "type">): boolean {
+  return response.status === 200 && !response.redirected && response.type !== "opaqueredirect";
+}
+
 /** Apaga tudo o que o app guardou para uso offline (ao sair da conta, para não ficar dados no aparelho). */
 export async function clearOfflineCaches(): Promise<void> {
   if (typeof caches === "undefined") return;

@@ -50,8 +50,9 @@ export function createFinanceRepository(db: DbClient) {
         .gt("check_out", from);
       const stays = unwrapList(result, "Listar estadias do ano");
       if (stays.length === 0) return [];
+      // Mesma janela de datas da consulta acima (e não uma lista de IDs, que estouraria a URL num ano cheio).
       const sources = unwrapList(
-        await db.from("reservations").select("id, source").in("id", stays.map((stay) => stay.reservation_id)),
+        await db.from("reservations").select("id, source").neq("status", "cancelled").lte("check_in", to).gt("check_out", from),
         "Listar origem das reservas",
       );
       const sourceById = new Map(sources.map((row) => [row.id, row.source]));
