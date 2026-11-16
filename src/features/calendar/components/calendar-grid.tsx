@@ -120,7 +120,7 @@ export function CalendarGrid({ grid }: { grid: Grid }) {
         {todayIndex >= 0 ? (
           <div
             aria-hidden="true"
-            className="pointer-events-none ml-[50%] border-l-2 border-dashed border-[#7fa9d1]"
+            className="pointer-events-none ml-[50%] border-l-2 border-dashed border-primary/50"
             style={{ gridRow: `2 / span ${grid.rows.length}`, gridColumn: todayIndex + 2 }}
           />
         ) : null}

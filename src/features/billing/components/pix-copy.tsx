@@ -54,7 +54,7 @@ export function PixCopy({ payload, whatsappHref, className }: PixCopyProps) {
           href={whatsappHref}
           target="_blank"
           rel="noreferrer"
-          className={cn(buttonVariants({ variant: "ghost", block: true }), "text-[#f5efe6] hover:bg-white/10")}
+          className={cn(buttonVariants({ variant: "ghost", block: true }), "text-on-primary hover:bg-white/10")}
         >
           <MessageCircle aria-hidden="true" />
           Enviar cobrança no WhatsApp

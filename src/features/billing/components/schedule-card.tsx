@@ -86,7 +86,7 @@ export function ScheduleCard({ reservationId, schedule, total, checkIn, today, c
               </div>
               {nextPix?.installmentId === item.id ? (
                 <div className="rounded-2xl bg-primary-strong p-3">
-                  <p className="mb-2 text-xs text-[#cfdcc2]">Cobrar só esta parcela: {formatCurrency(nextPix.amount)}</p>
+                  <p className="mb-2 text-xs text-on-primary/75">Cobrar só esta parcela: {formatCurrency(nextPix.amount)}</p>
                   <PixCopy payload={nextPix.payload} />
                 </div>
               ) : null}
