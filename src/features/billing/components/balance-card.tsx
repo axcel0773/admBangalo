@@ -26,8 +26,8 @@ export function BalanceCard({ total, paid, balance, cancelled, pix, hasPixKey, g
   const overpaid = balance < 0;
 
   return (
-    <Card className="flex flex-col gap-3 bg-primary-strong p-5 text-[#f5efe6] shadow-[0_12px_26px_rgb(52_80_42/0.25)]">
-      <p className="text-sm text-[#cfdcc2]">{overpaid ? "Pago a mais" : "Saldo a receber"}</p>
+    <Card className="flex flex-col gap-3 bg-primary-strong p-5 text-on-primary shadow-primary">
+      <p className="text-sm text-on-primary/75">{overpaid ? "Pago a mais" : "Saldo a receber"}</p>
       <p className="font-display text-4xl leading-none font-semibold text-on-primary">
         {formatCurrency(Math.abs(balance))}
       </p>
@@ -35,15 +35,15 @@ export function BalanceCard({ total, paid, balance, cancelled, pix, hasPixKey, g
         value={paidRatio(total, paid)}
         label="Quanto já foi pago"
         trackClassName="bg-white/20"
-        barClassName="bg-[#e8b98f]"
+        barClassName="bg-accent"
       />
-      <div className="flex justify-between text-xs text-[#cfdcc2]">
+      <div className="flex justify-between text-xs text-on-primary/75">
         <span>Pago {formatCurrency(paid)}</span>
         <span>de {formatCurrency(total)}</span>
       </div>
 
       {cancelled ? (
-        <p className="rounded-xl bg-white/10 px-3 py-2 text-xs text-[#cfdcc2]">
+        <p className="rounded-xl bg-white/10 px-3 py-2 text-xs text-on-primary/75">
           Reserva cancelada. Se houve devolução ao hóspede, registre um estorno abaixo.
         </p>
       ) : pix ? (
@@ -57,7 +57,7 @@ export function BalanceCard({ total, paid, balance, cancelled, pix, hasPixKey, g
           className="mt-1"
         />
       ) : balance > 0 && !hasPixKey ? (
-        <Link href={routes.profile} className="rounded-xl bg-white/10 px-3 py-2 text-xs text-[#f5efe6] underline-offset-2 hover:underline">
+        <Link href={routes.profile} className="rounded-xl bg-white/10 px-3 py-2 text-xs text-on-primary underline-offset-2 hover:underline">
           Cadastre sua chave Pix no perfil para cobrar com um toque.
         </Link>
       ) : null}

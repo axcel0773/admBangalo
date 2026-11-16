@@ -37,7 +37,7 @@ export function WeekStrip({ days, start, selected, chalets, stays }: WeekStripPr
             <span
               className={cn(
                 "text-[10px] tracking-wide uppercase",
-                active ? "text-[#cfe2f3]" : day.isWeekend ? "text-accent-ink" : "text-ink-muted",
+                active ? "text-on-primary/80" : day.isWeekend ? "text-accent-ink" : "text-ink-muted",
               )}
             >
               {day.weekday}
@@ -50,7 +50,7 @@ export function WeekStrip({ days, start, selected, chalets, stays }: WeekStripPr
                 <span
                   key={`${chaletId}-${index}`}
                   className="size-1.5 rounded-full"
-                  style={{ backgroundColor: active ? "#fffdf9" : (colorById.get(chaletId) ?? "#1F6FB2") }}
+                  style={{ backgroundColor: active ? "var(--color-on-primary)" : (colorById.get(chaletId) ?? "var(--color-primary)") }}
                 />
               ))}
             </span>
