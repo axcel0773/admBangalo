@@ -47,3 +47,31 @@ export async function createTestOwner(): Promise<TestOwner> {
     },
   };
 }
+
+/** Textos longos de propósito: é com eles que uma tela "vaza" para o lado no celular. */
+export const LONG_GUEST = {
+  full_name: "Maria Aparecida de Albuquerque Vasconcelos Cavalcanti Figueiredo",
+  email: "maria.aparecida.albuquerque.vasconcelos.cavalcanti@provedor-de-email-muito-longo.example.com.br",
+  phone: "(21) 99876-1234",
+  city: "São José do Vale do Rio Preto",
+  state: "RJ",
+  notes: "Chega tarde. Alergia a frutos do mar. " + "Observaçãosemespaçoparaquebrar".repeat(4),
+};
+
+/** Dados mínimos do proprietário de teste: um bangalô e um hóspede com textos longos. */
+export async function seedOwnerData(ownerId: string): Promise<{ chaletId: string; guestId: string }> {
+  const client = admin();
+  const chalet = await client
+    .from("chalets")
+    .insert({ owner_id: ownerId, name: "Bangalô com um nome bem comprido de teste", max_guests: 4, base_nightly_rate: 350 })
+    .select("id")
+    .single();
+  if (chalet.error) throw chalet.error;
+  const guest = await client
+    .from("guests")
+    .insert({ owner_id: ownerId, ...LONG_GUEST })
+    .select("id")
+    .single();
+  if (guest.error) throw guest.error;
+  return { chaletId: chalet.data.id as string, guestId: guest.data.id as string };
+}
