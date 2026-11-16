@@ -1,8 +1,8 @@
 # Melhorias sugeridas — backlog com esforço e guia de implementação
 
-**Última atualização:** 05/11/2026 (lote M entregue + ajustes de busca e aparência) · Complementa `docs/etapas.md` (o que já foi feito), `docs/padroes.md` e `docs/arquitetura.md`.
+**Última atualização:** 15/11/2026 (offline, notificações e revisão geral) · Complementa `docs/etapas.md` (o que já foi feito), `docs/padroes.md` e `docs/arquitetura.md`.
 
-**Já feitas (05/11):** todas as de esforço **P** e **M** — 1, 2, 3, 4, 5, 6, 7 (já existia), 8, 10, 11, 12 e 17 (✅). **Faltam** só as de esforço G: 9, 13, 14 e 15. A sugestão 16 (acesso de equipe) foi retirada do backlog a pedido do dono. Migrações novas: `0013` (sinal), `0014` (despesas), `0015` (status do orçamento), `0016` (limpeza).
+**Já feitas:** 1 a 8, 10 a 14 e 17 (✅). A 9 (tarifas sazonais com mínimo de noites) **já existia desde a etapa 4** e estava listada aqui por engano. **Falta só a 15** (histórico de alterações e exportação de dados). A sugestão 16 (acesso de equipe) foi retirada do backlog a pedido do dono. Migrações deste backlog: `0013` (sinal), `0014` (despesas), `0015` (status do orçamento), `0016` (limpeza), `0017` (push).
 
 **Esforço:** **P** = até meio dia · **M** = 1 a 2 dias · **G** = 3 dias ou mais. Considera código, testes, migração e documentação.
 **Restrição fixa:** tudo precisa continuar rodando no plano **gratuito** da Vercel e do Supabase.
@@ -21,16 +21,16 @@
 | 6 | Controle de limpeza ✅ | M | sim | Média |
 | 7 | Leitura de medidor (kWh) no check-in/out ✅ | M | sim | Alta |
 | 8 | Despesas por bangalô ✅ | M | sim | Alta |
-| 9 | Tarifas sazonais e mínimo de noites | G | sim | Média |
+| 9 | Tarifas sazonais e mínimo de noites ✅ | G | sim | Média |
 | 10 | Relatórios e exportação CSV/PDF ✅ | M | não | Média |
 | 11 | Hóspedes recorrentes (marcas e filtros) ✅ | P | sim | Baixa |
 | 12 | Comparativo de meses ✅ | P | não | Baixa |
-| 13 | Notificações push (PWA) | G | sim | Média |
-| 14 | Modo offline (leitura) | G | não | Baixa |
+| 13 | Notificações push (PWA) ✅ | G | sim | Média |
+| 14 | Modo offline (leitura) ✅ | G | não | Baixa |
 | 15 | Histórico de alterações e exportação de dados | G | sim | Média |
 | 17 | Refinos de interface (contagem nos atalhos, busca global ao vivo, modo escuro com escolha manual) ✅ | P–M | não | Baixa |
 
-**Ordem recomendada:** 1 → 2 → 3 → 7 → 8 → 4 → 5 → 6 → 10 → 9 → demais. (Feitas até a 10; segue a 9.)
+**Ordem recomendada:** 1 → 2 → 3 → 7 → 8 → 4 → 5 → 6 → 10 → 9 → demais. (Tudo feito, menos a 15.)
 
 ---
 
@@ -159,7 +159,9 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 - `features/finance/domain.ts`: estender o relatório mensal com `expenses` e `profit` (puro, testado, incluindo mês sem despesas). Mostrar no `finance-summary` e em `revenue-breakdown` (cores só por token).
 - Rota `financeiro/despesas` (lista + nova) ligada ao menu do Financeiro, sem item novo na barra inferior.
 
-## 9. Tarifas sazonais e mínimo de noites — esforço **G**
+## 9. Tarifas sazonais e mínimo de noites — esforço **G** ✅ (já existia)
+
+> **Nota (15/11):** já estava pronto desde a etapa 4: tabela `chalet_rates` com exclusão de sobreposição, tela em Configurações → Bangalôs (temporadas), cálculo por noite em `reservations/domain/seasons.ts` e aviso de mínimo de noites na nova reserva e no orçamento. O texto abaixo é o plano original.
 
 **Objetivo:** preços por período (feriados, alta temporada) e mínimo de noites. Já previsto como `chalet_rates` na etapa 4.
 
@@ -185,7 +187,9 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 
 **Onde mexer:** função pura em `finance/domain.ts` (`compareMonths(current, previous)` → variação em R$ e %, tratando mês anterior zerado) + testes; exibir seta e % no `finance-summary`. Sem banco.
 
-## 13. Notificações push (PWA) — esforço **G**
+## 13. Notificações push (PWA) — esforço **G** ✅
+
+> **Feito (PR #61, migração `0017`):** aviso diário (≈8h) com chegadas, saídas e cobranças vencidas; Configurações → Notificações (ativar, preferências, teste). Sem biblioteca npm (Web Push com `crypto` do Node, testado ida e volta) e sem `service_role` (função do banco protegida por segredo). Passo a passo e variáveis em `docs/notificacoes.md`. Avisos de novas reservas do iCal ficaram de fora.
 
 **Objetivo:** avisos de chegadas do dia, pagamentos vencidos e novas reservas do iCal.
 
@@ -196,7 +200,9 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 
 **Cuidados:** limite de 1 cron diário no plano gratuito — agrupar tudo numa mensagem diária; remover inscrições expiradas (HTTP 404/410).
 
-## 14. Modo offline (leitura) — esforço **G**
+## 14. Modo offline (leitura) — esforço **G** ✅
+
+> **Feito (PR #60):** telas e dados já visitados ficam 7 dias no aparelho (rede primeiro, 4 s de espera); faixa "Sem conexão. Mostrando dados de HH:mm"; cache apagado ao voltar para o login; login, API, iCal e recibos nunca entram no cache; só resposta 200 direta é guardada. Continua só leitura.
 
 **Onde mexer:** cache do service worker para telas de leitura (Painel, calendário, reserva) com estratégia *stale-while-revalidate* e aviso "Dados de HH:mm (sem conexão)". **Não** permitir gravações offline na primeira versão (evita conflito de dados). Testar com Playwright em modo offline. Serwist exige build com `--webpack` (já configurado).
 
