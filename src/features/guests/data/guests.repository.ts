@@ -2,6 +2,7 @@ import "server-only";
 
 import { assertMutation } from "@/lib/supabase/errors";
 import { unwrap, unwrapList } from "@/lib/supabase/result";
+import { chunk } from "@/lib/search-params";
 import type { DbClient } from "@/lib/supabase/server";
 
 import { sanitizeSearch, type Guest, type GuestStay } from "../domain";
@@ -41,12 +42,20 @@ export function createGuestsRepository(db: DbClient) {
     /** Estadias em que o hóspede é o responsável, mais recentes primeiro. */
     async listStays(guestIds: string[]): Promise<(GuestStay & { main_guest_id: string })[]> {
       if (guestIds.length === 0) return [];
-      const result = await db
-        .from("reservation_financials")
-        .select(STAY_COLUMNS)
-        .in("main_guest_id", guestIds)
-        .order("check_in", { ascending: false });
-      return unwrapList(result, "Listar estadias do hóspede");
+      // Em blocos: centenas de IDs numa consulta só estouram o tamanho da URL.
+      const blocks = await Promise.all(
+        chunk(guestIds, 100).map(async (ids) =>
+          unwrapList(
+            await db
+              .from("reservation_financials")
+              .select(STAY_COLUMNS)
+              .in("main_guest_id", ids)
+              .order("check_in", { ascending: false }),
+            "Listar estadias do hóspede",
+          ),
+        ),
+      );
+      return blocks.flat();
     },
 
     async create(input: GuestInput): Promise<string> {

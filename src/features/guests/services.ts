@@ -2,8 +2,10 @@ import "server-only";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-import { createGuestsRepository } from "./data/guests.repository";
 import { todayIso } from "@/lib/dates";
+import { PAGE_MAX, paginate } from "@/lib/search-params";
+
+import { createGuestsRepository } from "./data/guests.repository";
 
 import { guestsCsv, isBirthdayMonth, isRecurringGuest, type Guest, type GuestStay, type GuestSummary } from "./domain";
 
@@ -11,16 +13,29 @@ export async function guestsRepository() {
   return createGuestsRepository(await createSupabaseServerClient());
 }
 
-/** Lista para a tela de hóspedes: cada um com nº de estadias e a última. */
-export async function searchGuests(term?: string): Promise<GuestSummary[]> {
+export interface GuestPage {
+  guests: GuestSummary[];
+  /** Tamanho da próxima página para o link "Ver mais"; null quando já está tudo na tela. */
+  nextSize: number | null;
+}
+
+/**
+ * Lista para a tela de hóspedes: cada um com nº de estadias e a última.
+ * `size` vem da URL. Com filtro (recorrentes, aniversariantes) use `PAGE_MAX`:
+ * o filtro precisa olhar todos, não só a primeira página.
+ */
+export async function searchGuests(term?: string, size = PAGE_MAX): Promise<GuestPage> {
   const repo = await guestsRepository();
-  const guests = await repo.search(term);
+  const { items: guests, nextSize } = paginate(await repo.search(term, size + 1), size);
   const stays = await repo.listStays(guests.map((guest) => guest.id));
 
   const today = todayIso();
 
-  return guests.map((guest) => {
-    const own = stays.filter((stay) => stay.main_guest_id === guest.id);
+  const staysByGuest = new Map<string, typeof stays>();
+  for (const stay of stays) staysByGuest.set(stay.main_guest_id, [...(staysByGuest.get(stay.main_guest_id) ?? []), stay]);
+
+  const summaries = guests.map((guest) => {
+    const own = staysByGuest.get(guest.id) ?? [];
     return {
       ...guest,
       staysCount: own.length,
@@ -29,6 +44,7 @@ export async function searchGuests(term?: string): Promise<GuestSummary[]> {
       birthdayThisMonth: isBirthdayMonth(guest.birth_date, today),
     };
   });
+  return { guests: summaries, nextSize };
 }
 
 export async function getGuestWithStays(
