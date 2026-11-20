@@ -144,3 +144,37 @@ export function icalUrlProblem(raw: string): string | null {
   }
   return null;
 }
+
+/**
+ * Endereço IP que não é da internet pública (rede interna, loopback, link-local, CGNAT,
+ * multicast, reservado). Usado depois de resolver o DNS: um nome público pode apontar para
+ * 127.0.0.1 (ex.: serviços de DNS curinga) e o filtro só pelo nome não pegaria.
+ */
+export function isPrivateAddress(address: string): boolean {
+  const ip = address.toLowerCase().replace(/^\[|\]$/g, "");
+  const mapped = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/.exec(ip);
+  if (mapped?.[1]) return isPrivateAddress(mapped[1]);
+
+  const v4 = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(ip);
+  if (v4) {
+    const [a, b] = [Number(v4[1]), Number(v4[2])];
+    return (
+      a === 0 || a === 10 || a === 127 || a >= 224 ||
+      (a === 100 && b >= 64 && b <= 127) || // CGNAT
+      (a === 169 && b === 254) ||
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168) ||
+      (a === 192 && b === 0) ||
+      (a === 198 && (b === 18 || b === 19))
+    );
+  }
+  if (!ip.includes(":")) return true; // formato desconhecido: não arrisca
+  return (
+    ip === "::" || ip === "::1" ||
+    /^f[cd]/.test(ip) || // ULA
+    /^fe[89ab]/.test(ip) || // link-local
+    /^ff/.test(ip) || // multicast
+    ip.startsWith("64:ff9b:") || ip.startsWith("2001:db8:")
+  );
+}
+

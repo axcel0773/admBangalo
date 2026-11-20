@@ -27,7 +27,7 @@ export function LoginForm({ next }: LoginFormProps) {
         </span>
         <h2 className="font-display text-xl font-semibold">Confira seu e-mail</h2>
         <p className="text-sm text-ink-muted">
-          Enviamos um link de acesso para <b className="text-ink">{state.email}</b>.
+          Se <b className="text-ink">{state.email}</b> tiver cadastro, enviamos um link de acesso para ele.
         </p>
       </div>
     );

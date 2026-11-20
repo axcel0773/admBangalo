@@ -12,10 +12,10 @@ public/sw.js
 public/sw.js.map
 public/swe-worker-*.js
 
-# ambiente
+# ambiente (qualquer .env, menos o modelo sem valores)
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 
 # testes
 coverage/

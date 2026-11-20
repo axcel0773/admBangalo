@@ -1,12 +1,14 @@
 import "server-only";
 
+import { lookup } from "node:dns/promises";
+
 import { addDays, todayIso, type IsoDate } from "@/lib/dates";
 import { env } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { createAvailabilityRepository, type IcalSource } from "./data/availability.repository";
 import type { ChaletBlock } from "./domain/blocks";
-import { buildIcs, icalUrlProblem, parseIcs, relevantEvents } from "./domain/ical";
+import { buildIcs, icalUrlProblem, isPrivateAddress, parseIcs, relevantEvents } from "./domain/ical";
 
 const FETCH_TIMEOUT_MS = 10_000;
 const MAX_ICS_BYTES = 2_000_000;
@@ -53,6 +55,11 @@ async function fetchIcs(startUrl: string): Promise<string> {
     for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
       const problem = icalUrlProblem(url);
       if (problem) throw new Error(problem);
+      // O nome pode ser público e apontar para a rede interna: confere os IPs resolvidos.
+      const addresses = await lookup(new URL(url).hostname, { all: true, verbatim: true });
+      if (addresses.length === 0 || addresses.some(({ address }) => isPrivateAddress(address))) {
+        throw new Error("Esse endereço não é público.");
+      }
       response = await fetch(url, {
         signal: controller.signal,
         cache: "no-store",

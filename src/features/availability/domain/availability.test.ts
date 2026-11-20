@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { blockWarning, blocksNight, overlappingBlocks, rangesOverlap, type ChaletBlock } from "./blocks";
-import { buildIcs, icalDate, icalUrlProblem, parseIcs, relevantEvents } from "./ical";
+import { buildIcs, icalDate, icalUrlProblem, isPrivateAddress, parseIcs, relevantEvents } from "./ical";
 
 const AIRBNB = [
   "BEGIN:VCALENDAR",
@@ -127,5 +127,19 @@ describe("bloqueios de datas", () => {
   it("noite bloqueada", () => {
     expect(blocksNight(blocks[0]!, "2026-12-04")).toBe(true);
     expect(blocksNight(blocks[0]!, "2026-12-05")).toBe(false);
+  });
+});
+
+describe("isPrivateAddress (SSRF por DNS)", () => {
+  it("barra rede interna, loopback, link-local e afins", () => {
+    for (const ip of ["127.0.0.1", "10.1.2.3", "172.16.0.1", "192.168.0.10", "169.254.169.254", "100.64.0.1", "0.0.0.0", "::1", "fd00::1", "fe80::1", "::ffff:127.0.0.1", "[::1]", "lixo"]) {
+      expect(isPrivateAddress(ip), ip).toBe(true);
+    }
+  });
+
+  it("deixa passar endereços públicos", () => {
+    for (const ip of ["8.8.8.8", "54.230.10.1", "172.32.0.1", "2a03:2880:f003:c07:face:b00c::2"]) {
+      expect(isPrivateAddress(ip), ip).toBe(false);
+    }
   });
 });
