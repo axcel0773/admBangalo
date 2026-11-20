@@ -56,13 +56,13 @@ describe("web push", () => {
 
   it("o cabeçalho VAPID traz um JWT ES256 verificável com a chave pública", () => {
     const { publicKey, privateKey } = generateVapidKeys();
-    const header = vapidAuthorization("https://push.example.com/abc", { publicKey, privateKey, subject: "mailto:dono@example.com" }, 1_000);
+    const header = vapidAuthorization("https://fcm.googleapis.com/fcm/send/abc", { publicKey, privateKey, subject: "mailto:dono@example.com" }, 1_000);
     const match = /^vapid t=([^.]+)\.([^.]+)\.([^,]+), k=(.+)$/.exec(header);
     expect(match).not.toBeNull();
     const [, h, c, s, k] = match!;
     expect(k).toBe(publicKey);
     const claims = JSON.parse(Buffer.from(c!, "base64url").toString());
-    expect(claims).toMatchObject({ aud: "https://push.example.com", sub: "mailto:dono@example.com", exp: 1_000 + 43_200 });
+    expect(claims).toMatchObject({ aud: "https://fcm.googleapis.com", sub: "mailto:dono@example.com", exp: 1_000 + 43_200 });
 
     const raw = Buffer.from(publicKey, "base64url");
     const key = createPublicKey({
@@ -75,12 +75,24 @@ describe("web push", () => {
   it("traduz a resposta do serviço de push", async () => {
     const { keys } = newDevice();
     const vapid = { ...generateVapidKeys(), subject: "mailto:dono@example.com" };
-    const subscription = { endpoint: "https://push.example.com/abc", ...keys };
+    const subscription = { endpoint: "https://fcm.googleapis.com/fcm/send/abc", ...keys };
     const reply = (status: number) => (async () => new Response(null, { status })) as unknown as typeof fetch;
     const message = { title: "t", body: "b" };
     expect(await sendPush(subscription, message, vapid, reply(201))).toBe("sent");
     expect(await sendPush(subscription, message, vapid, reply(410))).toBe("gone");
     expect(await sendPush(subscription, message, vapid, reply(404))).toBe("gone");
     expect(await sendPush(subscription, message, vapid, reply(500))).toBe("failed");
+  });
+
+  it("não envia para endereço fora dos serviços de push", async () => {
+    const { keys } = newDevice();
+    const vapid = { ...generateVapidKeys(), subject: "mailto:dono@example.com" };
+    let called = false;
+    const spy = (async () => {
+      called = true;
+      return new Response(null, { status: 201 });
+    }) as unknown as typeof fetch;
+    expect(await sendPush({ endpoint: "https://169.254.169.254/x", ...keys }, { title: "t", body: "b" }, vapid, spy)).toBe("gone");
+    expect(called).toBe(false);
   });
 });

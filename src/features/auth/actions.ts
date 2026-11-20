@@ -76,7 +76,9 @@ async function sendMagicLink(
     options: { emailRedirectTo: callbackUrl.toString(), shouldCreateUser: false },
   });
 
-  if (error) return { status: "error", message: "Não foi possível enviar o link. Tente de novo." };
+  // Mesma resposta para e-mail cadastrado ou não: a tela não revela quem tem conta.
+  // Só o limite de envios aparece, porque aí a pessoa precisa esperar.
+  if (error?.status === 429) return { status: "error", message: "Muitas tentativas. Espere um minuto e tente de novo." };
 
   return { status: "link-sent", email: parsed.data.email };
 }

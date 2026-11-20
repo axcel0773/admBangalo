@@ -1,5 +1,7 @@
 import { createCipheriv, createECDH, createPrivateKey, hkdfSync, randomBytes, sign } from "node:crypto";
 
+import { isKnownPushEndpoint } from "./schemas";
+
 /**
  * Web Push sem dependências: VAPID (RFC 8292) + criptografia aes128gcm (RFC 8188/8291).
  * Só usa o módulo `crypto` do Node. A chave privada VAPID nunca sai do servidor.
@@ -95,6 +97,8 @@ export async function sendPush(
   vapid: VapidKeys,
   fetcher: typeof fetch = fetch,
 ): Promise<PushResult> {
+  // Segunda barreira: nunca envia para fora dos serviços de push, nem se o banco tiver algo estranho.
+  if (!isKnownPushEndpoint(subscription.endpoint)) return "gone";
   const body = encryptPayload(Buffer.from(JSON.stringify(message)), subscription);
   const response = await fetcher(subscription.endpoint, {
     method: "POST",
