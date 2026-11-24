@@ -1,11 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <defs><clipPath id="r"><rect width="512" height="512" rx="112"/></clipPath></defs>
-  <g clip-path="url(#r)">
-    <rect width="512" height="512" fill="#14508A"/>
-    <circle cx="150" cy="170" r="48" fill="#FFD98A"/>
-    <path d="M0 340q64-22 128 0t128 0 128 0 128 0v172H0z" fill="#1F6FB2"/>
-    <path d="M0 400q64-22 128 0t128 0 128 0 128 0v112H0z" fill="#0E3A63" opacity=".8"/>
-    <path d="M330 420c0-70 6-130 22-190" stroke="#FFFDF9" stroke-width="16" fill="none" stroke-linecap="round"/>
-    <g stroke="#FFFDF9" stroke-width="16" fill="none" stroke-linecap="round"><path d="M352 230c-30-34-72-34-100-14M352 230c30-34 72-34 100-14M352 230c-22-46-62-56-92-44M352 230c22-46 62-56 92-44"/></g>
-  </g>
+  <!-- Marca Bangalôs: "b" com o topo da haste em diagonal (água do telhado) e o sol nascendo na barriga. -->
+  <rect width="512" height="512" rx="112" fill="#F7F1E6"/>
+  <path d="M138 126 212 86v334h-74z" fill="#14508A" stroke="#14508A" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="292" cy="326" r="86" fill="none" stroke="#14508A" stroke-width="58"/>
+  <path d="M236 338a56 56 0 0 1 112 0z" fill="#F29A3E"/>
 </svg>
