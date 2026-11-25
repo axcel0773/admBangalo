@@ -11,21 +11,21 @@ export function YearReportView({ report }: { report: YearReport }) {
   return (
     <>
       <CardSection title={`Resumo de ${report.year}`} titleId="report-summary">
-        <dl className="grid grid-cols-3 gap-3 text-center">
+        <dl className="grid grid-cols-3 gap-2 text-center md:gap-3">
           <div>
             <dt className="text-xs text-ink-muted">Ocupação</dt>
-            <dd className="font-display text-xl font-semibold">{formatPercent(totals.occupancy)}</dd>
+            <dd className="font-display text-lg font-semibold tabular-nums md:text-xl">{formatPercent(totals.occupancy)}</dd>
           </div>
           <div>
             <dt className="text-xs text-ink-muted">Diária média</dt>
-            <dd className="font-display text-xl font-semibold">
-              <Money value={totals.averageRate} />
+            <dd className="font-display text-lg font-semibold tabular-nums md:text-xl">
+              <Money value={totals.averageRate} rounded />
             </dd>
           </div>
           <div>
             <dt className="text-xs text-ink-muted">Hospedagem</dt>
-            <dd className="font-display text-xl font-semibold">
-              <Money value={totals.revenue} />
+            <dd className="font-display text-lg font-semibold tabular-nums md:text-xl">
+              <Money value={totals.revenue} rounded />
             </dd>
           </div>
         </dl>

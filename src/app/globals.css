@@ -162,6 +162,14 @@
   }
 }
 
+/* Fileiras que rolam para o lado (filtros, carrossel): sem barra de rolagem visível. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Espaço para a barra inferior + área segura do iPhone. */
 @utility pb-safe-nav {
   padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));

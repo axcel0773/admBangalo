@@ -98,8 +98,9 @@ export function DayAgenda({ entries, day, today }: { entries: ChaletDayEntry[]; 
 
   return (
     <section aria-labelledby="day-agenda-title" className="flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-3">
-        <h2 id="day-agenda-title" className="min-w-0 font-display text-xl font-semibold">
+      {/* Quebra o contador para baixo quando o dia por extenso não cabe ao lado (celular). */}
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+        <h2 id="day-agenda-title" className="min-w-0 max-w-full font-display text-xl font-semibold">
           <DatePicker selected={day} today={today} label={`${title}: escolher outro dia no calendário`} className="-ml-1 px-1 py-0.5">
             <span className="truncate first-letter:uppercase">{title}</span>
             <ChevronDown className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />

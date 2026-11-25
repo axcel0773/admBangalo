@@ -11,7 +11,7 @@ export interface FilterChip {
 /** Filtros como links (o estado fica na URL, então funciona sem JavaScript e no voltar). */
 export function FilterChips({ chips, label }: { chips: FilterChip[]; label: string }) {
   return (
-    <nav aria-label={label} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:px-0">
+    <nav aria-label={label} className="scrollbar-none -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:px-0">
       {chips.map((chip) => (
         <Link
           key={chip.href}

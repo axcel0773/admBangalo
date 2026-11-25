@@ -28,8 +28,8 @@ export function MonthNav({
       <Link href={hrefFor(shiftMonth(month, -1))} aria-label="Mês anterior" className={linkClass}>
         <ChevronLeft className="size-5" aria-hidden="true" />
       </Link>
-      <span className="flex h-10 min-w-40 items-center justify-center rounded-xl bg-surface px-4 text-sm font-semibold capitalize shadow-sm">
-        {formatMonth(month)}
+      <span className="flex h-10 min-w-40 items-center justify-center rounded-xl bg-surface px-4 text-sm font-semibold shadow-sm">
+        <span className="inline-block first-letter:uppercase">{formatMonth(month)}</span>
       </span>
       <Link href={hrefFor(shiftMonth(month, 1))} aria-label="Próximo mês" className={linkClass}>
         <ChevronRight className="size-5" aria-hidden="true" />

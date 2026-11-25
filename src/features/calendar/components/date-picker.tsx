@@ -82,8 +82,8 @@ export function DatePicker({ selected, today, children, label = "Escolher data n
             <Button variant="ghost" size="icon" aria-label="Mês anterior" onClick={() => setMonth(shiftCalendarMonth(month, -1))}>
               <ChevronLeft aria-hidden="true" />
             </Button>
-            <h2 id="date-picker-title" className="font-display text-lg font-semibold capitalize" aria-live="polite">
-              {title}
+            <h2 id="date-picker-title" className="font-display text-lg font-semibold" aria-live="polite">
+              <span className="inline-block first-letter:uppercase">{title}</span>
             </h2>
             <Button variant="ghost" size="icon" aria-label="Próximo mês" onClick={() => setMonth(shiftCalendarMonth(month, 1))}>
               <ChevronRight aria-hidden="true" />

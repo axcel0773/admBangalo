@@ -20,7 +20,7 @@ export function ProfitSummary({ report }: { report: MonthReport }) {
         iconTone="accent"
         value={<Money value={report.expenses} rounded tone="pending" />}
         footer={
-          <Link href={routes.expenses} className="inline-flex items-center gap-1 font-semibold text-primary-ink">
+          <Link href={routes.expenses} className="-my-2.5 inline-flex min-h-10 items-center gap-1 font-semibold text-primary-ink">
             Ver e lançar <ArrowRight aria-hidden="true" className="size-3.5" />
           </Link>
         }

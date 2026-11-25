@@ -75,7 +75,7 @@ export function ReceivablesList({ items, filter }: { items: ReceivableEntry[]; f
                     <Avatar name={item.guestName} />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[15px] font-semibold">{item.guestName}</p>
-                      <p className="truncate text-xs text-ink-muted">
+                      <p className="line-clamp-2 text-xs text-ink-muted">
                         {item.chaletName} · {formatShortDate(item.checkIn)} a {formatShortDate(item.checkOut)}
                       </p>
                     </div>

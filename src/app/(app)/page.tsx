@@ -48,7 +48,7 @@ export default async function DashboardPage() {
         <TodayActions actions={dashboard.actions} />
         <TodayAgenda events={dashboard.agenda} />
         <ChaletList chalets={dashboard.chalets} />
-        <div className="grid gap-4 md:gap-5 lg:grid-cols-2">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:gap-5 lg:grid-cols-2">
           <ReceivablesCard receivables={dashboard.receivables} />
           <UpcomingArrivals arrivals={dashboard.upcoming} />
         </div>
