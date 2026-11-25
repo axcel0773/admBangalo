@@ -23,7 +23,8 @@ export function ListRow({ href, leading, title, subtitle, trailing, className, i
         {leading}
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[15px] font-semibold">{title}</span>
-          {subtitle ? <span className="block truncate text-xs text-ink-muted">{subtitle}</span> : null}
+          {/* Até 2 linhas: no celular a data não pode sumir atrás das reticências. */}
+          {subtitle ? <span className="line-clamp-2 text-xs break-words text-ink-muted">{subtitle}</span> : null}
         </span>
         {trailing}
         <ChevronRight className="size-5 shrink-0 text-ink-muted/50" aria-hidden="true" />

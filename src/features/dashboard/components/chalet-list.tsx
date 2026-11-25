@@ -28,11 +28,11 @@ export function ChaletList({ chalets }: { chalets: ChaletOverview[] }) {
         <h2 id="chalets-title" className="font-display text-xl font-semibold md:text-2xl">
           Seus bangalôs
         </h2>
-        <Link href={routes.calendar} className="text-sm font-semibold">
+        <Link href={routes.calendar} className="-my-2 inline-flex min-h-10 items-center px-1 text-sm font-semibold">
           Ver ocupação
         </Link>
       </div>
-      <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-2 md:gap-4.5 md:overflow-visible md:px-0 lg:grid-cols-3">
+      <div className="scrollbar-none -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-2 md:gap-4.5 md:overflow-visible md:px-0 lg:grid-cols-3">
         {chalets.map((chalet) => (
           <ChaletCard key={chalet.id} chalet={chalet} />
         ))}
