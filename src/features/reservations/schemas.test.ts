@@ -80,3 +80,48 @@ describe("newReservationSchema", () => {
     expect(nightly.error?.issues.map((issue) => issue.path.join("."))).toEqual(["nightly_rate"]);
   });
 });
+
+describe("comissão do corretor na nova reserva", () => {
+  const guest = { ...base, guest_mode: "new", new_guest_name: "Ana Teste" };
+
+  it("sem o interruptor, não manda comissão (mesmo com campos sobrando)", () => {
+    const parsed = newReservationSchema.parse({ ...guest, broker_name: "Carlos", commission_amount: "120" });
+    expect(toCreateReservationPayload(parsed)).toMatchObject({ commission: null });
+  });
+
+  it("comissão a pagar", () => {
+    const parsed = newReservationSchema.parse({
+      ...guest,
+      has_commission: "on",
+      broker_name: " Carlos ",
+      commission_amount: "120,00",
+      commission_status: "pending",
+    });
+    expect(toCreateReservationPayload(parsed)).toMatchObject({
+      commission: { broker_name: "Carlos", amount: 120, paid_on: null, method: null },
+    });
+  });
+
+  it("comissão já paga leva data e forma", () => {
+    const parsed = newReservationSchema.parse({
+      ...guest,
+      has_commission: "on",
+      broker_name: "Carlos",
+      commission_amount: "120",
+      commission_status: "paid",
+      commission_paid_on: "2026-11-25",
+      commission_method: "pix",
+    });
+    expect(toCreateReservationPayload(parsed)).toMatchObject({
+      commission: { broker_name: "Carlos", amount: 120, paid_on: "2026-11-25", method: "pix" },
+    });
+  });
+
+  it("interruptor ligado exige nome e valor", () => {
+    const result = newReservationSchema.safeParse({ ...guest, has_commission: "on", broker_name: "", commission_amount: "" });
+    expect(result.success).toBe(false);
+    const paths = result.error?.issues.map((issue) => issue.path.join("."));
+    expect(paths).toContain("broker_name");
+    expect(paths).toContain("commission_amount");
+  });
+});

@@ -14,6 +14,7 @@ import {
   ScheduleCard,
 } from "@/features/billing";
 import { requireOwner } from "@/features/auth/session";
+import { CommissionCard, commissionOf, listBrokerNames } from "@/features/commissions";
 import { DeleteReservationCard, getReservationDetail, ReservationDetail } from "@/features/reservations";
 import { todayIso } from "@/lib/dates";
 
@@ -21,7 +22,7 @@ export const metadata: Metadata = { title: "Reserva" };
 
 export default async function ReservationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [detail, owner] = await Promise.all([getReservationDetail(id), requireOwner()]);
+  const [detail, owner, brokers] = await Promise.all([getReservationDetail(id), requireOwner(), listBrokerNames()]);
   if (!detail) notFound();
 
   const { reservation, financials, charges, mainGuest } = detail;
@@ -72,6 +73,14 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
                 hasPixKey={billing.hasPixKey}
                 guestName={mainGuest.full_name}
                 guestPhone={mainGuest.phone}
+              />
+              <CommissionCard
+                reservationId={id}
+                commission={commissionOf(reservation)}
+                total={financials.grand_total}
+                cancelled={cancelled}
+                brokers={brokers}
+                today={todayIso()}
               />
               <ScheduleCard
                 reservationId={id}

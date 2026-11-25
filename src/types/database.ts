@@ -266,6 +266,10 @@ export type Database = {
           discount: number;
           package_name: string | null;
           package_total: number | null;
+          broker_name: string | null;
+          commission_amount: number | null;
+          commission_paid_on: string | null;
+          commission_method: Database["public"]["Enums"]["payment_method"] | null;
           lodging_total: number;
           status: Database["public"]["Enums"]["reservation_status"];
           source: Database["public"]["Enums"]["reservation_source"];
@@ -287,6 +291,10 @@ export type Database = {
           discount?: number;
           package_name?: string | null;
           package_total?: number | null;
+          broker_name?: string | null;
+          commission_amount?: number | null;
+          commission_paid_on?: string | null;
+          commission_method?: Database["public"]["Enums"]["payment_method"] | null;
           status?: Database["public"]["Enums"]["reservation_status"];
           source?: Database["public"]["Enums"]["reservation_source"];
           notes?: string | null;

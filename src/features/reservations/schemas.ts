@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { MAX_CHALET_GUESTS } from "@/features/chalets/domain";
+import { newReservationCommissionFields, resolveNewReservationCommission } from "@/features/commissions/schemas";
 import { daysBetween } from "@/lib/dates";
 import { isUuid } from "@/lib/ids";
 import { document, integer, isoDate, money, optionalText, phone } from "@/lib/validation";
@@ -98,6 +99,8 @@ export const newReservationSchema = z
       .transform((value) => (value && value.trim() ? value : "0"))
       .pipe(money("Desconto")),
     notes: optionalText(1000),
+    // Corretor (passo Hóspedes): só vale com o interruptor "Veio por corretor" ligado.
+    ...newReservationCommissionFields,
     // Orçamento que originou a reserva (opcional); vazio ou inválido é ignorado.
     quote_id: z
       .string()
@@ -106,6 +109,7 @@ export const newReservationSchema = z
   })
   .superRefine((data, ctx) => {
     checkLodgingPricing(data, ctx);
+    resolveNewReservationCommission(data, ctx);
     if (data.adults + data.children > MAX_CHALET_GUESTS) {
       ctx.addIssue({
         code: "custom",
@@ -128,6 +132,7 @@ export type NewReservationInput = z.infer<typeof newReservationSchema>;
 
 /** Formato aceito pela função create_reservation do banco. */
 export function toCreateReservationPayload(input: NewReservationInput): Json {
+  const commission = resolveNewReservationCommission(input);
   return {
     chalet_id: input.chalet_id,
     check_in: input.check_in,
@@ -151,6 +156,9 @@ export function toCreateReservationPayload(input: NewReservationInput): Json {
     companions: input.companions
       .filter((companion) => companion.full_name)
       .map((companion) => ({ full_name: companion.full_name, is_child: companion.is_child })),
+    commission: commission
+      ? { broker_name: commission.broker_name, amount: commission.amount, paid_on: commission.paid_on, method: commission.method }
+      : null,
   };
 }
 

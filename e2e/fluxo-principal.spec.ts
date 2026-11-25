@@ -93,4 +93,44 @@ test.describe("fluxo principal", () => {
     await expect(page.getByRole("list", { name: "Prévia das parcelas" })).toBeHidden();
     await expect(page.getByText("Parcela 2").first()).toBeVisible();
   });
+
+  test("comissão do corretor: registrada ao fechar, paga e somada às despesas", async ({ page }) => {
+    await page.goto("/login");
+    await page.getByLabel("E-mail").fill(owner.email);
+    await page.getByLabel("Senha").fill(owner.password);
+    await page.getByRole("button", { name: "Entrar", exact: true }).click();
+    await expect(page).toHaveURL(/\/$/);
+
+    await page.goto("/configuracoes/chales/novo");
+    await page.getByLabel("Nome", { exact: true }).fill("Bangalô Corretor");
+    await page.getByLabel("Diária base (R$)").fill("350,00");
+    await page.getByRole("button", { name: "Cadastrar bangalô" }).click();
+    await expect(page).toHaveURL(/\/configuracoes\/chales$/);
+
+    // Passo Hóspedes: corretor com 10% do total (2 noites × R$ 350 = R$ 700 → R$ 70)
+    await page.goto("/reservas/nova");
+    await page.getByRole("button", { name: "Continuar" }).click();
+    await page.getByRole("radio", { name: "Novo hóspede" }).click();
+    await page.getByLabel("Nome do responsável").fill("Hóspede Corretor");
+    await page.getByText("Veio por corretor", { exact: true }).click();
+    await page.getByLabel("Nome do corretor").fill("Carlos E2E");
+    await page.getByRole("button", { name: "10%" }).click();
+    await expect(page.getByLabel("Comissão (R$)")).toHaveValue("70,00");
+    await page.getByRole("button", { name: "Continuar" }).click();
+    await page.getByRole("button", { name: "Criar reserva" }).click();
+    await expect(page).toHaveURL(/\/reservas\/[0-9a-f-]{36}$/);
+
+    const card = page.getByRole("region", { name: "Comissão do corretor" });
+    await expect(card.getByText("Carlos E2E")).toBeVisible();
+    await expect(card.getByText("A pagar")).toBeVisible();
+
+    await card.getByRole("button", { name: "Marcar como paga" }).click();
+    await card.getByRole("button", { name: "Confirmar" }).click();
+    await expect(card.getByText(/Paga em/)).toBeVisible();
+
+    // Despesas do mês: a comissão paga aparece e soma no total
+    await page.goto("/financeiro/despesas");
+    await expect(page.getByText("Comissões de corretor")).toBeVisible();
+    await expect(page.getByRole("region", { name: "Comissões pagas no mês" }).getByText("Carlos E2E")).toBeVisible();
+  });
 });

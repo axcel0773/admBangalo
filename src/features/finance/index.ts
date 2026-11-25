@@ -6,6 +6,6 @@ export { MonthReservations } from "./components/month-reservations";
 export { RevenueBreakdown } from "./components/revenue-breakdown";
 export { YearReportView } from "./components/year-report";
 export { RevenueChart } from "./components/revenue-chart";
-export { formatMonth, monthParam, parseMonthParam, previousTrendPoint } from "./domain";
+export { endOfMonth, formatMonth, monthParam, parseMonthParam, previousTrendPoint } from "./domain";
 export { parseYearParam } from "./reports";
 export { getFinanceOverview, getMonthCsv, getYearReport, getYearReportCsv } from "./services";
