@@ -1,5 +1,6 @@
 import { CircleCheck, Clock3, House, Users } from "lucide-react";
 
+import { routes } from "@/components/layout/navigation";
 import { Money } from "@/components/ui/money";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { StatCard } from "@/components/ui/stat-card";
@@ -13,6 +14,7 @@ export function SummaryCards({ summary }: { summary: DashboardSummary }) {
     <section aria-label="Indicadores do mês" className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
       <StatCard
         label="A receber"
+        href={routes.receivables}
         icon={<Clock3 />}
         iconTone="accent"
         value={<Money value={summary.receivableTotal} rounded tone="pending" />}

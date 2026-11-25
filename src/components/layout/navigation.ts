@@ -30,6 +30,7 @@ export const routes = {
   finance: "/financeiro",
   cleaning: "/limpeza",
   reports: "/financeiro/relatorios",
+  receivables: "/financeiro/a-receber",
   expenses: "/financeiro/despesas",
   newExpense: "/financeiro/despesas/nova",
   settings: "/configuracoes",

@@ -49,6 +49,7 @@ test.describe("telas no celular", () => {
       "/financeiro/despesas",
       "/financeiro/despesas/nova",
       "/financeiro/relatorios",
+      "/financeiro/a-receber",
       "/limpeza",
       "/busca?q=maria",
       "/configuracoes",
