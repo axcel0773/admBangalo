@@ -1,7 +1,7 @@
 -- Pacotes: valor fechado da hospedagem, cópia na reserva e no orçamento, RLS por dono.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(10);
+select plan(12);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'dono-a@teste.local'),
@@ -37,18 +37,17 @@ select throws_ok($$ insert into reservations (chalet_id, main_guest_id, check_in
   '23514', null, 'valor de pacote exige o nome');
 
 -- create_reservation grava o pacote.
-select is(
-  (select lodging_total from reservations where id = create_reservation(jsonb_build_object(
-    'chalet_id', 'aaaaaaaa-0000-0000-0000-000000000001', 'main_guest_id', 'bbbbbbbb-0000-0000-0000-000000000001',
-    'check_in', '2030-04-10', 'check_out', '2030-04-13', 'adults', 2,
-    'nightly_rate', 416.67, 'package_name', 'Feriado', 'package_total', 1250))),
-  1250.00::numeric,
-  'create_reservation com pacote');
-select is(
-  (select package_name from reservations where id = create_reservation(jsonb_build_object(
-    'chalet_id', 'aaaaaaaa-0000-0000-0000-000000000001', 'main_guest_id', 'bbbbbbbb-0000-0000-0000-000000000001',
-    'check_in', '2030-05-10', 'check_out', '2030-05-12', 'adults', 2, 'nightly_rate', 350))),
-  null,
+select lives_ok($$ select create_reservation(jsonb_build_object(
+  'chalet_id', 'aaaaaaaa-0000-0000-0000-000000000001', 'main_guest_id', 'bbbbbbbb-0000-0000-0000-000000000001',
+  'check_in', '2030-04-10', 'check_out', '2030-04-13', 'adults', 2,
+  'nightly_rate', 416.67, 'package_name', 'Feriado', 'package_total', 1250)) $$, 'create_reservation aceita pacote');
+select lives_ok($$ select create_reservation(jsonb_build_object(
+  'chalet_id', 'aaaaaaaa-0000-0000-0000-000000000001', 'main_guest_id', 'bbbbbbbb-0000-0000-0000-000000000001',
+  'check_in', '2030-05-10', 'check_out', '2030-05-12', 'adults', 2, 'nightly_rate', 350)) $$, 'create_reservation sem pacote');
+
+select is((select lodging_total from reservations where check_in = '2030-04-10'), 1250.00::numeric,
+  'create_reservation com pacote: hospedagem é o valor fechado');
+select is((select package_name from reservations where check_in = '2030-05-10'), null,
   'create_reservation sem pacote continua por diária');
 
 select is((select grand_total from reservation_financials where reservation_id = 'cccccccc-0000-0000-0000-000000000001'),
