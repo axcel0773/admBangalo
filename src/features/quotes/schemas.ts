@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { MAX_CHALET_GUESTS } from "@/features/chalets/domain";
+import { checkLodgingPricing, lodgingPricingFields } from "@/features/reservations/schemas";
 import { daysBetween } from "@/lib/dates";
 import { integer, isoDate, money, optionalText, phone, requiredText } from "@/lib/validation";
 
@@ -15,7 +16,7 @@ export const newQuoteSchema = z
     children: integer("Crianças", 0, MAX_CHALET_GUESTS - 1),
     guest_name: requiredText("Nome do hóspede", 120),
     guest_phone: phone,
-    nightly_rate: money("Diária"),
+    ...lodgingPricingFields,
     discount: z
       .string()
       .optional()
@@ -28,6 +29,7 @@ export const newQuoteSchema = z
     notes: optionalText(1000),
   })
   .superRefine((data, ctx) => {
+    checkLodgingPricing(data, ctx);
     if (data.adults + data.children > MAX_CHALET_GUESTS) {
       ctx.addIssue({
         code: "custom",

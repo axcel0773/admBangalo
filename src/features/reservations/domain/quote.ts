@@ -37,6 +37,8 @@ export interface ReservationDraft {
   children: number;
   nightlyRate: number;
   discount: number;
+  /** Valor fechado do pacote; null/undefined = cobra por diária. */
+  packageTotal?: number | null;
 }
 
 export interface DraftIssues {
@@ -66,6 +68,7 @@ export function quoteDraft(draft: ReservationDraft, fees: FeeForQuote[]): StayQu
     stay: { nights, guests: draft.adults + draft.children, includedGuests: draft.chalet.base_guests },
     nightlyRate: draft.nightlyRate,
     discount: draft.discount,
+    packageTotal: draft.packageTotal ?? null,
     fees: autoFeesFor(draft.chalet.id, fees),
   });
 }

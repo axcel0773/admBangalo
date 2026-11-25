@@ -11,8 +11,15 @@ import { MutationError } from "@/lib/supabase/errors";
 
 import { contextWithout, validatePayment } from "./domain/payments";
 import { isOwnReceiptPath } from "./domain/receipts";
-import { depositAndBalance } from "./domain/schedule";
-import { extraChargeSchema, installmentSchema, meterReadingSchema, paymentEditSchema, paymentSchema } from "./schemas";
+import { isSplitCount, splitPlan } from "./domain/schedule";
+import {
+  extraChargeSchema,
+  installmentSchema,
+  meterReadingSchema,
+  paymentEditSchema,
+  paymentSchema,
+  splitPlanSchema,
+} from "./schemas";
 import { billingRepository } from "./services";
 
 /** Valores e saldos aparecem no Painel, Financeiro, listas e ficha do hóspede. */
@@ -175,20 +182,32 @@ export async function addInstallment(reservationId: string, _prev: FormState, fo
   );
 }
 
-/** Atalho "sinal 50% hoje + saldo no check-in". Use com `.bind(null, reservationId)`. */
-export async function addDepositPlan(reservationId: string): Promise<FormState> {
-  return attempt(async () => {
-    assertIds(reservationId);
-    const repo = await billingRepository();
-    const [context, existing] = await Promise.all([repo.findContext(reservationId), repo.listSchedule(reservationId)]);
-    if (!context || existing.length > 0 || context.status === "cancelled") return;
+/**
+ * Divide o total em parcelas (sinal hoje, saldo no check-in). Só quando a reserva ainda não tem parcelas.
+ * Use com `.bind(null, reservationId)`. O servidor recalcula a partir do total do banco.
+ */
+export async function addSplitPlan(reservationId: string, _prev: FormState, formData: FormData): Promise<FormState> {
+  if (!isUuid(reservationId)) return errorFormState(INVALID_ID_MESSAGE, formData);
+  const parsed = splitPlanSchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) return invalidFormState(parsed.error, formData);
+  const count = parsed.data.count;
+  if (!isSplitCount(count)) return errorFormState("Escolha em quantas vezes dividir.", formData);
+  const wholeReais = parsed.data.whole_reais;
 
-    await repo.createInstallments(
-      reservationId,
-      depositAndBalance({ total: context.total, checkIn: context.checkIn, today: todayIso() }),
-    );
-    refresh();
-  });
+  return run(
+    formData,
+    async () => {
+      const repo = await billingRepository();
+      const [context, existing] = await Promise.all([repo.findContext(reservationId), repo.listSchedule(reservationId)]);
+      if (!context || context.status === "cancelled") throw new MutationError("Reserva não encontrada ou cancelada.");
+      if (existing.length > 0) throw new MutationError("Esta reserva já tem parcelas.");
+      await repo.createInstallments(
+        reservationId,
+        splitPlan({ total: context.total, count, checkIn: context.checkIn, today: todayIso(), wholeReais }),
+      );
+    },
+    "Parcelas criadas.",
+  );
 }
 
 /** Corrige descrição, valor ou vencimento da parcela. Use com `.bind(null, reservationId, installmentId)`. */

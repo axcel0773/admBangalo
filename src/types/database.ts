@@ -140,6 +140,8 @@ export type Database = {
           lines: Json;
           total: number;
           deposit_amount: number;
+          package_name: string | null;
+          package_total: number | null;
           notes: string | null;
           valid_until: string;
           status: "draft" | "sent" | "accepted" | "declined";
@@ -159,6 +161,8 @@ export type Database = {
           lines?: Json;
           total: number;
           deposit_amount?: number;
+          package_name?: string | null;
+          package_total?: number | null;
           notes?: string | null;
           valid_until: string;
           status?: "draft" | "sent" | "accepted" | "declined";
@@ -229,6 +233,24 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["guests"]["Insert"]>;
         Relationships: [];
       };
+      stay_packages: {
+        Row: {
+          id: string;
+          owner_id: string;
+          name: string;
+          nights: number;
+          total: number;
+        } & Timestamps;
+        Insert: {
+          id?: string;
+          owner_id?: string;
+          name: string;
+          nights: number;
+          total: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["stay_packages"]["Insert"]>;
+        Relationships: [];
+      };
       reservations: {
         Row: {
           id: string;
@@ -242,6 +264,8 @@ export type Database = {
           children: number;
           nightly_rate: number;
           discount: number;
+          package_name: string | null;
+          package_total: number | null;
           lodging_total: number;
           status: Database["public"]["Enums"]["reservation_status"];
           source: Database["public"]["Enums"]["reservation_source"];
@@ -261,6 +285,8 @@ export type Database = {
           children?: number;
           nightly_rate: number;
           discount?: number;
+          package_name?: string | null;
+          package_total?: number | null;
           status?: Database["public"]["Enums"]["reservation_status"];
           source?: Database["public"]["Enums"]["reservation_source"];
           notes?: string | null;

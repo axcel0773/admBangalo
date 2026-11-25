@@ -1,4 +1,4 @@
-import { FileText, House, LogOut, UserRound, Users } from "lucide-react";
+import { FileText, House, LogOut, Tag, UserRound, Users } from "lucide-react";
 import type { Metadata } from "next";
 
 import { routes } from "@/components/layout/navigation";
@@ -38,6 +38,12 @@ export default async function SettingsPage() {
             leading={<IconTile><House /></IconTile>}
             title="Bangalôs"
             subtitle={`${pluralize(chalets.length, "bangalô cadastrado", "bangalôs cadastrados")} · capacidade, diária, horários`}
+          />
+          <ListRow
+            href={routes.packages}
+            leading={<IconTile tone="neutral"><Tag /></IconTile>}
+            title="Pacotes"
+            subtitle="Valores fechados: fim de semana, feriado…"
           />
           {/* Atalhos que no computador ficam no menu lateral; no celular moram aqui. */}
           <ListRow

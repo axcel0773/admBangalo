@@ -10,9 +10,20 @@ export function roundMoney(value: number): number {
   return Math.round((value + Number.EPSILON) * 100) / 100;
 }
 
-export function lodgingTotal(nights: number, nightlyRate: number, discount = 0): number {
+/**
+ * Hospedagem: valor fechado do pacote (quando houver) ou noites × diária; menos o desconto.
+ * Mesma regra da coluna gerada reservations.lodging_total (migração 0019).
+ */
+export function lodgingTotal(nights: number, nightlyRate: number, discount = 0, packageTotal: number | null = null): number {
   if (nights < 0) throw new RangeError("Número de noites não pode ser negativo");
-  return roundMoney(nights * nightlyRate - discount);
+  const base = packageTotal ?? nights * nightlyRate;
+  return roundMoney(base - discount);
+}
+
+/** Diária média de um pacote (só informativa: o valor cobrado é o total fechado). */
+export function averageNightlyRate(total: number, nights: number): number {
+  if (!(nights > 0)) return roundMoney(total);
+  return roundMoney(total / nights);
 }
 
 /** Pessoas que passam dos hóspedes incluídos na diária. */
@@ -86,9 +97,11 @@ export function quoteStay(input: {
   stay: StayContext;
   nightlyRate: number;
   discount?: number;
+  /** Valor fechado do pacote; null/undefined = cobra por diária. */
+  packageTotal?: number | null;
   fees: FeeRule[];
 }): StayQuote {
-  const lodging = lodgingTotal(input.stay.nights, input.nightlyRate, input.discount);
+  const lodging = lodgingTotal(input.stay.nights, input.nightlyRate, input.discount, input.packageTotal ?? null);
   const charges = buildChargeLines(input.fees, input.stay);
   const chargesTotal = sumCharges(charges);
   return { lodging, charges, chargesTotal, total: roundMoney(lodging + chargesTotal) };

@@ -330,6 +330,17 @@ Boas práticas que valem para todas as etapas seguintes.
 - [x] Ficha do hóspede se encaixa no celular (#62)
 - [x] **Revisão geral (15/11):** paginação em Hóspedes e Reservas, cores fixas viram tokens, Sair em dois toques, relatório anual por período, cache offline sem redirecionamentos, funções em São Paulo (`gru1`), teste E2E de telas no celular, documentação atualizada
 
+## Pacotes e valores redondos (25/11/2026) ✅
+
+Pedido do dono: cobrar valor fechado ("fim de semana = R$ 1.000") sem mostrar a diária ao hóspede, e parar de ver centavos quebrados (R$ 1.000 ÷ 3 = 333,33 → total 999,99).
+
+- [x] Migração `0019`: tabela `stay_packages` (RLS por dono); `package_name`/`package_total` em `reservations` e `quotes`; `lodging_total` passa a usar o valor do pacote; `create_reservation` grava o pacote. pgTAP `15_packages`
+- [x] Configurações › Pacotes: lista, novo, editar e excluir (reservas e orçamentos guardam uma cópia)
+- [x] Nova reserva e Novo orçamento: "Por diária / Pacote fechado", chips dos pacotes salvos (os de mesma quantidade de noites primeiro) e "Valor da hospedagem"
+- [x] Orçamento, PDF, WhatsApp, recibo e "Hospedagem e taxas" mostram o pacote em vez de noites × diária
+- [x] Reserva criada a partir de um orçamento cobra o mesmo valor do orçamento (pacote ou diária e desconto)
+- [x] Parcelas: "Dividir em 2x/3x/4x" com "Só valores redondos" (a sobra fica no sinal) e prévia; substitui o atalho "sinal 50% + saldo" (o 2x faz o mesmo)
+
 ### Pendências conhecidas (da revisão de 15/11)
 
 - [ ] **Migrações de produção são coladas à mão** no SQL Editor: não há registro de quais rodaram. Ideal: `supabase link` + `supabase db push`.

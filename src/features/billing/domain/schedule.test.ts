@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { isOwnReceiptPath, receiptPath, receiptProblem } from "./receipts";
-import { allocatePayments, balanceDueDate, depositAndBalance, nextInstallment, unscheduledAmount } from "./schedule";
+import { allocatePayments, balanceDueDate, isSplitCount, nextInstallment, splitPlan, unscheduledAmount } from "./schedule";
 
 const TODAY = "2026-11-10";
 
@@ -40,17 +40,56 @@ describe("parcelas previstas", () => {
     expect(unscheduledAmount(items, 1300)).toBe(-100);
   });
 
-  it("sugere sinal hoje e saldo no check-in", () => {
-    expect(depositAndBalance({ total: 1364.5, checkIn: "2026-12-20", today: TODAY })).toEqual([
-      { description: "Sinal 50%", amount: 682.25, due_date: TODAY },
+});
+
+describe("dividir o total em parcelas", () => {
+  const sum = (items: { amount: number }[]) => Math.round(items.reduce((total, item) => total + item.amount * 100, 0)) / 100;
+
+  it("valores redondos: a sobra fica no sinal", () => {
+    const plan = splitPlan({ total: 1250, count: 3, checkIn: "2026-12-12", today: "2026-11-25", wholeReais: true });
+    expect(plan.map((item) => item.amount)).toEqual([418, 416, 416]);
+    expect(sum(plan)).toBe(1250);
+  });
+
+  it("até o centavo: os centavos que sobram vão para as primeiras", () => {
+    const plan = splitPlan({ total: 1250, count: 3, checkIn: "2026-12-12", today: "2026-11-25", wholeReais: false });
+    expect(plan.map((item) => item.amount)).toEqual([416.67, 416.67, 416.66]);
+    expect(sum(plan)).toBe(1250);
+    expect(splitPlan({ total: 1000, count: 3, checkIn: "2026-12-12", today: TODAY, wholeReais: false }).map((i) => i.amount)).toEqual([
+      333.34, 333.33, 333.33,
+    ]);
+  });
+
+  it("total com centavos e redondos: só o sinal leva os centavos", () => {
+    const plan = splitPlan({ total: 1364.5, count: 2, checkIn: "2026-12-20", today: TODAY, wholeReais: true });
+    expect(plan.map((item) => item.amount)).toEqual([682.5, 682]);
+    expect(sum(plan)).toBe(1364.5);
+  });
+
+  it("2x equivale ao antigo sinal de 50% + saldo no check-in", () => {
+    expect(splitPlan({ total: 1364.5, count: 2, checkIn: "2026-12-20", today: TODAY, wholeReais: false })).toEqual([
+      { description: "Sinal", amount: 682.25, due_date: TODAY },
       { description: "Saldo no check-in", amount: 682.25, due_date: "2026-12-20" },
     ]);
-    // check-in já passou: tudo vence hoje
-    expect(depositAndBalance({ total: 100, checkIn: "2026-11-01", today: TODAY, depositPercent: 30 })[1]).toEqual({
-      description: "Saldo no check-in",
-      amount: 70,
-      due_date: TODAY,
-    });
+  });
+
+  it("sinal hoje, saldo no check-in e as do meio espaçadas", () => {
+    const plan = splitPlan({ total: 1200, count: 4, checkIn: "2026-11-19", today: TODAY, wholeReais: true });
+    expect(plan.map((item) => [item.description, item.due_date])).toEqual([
+      ["Sinal", "2026-11-10"],
+      ["Parcela 2", "2026-11-13"],
+      ["Parcela 3", "2026-11-16"],
+      ["Saldo no check-in", "2026-11-19"],
+    ]);
+  });
+
+  it("check-in já passou: tudo vence hoje; parcela zerada some", () => {
+    const plan = splitPlan({ total: 2, count: 3, checkIn: "2026-11-01", today: TODAY, wholeReais: true });
+    expect(plan).toEqual([{ description: "Sinal", amount: 2, due_date: TODAY }]);
+  });
+
+  it("aceita só 2, 3 ou 4 vezes", () => {
+    expect([1, 2, 3, 4, 5].filter(isSplitCount)).toEqual([2, 3, 4]);
   });
 });
 

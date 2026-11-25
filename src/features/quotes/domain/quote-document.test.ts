@@ -30,6 +30,11 @@ const chalet = { name: "Bangalô Asahi", check_in_time: "14:00:00", check_out_ti
 const base = { quote, chalet, issuer: "Bangalôs Guaratiba", issuerPhone: null, pixKey: "chave@exemplo.com" };
 
 describe("orçamento", () => {
+  it("pacote: a linha não mostra a diária quebrada", () => {
+    const lines = buildQuoteLines({ nights: 3, nightlyRate: 333.33, packageName: "Fim de semana", discount: 0, lodging: 1000, charges: [] });
+    expect(lines).toEqual([{ description: "Hospedagem: pacote Fim de semana (3 noites)", amount: 1000 }]);
+  });
+
   it("monta as linhas de hospedagem e taxas", () => {
     const lines = buildQuoteLines({
       nights: 2,

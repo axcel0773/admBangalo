@@ -1,8 +1,9 @@
 import { z } from "zod";
 
-import { integer, isoDate, money, optionalText, requiredText } from "@/lib/validation";
+import { checkbox, integer, isoDate, money, optionalText, requiredText } from "@/lib/validation";
 
 import { parseReading } from "./domain/meter";
+import { isSplitCount } from "./domain/schedule";
 
 /** Leitura opcional do medidor: vazio = ainda não anotada. */
 const reading = (label: string) =>
@@ -72,3 +73,12 @@ export const installmentSchema = z.object({
 });
 
 export type InstallmentInput = z.infer<typeof installmentSchema>;
+
+/** Dividir o total da reserva em 2, 3 ou 4 parcelas, com ou sem valores redondos. */
+export const splitPlanSchema = z.object({
+  count: z.coerce
+    .number({ invalid_type_error: "Escolha em quantas vezes" })
+    .int()
+    .refine(isSplitCount, "Escolha 2, 3 ou 4 vezes"),
+  whole_reais: checkbox,
+});

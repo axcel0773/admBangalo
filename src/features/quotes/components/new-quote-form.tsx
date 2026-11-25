@@ -11,12 +11,16 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { TextareaField } from "@/components/ui/textarea-field";
 import { blockWarning, overlappingBlocks, type ChaletBlock } from "@/features/availability/client";
 import { MAX_CHALET_GUESTS } from "@/features/chalets/domain";
+import type { PackageOption } from "@/features/packages/domain";
 import {
+  DEFAULT_PACKAGE_NAME,
+  LodgingPricingFields,
   nightlyBreakdown,
   nightsOf,
   QuoteSummary,
   quoteDraft,
   StayStep,
+  useLodgingPricing,
   validateDraft,
   type FeeForQuote,
   type SeasonRate,
@@ -43,6 +47,7 @@ interface NewQuoteFormProps {
   fees: FeeForQuote[];
   seasons: SeasonRate[];
   blocks: ChaletBlock[];
+  packages: PackageOption[];
   today: IsoDate;
   prefill: {
     chaletId?: string;
@@ -55,7 +60,7 @@ interface NewQuoteFormProps {
 }
 
 /** Novo orçamento: mesma estadia e mesmo cálculo da reserva, mas sem criar nada no calendário. */
-export function NewQuoteForm({ chalets, fees, seasons, blocks, today, prefill }: NewQuoteFormProps) {
+export function NewQuoteForm({ chalets, fees, seasons, blocks, packages, today, prefill }: NewQuoteFormProps) {
   const [state, formAction] = useActionState(createQuote, idleFormState);
 
   const initialChalet = chalets.find((c) => c.id === prefill.chaletId) ?? chalets[0];
@@ -71,6 +76,7 @@ export function NewQuoteForm({ chalets, fees, seasons, blocks, today, prefill }:
   const [nightlyRate, setNightlyRate] = useState("");
   const [rateTouched, setRateTouched] = useState(false);
   const [discount, setDiscount] = useState("");
+  const pricing = useLodgingPricing(packages);
 
   const chalet = chalets.find((c) => c.id === chaletId) ?? null;
   const nights = nightsOf(checkIn, checkOut);
@@ -98,7 +104,17 @@ export function NewQuoteForm({ chalets, fees, seasons, blocks, today, prefill }:
     ? `A temporada “${breakdown.minNightsIssue.label}” pede no mínimo ${pluralize(breakdown.minNightsIssue.minNights, "noite", "noites")}.`
     : null;
 
-  const draft = { chalet, checkIn, checkOut, adults, children, nightlyRate: rate, discount: discountValue };
+  const draft = {
+    chalet,
+    checkIn,
+    checkOut,
+    adults,
+    children,
+    nightlyRate: rate,
+    discount: discountValue,
+    packageTotal: pricing.packageTotal,
+  };
+  const packageName = pricing.mode === "package" ? (pricing.packageName ?? DEFAULT_PACKAGE_NAME) : null;
   const issues = validateDraft(draft);
   const quote = quoteDraft(draft, fees);
   const error = (name: string) => fieldError(state, name);
@@ -166,31 +182,30 @@ export function NewQuoteForm({ chalets, fees, seasons, blocks, today, prefill }:
           </FormSection>
 
           <FormSection title="Valores">
-            <FieldRow>
-              <Field
-                label="Diária (R$)"
-                name="nightly_rate"
-                inputMode="decimal"
-                mask="money"
-                value={rateText}
-                onChange={(event) => {
-                  setNightlyRate(event.target.value);
-                  setRateTouched(true);
-                }}
-                hint={rateHint}
-                error={error("nightly_rate")}
-              />
-              <Field
-                label="Desconto total (R$)"
-                name="discount"
-                inputMode="decimal"
-                mask="money"
-                placeholder="0,00"
-                value={discount}
-                onChange={(event) => setDiscount(event.target.value)}
-                error={error("discount")}
-              />
-            </FieldRow>
+            <LodgingPricingFields
+              pricing={pricing}
+              packages={packages}
+              nights={nights}
+              rateText={rateText}
+              rateHint={rateHint}
+              onRateChange={(value) => {
+                setNightlyRate(value);
+                setRateTouched(true);
+              }}
+              error={error}
+              discountField={
+                <Field
+                  label="Desconto total (R$)"
+                  name="discount"
+                  inputMode="decimal"
+                  mask="money"
+                  placeholder="0,00"
+                  value={discount}
+                  onChange={(event) => setDiscount(event.target.value)}
+                  error={error("discount")}
+                />
+              }
+            />
             <SelectField
               label="Validade do orçamento"
               name="validity_days"
@@ -213,7 +228,8 @@ export function NewQuoteForm({ chalets, fees, seasons, blocks, today, prefill }:
                 nights={nights}
                 nightlyRate={rate}
                 discount={discountValue}
-                seasonGroups={breakdown?.seasonal && !rateTouched ? breakdown.groups : undefined}
+                packageName={packageName}
+                seasonGroups={breakdown?.seasonal && !rateTouched && !packageName ? breakdown.groups : undefined}
               />
             </Card>
           ) : null}
@@ -228,7 +244,8 @@ export function NewQuoteForm({ chalets, fees, seasons, blocks, today, prefill }:
                 nights={nights}
                 nightlyRate={rate}
                 discount={discountValue}
-                seasonGroups={breakdown?.seasonal && !rateTouched ? breakdown.groups : undefined}
+                packageName={packageName}
+                seasonGroups={breakdown?.seasonal && !rateTouched && !packageName ? breakdown.groups : undefined}
               />
             ) : (
               <p className="text-sm text-ink-muted">Escolha bangalô e datas para ver os valores.</p>

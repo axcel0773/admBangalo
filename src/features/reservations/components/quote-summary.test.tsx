@@ -44,4 +44,17 @@ describe("QuoteSummary", () => {
       "2 noites fora de temporada a R$ 350,00 · 1 noite Réveillon a R$ 600,00",
     );
   });
+
+  it("pacote mostra o valor fechado, sem a diária", () => {
+    const packageQuote = quoteStay({
+      stay: { nights: 3, guests: 2, includedGuests: 2 },
+      nightlyRate: 333.33,
+      packageTotal: 1000,
+      fees: [{ name: "Limpeza", kind: "cleaning", mode: "per_stay", amount: 80 }],
+    });
+    render(<QuoteSummary quote={packageQuote} nights={3} nightlyRate={333.33} discount={0} packageName="Fim de semana" />);
+    expect(screen.getByText("pacote Fim de semana (3 noites)")).toBeTruthy();
+    expect(screen.queryByText(/333,33/)).toBeNull();
+    expect(brl(screen.getByText("Total previsto").nextElementSibling?.textContent ?? null)).toBe("R$ 1.080,00");
+  });
 });

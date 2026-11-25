@@ -49,4 +49,34 @@ describe("newReservationSchema", () => {
     });
     expect(result.error?.issues.map((issue) => issue.path.join("."))).toEqual(["check_out"]);
   });
+
+  it("pacote: grava o valor fechado e a diária média", () => {
+    const parsed = newReservationSchema.parse({
+      ...base,
+      check_out: "2026-11-23",
+      nightly_rate: "",
+      pricing_mode: "package",
+      package_name: "Fim de semana",
+      package_total: "1.000,00",
+      guest_mode: "new",
+      new_guest_name: "Ana",
+    });
+    expect(toCreateReservationPayload(parsed)).toMatchObject({
+      nightly_rate: 333.33,
+      package_name: "Fim de semana",
+      package_total: 1000,
+    });
+  });
+
+  it("por diária não manda pacote, mesmo que o campo venha preenchido", () => {
+    const parsed = newReservationSchema.parse({ ...base, package_total: "999", guest_mode: "new", new_guest_name: "Ana" });
+    expect(toCreateReservationPayload(parsed)).toMatchObject({ nightly_rate: 350, package_name: null, package_total: null });
+  });
+
+  it("exige o valor do pacote no modo pacote e a diária no modo diária", () => {
+    const pkg = newReservationSchema.safeParse({ ...base, pricing_mode: "package", guest_mode: "new", new_guest_name: "Ana" });
+    expect(pkg.error?.issues.map((issue) => issue.path.join("."))).toEqual(["package_total"]);
+    const nightly = newReservationSchema.safeParse({ ...base, nightly_rate: "", guest_mode: "new", new_guest_name: "Ana" });
+    expect(nightly.error?.issues.map((issue) => issue.path.join("."))).toEqual(["nightly_rate"]);
+  });
 });

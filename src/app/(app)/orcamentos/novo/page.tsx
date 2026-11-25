@@ -43,6 +43,7 @@ export default async function NewQuotePage({ searchParams }: NewQuotePageProps) 
             fees={context.fees}
             seasons={context.seasons}
             blocks={context.blocks}
+            packages={context.packages}
             today={todayIso()}
             prefill={{
               chaletId: chale,

@@ -69,6 +69,16 @@ describe("dados do recibo", () => {
   });
 });
 
+describe("recibo de pacote", () => {
+  it("mostra o pacote no lugar de noites × diária", () => {
+    const data = buildReceiptData({
+      ...input,
+      reservation: { ...input.reservation, nightly_rate: 333.33, discount: 0, package_name: "Fim de semana", lodging_total: 1000 },
+    });
+    expect(data.items[0]).toEqual({ description: "Hospedagem: pacote Fim de semana (3 noites)", amount: 1000 });
+  });
+});
+
 describe("chargeLabel e nome do arquivo", () => {
   it("só mostra a conta quando há quantidade diferente de 1", () => {
     expect(chargeLabel({ description: "Limpeza", mode: "fixed", quantity: 1, unit_amount: 150, total: 150 })).toBe("Limpeza");

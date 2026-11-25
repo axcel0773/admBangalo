@@ -99,7 +99,8 @@ Bibliotecas em uso hoje: `@supabase/ssr`, Tailwind v4 (design system próprio em
 | `chalet_rates` | tarifas sazonais | período, diária, mínimo de noites |
 | `fees` | modelos de taxa | tipo, modo, valor, aplicar automático |
 | `guests` | cadastro de hóspedes | nome, documento, telefone, cidade |
-| `reservations` | estadias | check-in/out, adultos, crianças, diária, desconto, status, origem |
+| `reservations` | estadias | check-in/out, adultos, crianças, diária, desconto, pacote (nome e valor), status, origem |
+| `stay_packages` | pacotes (valor fechado) | nome, noites, valor total |
 | `reservation_guests` | nomes de todos da estadia | nome, documento, criança, principal |
 | `reservation_charges` | taxas cobradas | valor unit., quantidade, leitura do medidor, total |
 | `payments` | recebimentos | sinal/parcela/saldo/estorno, método, valor, data, comprovante |
@@ -112,6 +113,7 @@ Views (todas `security_invoker`): `reservation_financials` (total, pago, saldo, 
 - Sem sobreposição de reservas ativas no mesmo chalé (`exclude using gist`); check-out pode coincidir com o próximo check-in.
 - Adultos + crianças ≤ capacidade do chalé (trigger).
 - Ao criar reserva, taxas automáticas viram cobranças. Pessoa extra cobra só acima dos hóspedes inclusos. Energia medida = (leitura final − inicial) × tarifa.
+- Hospedagem = valor do pacote (se houver) ou noites × diária, menos o desconto (`lodging_total`, migração `0019`). No pacote a diária gravada é só a média, informativa.
 - Total = hospedagem + taxas · Pago = pagamentos − estornos · Saldo = total − pago.
 
 Testado em Postgres 16: 3 noites × R$ 350, 3 hóspedes (2 inclusos), limpeza R$ 150, pessoa extra R$ 60/noite, 84,5 kWh × R$ 0,95, sinal R$ 600 → total R$ 1.460,28, saldo R$ 860,28, status parcial. Sobreposição e excesso de capacidade foram recusados; outro usuário não viu nenhum dado.
@@ -143,6 +145,7 @@ Testado em Postgres 16: 3 noites × R$ 350, 3 hóspedes (2 inclusos), limpeza R$
 | Busca ao vivo | `features/search` | páginas + hóspedes, reservas, orçamentos |
 | Bloqueios e iCal | `features/availability`, `0006` | link público por token; importação com proteção contra SSRF |
 | Notificações push | `features/notifications`, `0017`, `docs/notificacoes.md` | cron diário; função do banco protegida por segredo, sem `service_role` |
+| Pacotes e parcelas redondas | `features/packages`, `0019`, `billing/domain/schedule.ts` (`splitPlan`) | o hóspede vê só o total do pacote; parcelas sem centavos quebrados |
 | Modo offline (leitura) | `src/app/sw.ts`, `src/lib/offline.ts` | rede primeiro; só resposta 200 direta entra no cache |
 
 Rotas públicas (sem login): `/login`, `/auth/*`, `/offline`, `/ical/*` e `/api/cron/*` (esta confere `CRON_SECRET`).

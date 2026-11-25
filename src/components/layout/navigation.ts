@@ -39,6 +39,8 @@ export const routes = {
   newChalet: "/configuracoes/chales/novo",
   fees: "/configuracoes/taxas",
   newFee: "/configuracoes/taxas/nova",
+  packages: "/configuracoes/pacotes",
+  newPackage: "/configuracoes/pacotes/novo",
   newGuest: "/hospedes/novo",
   login: "/login",
 } as const;
@@ -47,6 +49,7 @@ export const routes = {
 export const paths = {
   chalet: (id: string) => `${routes.chalets}/${id}`,
   fee: (id: string) => `${routes.fees}/${id}`,
+  package: (id: string) => `${routes.packages}/${id}`,
   guest: (id: string) => `${routes.guests}/${id}`,
   editGuest: (id: string) => `${routes.guests}/${id}/editar`,
   reservation: (id: string) => `${routes.reservations}/${id}`,

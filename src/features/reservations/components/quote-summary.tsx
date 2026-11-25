@@ -3,6 +3,7 @@ import { Info } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { formatCurrency, formatDecimal, pluralize } from "@/lib/format";
 
+import { lodgingBasis } from "../domain/lodging";
 import type { StayQuote } from "../domain/pricing";
 import type { NightlyBreakdownGroup } from "../domain/seasons";
 import type { ChargeMode } from "../domain/types";
@@ -20,13 +21,15 @@ interface QuoteSummaryProps {
   nights: number;
   nightlyRate: number;
   discount: number;
+  /** Nome do pacote quando a hospedagem é valor fechado (aí a diária não aparece). */
+  packageName?: string | null;
   /** Noites por temporada (quando a diária é a média sugerida). */
   seasonGroups?: NightlyBreakdownGroup[];
   className?: string;
 }
 
 /** Prévia dos valores: hospedagem, taxas automáticas e total. */
-export function QuoteSummary({ quote, nights, nightlyRate, discount, seasonGroups, className }: QuoteSummaryProps) {
+export function QuoteSummary({ quote, nights, nightlyRate, discount, packageName, seasonGroups, className }: QuoteSummaryProps) {
   const hasMetered = quote.charges.some((charge) => charge.mode === "metered");
 
   return (
@@ -36,7 +39,7 @@ export function QuoteSummary({ quote, nights, nightlyRate, discount, seasonGroup
           <dt>
             <span className="font-semibold">Hospedagem</span>
             <span className="block text-xs text-ink-muted">
-              {pluralize(nights, "noite", "noites")} × {formatCurrency(nightlyRate)}
+              {lodgingBasis({ nights, nightlyRate, packageName })}
               {discount > 0 ? ` − ${formatCurrency(discount)} de desconto` : ""}
             </span>
             {seasonGroups ? (
