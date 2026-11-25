@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { IsoDate } from "@/lib/dates";
+import { chunk } from "@/lib/search-params";
 import { unwrapList } from "@/lib/supabase/result";
 import type { DbClient } from "@/lib/supabase/server";
 
@@ -98,6 +99,24 @@ export function createDashboardRepository(db: DbClient) {
     },
 
     /** Parcelas previstas das reservas com saldo (para o vencimento do "A receber"). */
+    /** Telefone do hóspede principal de cada reserva (para cobrar pelo WhatsApp). */
+    async listGuestPhones(reservationIds: string[]): Promise<Map<string, string | null>> {
+      const phones = new Map<string, string | null>();
+      for (const ids of chunk(reservationIds, 100)) {
+        const reservations = unwrapList(
+          await db.from("reservations").select("id, main_guest_id").in("id", ids),
+          "Listar hóspedes das reservas",
+        );
+        const guestIds = [...new Set(reservations.map((row) => row.main_guest_id))];
+        const guests = guestIds.length
+          ? unwrapList(await db.from("guests").select("id, phone").in("id", guestIds), "Listar telefones dos hóspedes")
+          : [];
+        const phoneByGuest = new Map(guests.map((guest) => [guest.id, guest.phone]));
+        for (const row of reservations) phones.set(row.id, phoneByGuest.get(row.main_guest_id) ?? null);
+      }
+      return phones;
+    },
+
     async listSchedulesFor(reservationIds: string[]): Promise<ScheduleRow[]> {
       if (reservationIds.length === 0) return [];
       const result = await db

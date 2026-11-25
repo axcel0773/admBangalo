@@ -12,6 +12,7 @@ export const SEARCH_PAGES: SearchPage[] = [
   { label: "Novo orçamento", description: "Montar um orçamento", href: routes.newQuote },
   { label: "Hóspedes", description: "Contatos e histórico", href: routes.guests, keywords: ["clientes"] },
   { label: "Financeiro", description: "Receita e lucro do mês", href: routes.finance, keywords: ["dinheiro"] },
+  { label: "A receber", description: "Saldos em aberto e cobranças", href: routes.receivables, keywords: ["cobrar", "cobrancas", "pendentes", "saldo"] },
   { label: "Despesas", description: "Lançar e ver gastos", href: routes.expenses, keywords: ["gastos"] },
   { label: "Relatórios", description: "Ocupação e diária média", href: routes.reports },
   { label: "Limpeza", description: "Faxinas das saídas", href: routes.cleaning, keywords: ["faxina"] },

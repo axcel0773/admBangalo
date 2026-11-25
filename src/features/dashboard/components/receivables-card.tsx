@@ -47,8 +47,8 @@ export function ReceivablesCard({ receivables }: { receivables: Receivable[] }) 
           ))}
         </ul>
       )}
-      <ButtonLink href={routes.finance} variant="ghost" block className="mt-auto bg-canvas">
-        Abrir financeiro
+      <ButtonLink href={routes.receivables} variant="ghost" block className="mt-auto bg-canvas">
+        Ver todos a receber
       </ButtonLink>
     </CardSection>
   );
