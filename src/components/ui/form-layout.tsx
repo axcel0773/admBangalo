@@ -39,7 +39,7 @@ export function FormActions({ children, className }: { children: ReactNode; clas
   return (
     <div
       className={cn(
-        "keyboard-static sticky bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-30 -mx-4 flex gap-3 border-t border-line bg-surface/95 px-4 py-3 backdrop-blur md:static md:mx-0 md:justify-end md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none [&>*]:flex-1 md:[&>*]:flex-none",
+        "keyboard-static sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 -mx-4 flex gap-3 border-t border-line bg-surface/95 px-4 pt-3 pb-8 backdrop-blur md:static md:pb-0 md:mx-0 md:justify-end md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none [&>*]:flex-1 md:[&>*]:flex-none",
         className,
       )}
     >
