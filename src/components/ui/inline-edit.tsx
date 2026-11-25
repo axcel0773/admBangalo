@@ -49,7 +49,13 @@ export function InlineEdit({ children, trailing, editor, below, label, rowClassN
         </Button>
         {trailing}
       </div>
-      {open ? <CloseContext.Provider value={() => setOpen(false)}>{editor}</CloseContext.Provider> : below}
+      {open ? (
+        <CloseContext.Provider value={() => setOpen(false)}>
+          <div className="animate-expand origin-top">{editor}</div>
+        </CloseContext.Provider>
+      ) : (
+        below
+      )}
     </>
   );
 }

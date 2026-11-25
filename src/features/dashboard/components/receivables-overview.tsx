@@ -66,7 +66,7 @@ export function ReceivablesList({ items, filter }: { items: ReceivableEntry[]; f
             <span>{group.label}</span>
             <Money value={group.total} />
           </h2>
-          <ul className="divide-y divide-line overflow-hidden rounded-card bg-surface shadow-card">
+          <ul className="stagger divide-y divide-line overflow-hidden rounded-card bg-surface shadow-card">
             {group.items.map((item) => {
               const href = whatsappUrl(item.phone, item.message);
               return (

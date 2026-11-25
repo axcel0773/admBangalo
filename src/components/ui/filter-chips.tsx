@@ -18,7 +18,7 @@ export function FilterChips({ chips, label }: { chips: FilterChip[]; label: stri
           href={chip.href}
           aria-current={chip.active ? "true" : undefined}
           className={cn(
-            "inline-flex h-9 shrink-0 items-center rounded-full border px-4 text-[13px] whitespace-nowrap",
+            "inline-flex h-9 shrink-0 items-center rounded-full border px-4 text-[13px] whitespace-nowrap transition-[color,background-color,border-color,transform] duration-200 active:scale-95",
             chip.active
               ? "border-ink bg-ink font-semibold text-surface"
               : "border-line-strong bg-surface text-ink-soft hover:bg-subtle",

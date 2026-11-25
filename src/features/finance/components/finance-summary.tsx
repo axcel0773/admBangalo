@@ -37,7 +37,7 @@ interface FinanceSummaryProps {
 /** Indicadores do mês. Celular: 2 colunas, dinheiro primeiro. */
 export function FinanceSummary({ report, previous }: FinanceSummaryProps) {
   return (
-    <section aria-label="Indicadores do mês" className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
+    <section aria-label="Indicadores do mês" className="stagger grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
       <StatCard
         label="Previsto"
         icon={<Landmark />}

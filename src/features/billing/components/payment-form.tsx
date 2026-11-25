@@ -57,7 +57,7 @@ export function PaymentForm({ action, suggestedKind, suggestedAmount, today, own
   const v = (name: string, fallback?: string) => valueOf(state, name, fallback);
 
   return (
-    <form action={formAction} className="flex flex-col gap-3" noValidate>
+    <form action={formAction} className="animate-expand flex origin-top flex-col gap-3" noValidate>
       <FormAlert state={state} />
       <FieldRow>
         <SelectField

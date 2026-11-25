@@ -43,7 +43,7 @@ export function InstallmentForm({ action, suggestedAmount, suggestedDate }: Inst
   const v = (name: string, fallback?: string) => valueOf(state, name, fallback);
 
   return (
-    <form action={formAction} className="flex flex-col gap-3 rounded-2xl bg-canvas p-3" noValidate>
+    <form action={formAction} className="animate-expand flex origin-top flex-col gap-3 rounded-2xl bg-canvas p-3" noValidate>
       <FormAlert state={state} />
       <Field label="Descrição" name="description" placeholder="Parcela 2" defaultValue={v("description")} required error={error("description")} />
       <FieldRow>
