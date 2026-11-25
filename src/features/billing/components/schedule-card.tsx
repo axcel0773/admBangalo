@@ -3,14 +3,16 @@ import { CalendarClock, X } from "lucide-react";
 import { ActionForm } from "@/components/ui/action-form";
 import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { CardSection } from "@/components/ui/card";
+import { InlineEdit } from "@/components/ui/inline-edit";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { formatShortDate, type IsoDate } from "@/lib/dates";
 import { formatCurrency } from "@/lib/format";
 
-import { addDepositPlan, addInstallment, removeInstallment } from "../actions";
+import { addDepositPlan, addInstallment, editInstallment, removeInstallment } from "../actions";
 import { unscheduledAmount, type InstallmentProgress, type InstallmentStatus } from "../domain/schedule";
 import type { PixCharge } from "../services";
+import { InstallmentEditForm } from "./installment-edit-form";
 import { InstallmentForm } from "./installment-form";
 import { PixCopy } from "./pix-copy";
 
@@ -56,7 +58,40 @@ export function ScheduleCard({ reservationId, schedule, total, checkIn, today, c
         <ul className="mb-3 divide-y divide-line">
           {schedule.map((item) => (
             <li key={item.id} className="flex flex-col gap-2 py-3">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <InlineEdit
+                label={item.description}
+                rowClassName="flex flex-wrap items-center gap-x-2 gap-y-2"
+                editor={
+                  <InstallmentEditForm
+                    action={editInstallment.bind(null, reservationId, item.id)}
+                    initial={{ description: item.description, amount: item.amount, due_date: item.due_date }}
+                    covered={item.covered}
+                  />
+                }
+                below={
+                  nextPix?.installmentId === item.id ? (
+                    <div className="rounded-2xl bg-primary-strong p-3">
+                      <p className="mb-2 text-xs text-on-primary/75">Cobrar só esta parcela: {formatCurrency(nextPix.amount)}</p>
+                      <PixCopy payload={nextPix.payload} />
+                    </div>
+                  ) : null
+                }
+                trailing={
+                  <ActionForm action={removeInstallment.bind(null, reservationId, item.id)} className="contents">
+                    <ConfirmSubmit
+                      message={`Remover a parcela “${item.description}”? Pagamentos já lançados não mudam.`}
+                      confirmLabel="Remover"
+                      pendingLabel="Removendo…"
+                      triggerSize="icon"
+                      triggerLabel={`Remover ${item.description}`}
+                      block={false}
+                      className="size-11 text-ink-muted md:size-9"
+                    >
+                      <X aria-hidden="true" />
+                    </ConfirmSubmit>
+                  </ActionForm>
+                }
+              >
                 <span className="min-w-0 flex-1">
                   <span className="flex flex-wrap items-center gap-2 text-sm font-semibold">
                     {item.description}
@@ -70,26 +105,7 @@ export function ScheduleCard({ reservationId, schedule, total, checkIn, today, c
                   </span>
                 </span>
                 <span className="text-[15px] font-bold tabular-nums">{formatCurrency(item.amount)}</span>
-                <ActionForm action={removeInstallment.bind(null, reservationId, item.id)} className="contents">
-                  <ConfirmSubmit
-                    message={`Remover a parcela “${item.description}”? Pagamentos já lançados não mudam.`}
-                    confirmLabel="Remover"
-                    pendingLabel="Removendo…"
-                    triggerSize="icon"
-                    triggerLabel={`Remover ${item.description}`}
-                    block={false}
-                    className="size-11 text-ink-muted md:size-9"
-                  >
-                    <X aria-hidden="true" />
-                  </ConfirmSubmit>
-                </ActionForm>
-              </div>
-              {nextPix?.installmentId === item.id ? (
-                <div className="rounded-2xl bg-primary-strong p-3">
-                  <p className="mb-2 text-xs text-on-primary/75">Cobrar só esta parcela: {formatCurrency(nextPix.amount)}</p>
-                  <PixCopy payload={nextPix.payload} />
-                </div>
-              ) : null}
+              </InlineEdit>
             </li>
           ))}
         </ul>

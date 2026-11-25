@@ -9,10 +9,10 @@ import { errorFormState, formDataToObject, invalidFormState, submittedValues, ty
 import { assertIds, INVALID_ID_MESSAGE, isUuid } from "@/lib/ids";
 import { MutationError } from "@/lib/supabase/errors";
 
-import { validatePayment } from "./domain/payments";
+import { contextWithout, validatePayment } from "./domain/payments";
 import { isOwnReceiptPath } from "./domain/receipts";
 import { depositAndBalance } from "./domain/schedule";
-import { extraChargeSchema, installmentSchema, meterReadingSchema, paymentSchema } from "./schemas";
+import { extraChargeSchema, installmentSchema, meterReadingSchema, paymentEditSchema, paymentSchema } from "./schemas";
 import { billingRepository } from "./services";
 
 /** Valores e saldos aparecem no Painel, Financeiro, listas e ficha do hóspede. */
@@ -116,6 +116,41 @@ export async function registerPayment(reservationId: string, _prev: FormState, f
   );
 }
 
+/**
+ * Corrige um lançamento (valor, data, forma, tipo, observação). O comprovante não muda.
+ * As mesmas regras do registro valem, contando o saldo como se este lançamento não existisse.
+ * Use com `.bind(null, reservationId, paymentId)`.
+ */
+export async function editPayment(
+  reservationId: string,
+  paymentId: string,
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  if (!isUuid(reservationId) || !isUuid(paymentId)) return errorFormState(INVALID_ID_MESSAGE, formData);
+  const parsed = paymentEditSchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) return invalidFormState(parsed.error, formData);
+
+  const repo = await billingRepository();
+  const [context, current] = await Promise.all([repo.findContext(reservationId), repo.findPayment(reservationId, paymentId)]);
+  if (!context || !current) return errorFormState("Lançamento não encontrado.", formData);
+
+  const problem = validatePayment(
+    parsed.data,
+    contextWithout({ reservationStatus: context.status, paid: context.paid, balance: context.balance }, current),
+  );
+  if (problem) {
+    return {
+      status: "error",
+      message: problem.message,
+      fieldErrors: { [problem.field]: problem.message },
+      values: submittedValues(formData),
+    };
+  }
+
+  return run(formData, () => repo.updatePayment(reservationId, paymentId, parsed.data), "Lançamento atualizado.");
+}
+
 /** Use com `.bind(null, reservationId, paymentId)`. */
 export async function removePayment(reservationId: string, paymentId: string): Promise<FormState> {
   return attempt(async () => {
@@ -154,6 +189,24 @@ export async function addDepositPlan(reservationId: string): Promise<FormState> 
     );
     refresh();
   });
+}
+
+/** Corrige descrição, valor ou vencimento da parcela. Use com `.bind(null, reservationId, installmentId)`. */
+export async function editInstallment(
+  reservationId: string,
+  installmentId: string,
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  if (!isUuid(reservationId) || !isUuid(installmentId)) return errorFormState(INVALID_ID_MESSAGE, formData);
+  const parsed = installmentSchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) return invalidFormState(parsed.error, formData);
+
+  return run(
+    formData,
+    async () => (await billingRepository()).updateInstallment(reservationId, installmentId, parsed.data),
+    "Parcela atualizada.",
+  );
 }
 
 /** Use com `.bind(null, reservationId, installmentId)`. */
