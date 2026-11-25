@@ -11,12 +11,14 @@ import { StepIndicator } from "@/components/ui/step-indicator";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { blockWarning, overlappingBlocks, type ChaletBlock } from "@/features/availability/domain/blocks";
 import { MAX_CHALET_GUESTS } from "@/features/chalets/domain";
+import type { PackageOption } from "@/features/packages/domain";
 import { addDays, type IsoDate } from "@/lib/dates";
 import { fieldError, idleFormState } from "@/lib/forms";
 import { formatCurrency, formatMoneyInput, pluralize } from "@/lib/format";
 import { parseMoney } from "@/lib/money";
 
 import { createReservation } from "../../actions";
+import { DEFAULT_PACKAGE_NAME } from "../../domain/lodging";
 import { nightsOf, quoteDraft, validateDraft, type FeeForQuote } from "../../domain/quote";
 import { nightlyBreakdown, type SeasonRate } from "../../domain/seasons";
 import { QuoteSummary } from "../quote-summary";
@@ -25,6 +27,7 @@ import { CompanionsFields, type CompanionDraft } from "./companions-fields";
 import { PricingStep } from "./pricing-step";
 import { StayStep } from "./stay-step";
 import { GuestPicker, type GuestMode, type GuestOption, type NewGuestDraft } from "./guest-picker";
+import { useLodgingPricing, type LodgingPricingInitial } from "./lodging-pricing";
 
 const STEPS = ["Estadia", "Hóspedes", "Valores"];
 
@@ -41,7 +44,9 @@ const FIELD_STEP: Record<string, number> = {
   new_guest_phone: 1,
   new_guest_document: 1,
   companions: 1,
+  pricing_mode: 2,
   nightly_rate: 2,
+  package_total: 2,
   discount: 2,
   notes: 2,
 };
@@ -54,6 +59,7 @@ interface NewReservationFormProps {
   guests: GuestOption[];
   seasons: SeasonRate[];
   blocks: ChaletBlock[];
+  packages: PackageOption[];
   today: IsoDate;
   prefill: {
     chaletId?: string;
@@ -67,10 +73,12 @@ interface NewReservationFormProps {
     guestPhone?: string;
     /** Orçamento de origem (vira "aceito" quando a reserva é criada). */
     quoteId?: string;
+    /** Valores do orçamento de origem: a reserva cobra o mesmo que foi enviado ao hóspede. */
+    pricing?: LodgingPricingInitial & { nightlyRate?: number; discount?: number };
   };
 }
 
-export function NewReservationForm({ chalets, fees, guests, seasons, blocks, today, prefill }: NewReservationFormProps) {
+export function NewReservationForm({ chalets, fees, guests, seasons, blocks, packages, today, prefill }: NewReservationFormProps) {
   const [state, formAction] = useActionState(createReservation, idleFormState);
   const topRef = useRef<HTMLDivElement>(null);
 
@@ -97,9 +105,11 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
   });
   const [companions, setCompanions] = useState<CompanionDraft[]>([]);
   // Diária: segue a sugestão (base ou média da temporada) até o dono digitar outra.
-  const [nightlyRate, setNightlyRate] = useState("");
-  const [rateTouched, setRateTouched] = useState(false);
-  const [discount, setDiscount] = useState("");
+  // Vindo de um orçamento, a diária dele vale como se o dono tivesse digitado.
+  const [nightlyRate, setNightlyRate] = useState(formatMoneyInput(prefill.pricing?.nightlyRate ?? null));
+  const [rateTouched, setRateTouched] = useState(prefill.pricing?.nightlyRate !== undefined);
+  const [discount, setDiscount] = useState(prefill.pricing?.discount ? formatMoneyInput(prefill.pricing.discount) : "");
+  const pricing = useLodgingPricing(packages, prefill.pricing);
   const [notes, setNotes] = useState("");
   const [confirmed, setConfirmed] = useState(true);
   const [stepError, setStepError] = useState<string | null>(null);
@@ -129,7 +139,16 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
       : "Diária base do bangalô.";
   const discountValue = parseMoney(discount) ?? 0;
 
-  const draft = { chalet, checkIn, checkOut, adults, children, nightlyRate: rate, discount: discountValue };
+  const draft = {
+    chalet,
+    checkIn,
+    checkOut,
+    adults,
+    children,
+    nightlyRate: rate,
+    discount: discountValue,
+    packageTotal: pricing.packageTotal,
+  };
   const issues = validateDraft(draft);
   // Sem useMemo: o React Compiler já memoiza este cálculo puro.
   const quote = quoteDraft(draft, fees);
@@ -278,6 +297,9 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
           {/* Etapa 3 — Valores */}
           <div hidden={step !== 2} className="flex flex-col gap-4 md:gap-6">
             <PricingStep
+              pricing={pricing}
+              packages={packages}
+              nights={nights}
               rateText={rateText}
               rateHint={rateHint}
               onRateChange={(value) => {
@@ -294,7 +316,14 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
             />
             {quote ? (
               <Card className="p-4 md:p-6 lg:hidden">
-                <QuoteSummary quote={quote} nights={nights} nightlyRate={rate} discount={discountValue} seasonGroups={breakdown?.seasonal && !rateTouched ? breakdown.groups : undefined} />
+                <QuoteSummary
+                  quote={quote}
+                  nights={nights}
+                  nightlyRate={rate}
+                  discount={discountValue}
+                  packageName={pricing.mode === "package" ? (pricing.packageName ?? DEFAULT_PACKAGE_NAME) : null}
+                  seasonGroups={breakdown?.seasonal && !rateTouched && pricing.mode === "nightly" ? breakdown.groups : undefined}
+                />
               </Card>
             ) : null}
           </div>
@@ -305,7 +334,14 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, tod
           <Card className="p-6">
             <p className="mb-3 font-display text-lg font-semibold">{chalet?.name ?? "Resumo"}</p>
             {quote ? (
-              <QuoteSummary quote={quote} nights={nights} nightlyRate={rate} discount={discountValue} seasonGroups={breakdown?.seasonal && !rateTouched ? breakdown.groups : undefined} />
+              <QuoteSummary
+                  quote={quote}
+                  nights={nights}
+                  nightlyRate={rate}
+                  discount={discountValue}
+                  packageName={pricing.mode === "package" ? (pricing.packageName ?? DEFAULT_PACKAGE_NAME) : null}
+                  seasonGroups={breakdown?.seasonal && !rateTouched && pricing.mode === "nightly" ? breakdown.groups : undefined}
+                />
             ) : (
               <p className="text-sm text-ink-muted">Escolha bangalô e datas para ver os valores.</p>
             )}

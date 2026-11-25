@@ -6,6 +6,8 @@ import { isUuid } from "@/lib/ids";
 import { document, integer, isoDate, money, optionalText, phone } from "@/lib/validation";
 import type { Json } from "@/types/database";
 
+import { PRICING_MODES, resolveLodgingPricing, type LodgingPricing } from "./domain/lodging";
+
 const companionSchema = z.object({
   full_name: z.string().trim().max(120),
   is_child: z.boolean().default(false),
@@ -26,6 +28,54 @@ const companionsField = z
   })
   .pipe(z.array(companionSchema).max(30));
 
+/** Dinheiro opcional: vazio vira undefined; preenchido segue as regras de `money`. */
+const optionalMoney = (label: string) =>
+  z
+    .string()
+    .optional()
+    .transform((value) => (value && value.trim() ? value : undefined))
+    .pipe(money(label).optional());
+
+/**
+ * Campos de valor da hospedagem, iguais na nova reserva e no orçamento:
+ * por diária (nightly_rate) ou pacote fechado (package_total + package_name).
+ */
+export const lodgingPricingFields = {
+  pricing_mode: z.enum(PRICING_MODES).default("nightly"),
+  nightly_rate: optionalMoney("Diária"),
+  package_total: optionalMoney("Valor da hospedagem"),
+  package_name: z.string().trim().max(60, "Nome do pacote tem no máximo 60 caracteres").optional(),
+};
+
+type LodgingPricingInput = {
+  pricing_mode: (typeof PRICING_MODES)[number];
+  nightly_rate?: number;
+  package_total?: number;
+};
+
+/** Exige a diária ou o valor do pacote, conforme o modo escolhido. */
+export function checkLodgingPricing(data: LodgingPricingInput, ctx: z.RefinementCtx): void {
+  if (data.pricing_mode === "nightly" && data.nightly_rate === undefined) {
+    ctx.addIssue({ code: "custom", path: ["nightly_rate"], message: "Diária é obrigatório" });
+  }
+  if (data.pricing_mode === "package" && !(data.package_total !== undefined && data.package_total > 0)) {
+    ctx.addIssue({ code: "custom", path: ["package_total"], message: "Informe o valor do pacote" });
+  }
+}
+
+/** Diária, nome e valor do pacote que vão para o banco (a diária do pacote é a média, só informativa). */
+export function lodgingPricingOf(
+  input: LodgingPricingInput & { package_name?: string; check_in: string; check_out: string },
+): LodgingPricing {
+  return resolveLodgingPricing({
+    mode: input.pricing_mode,
+    nights: Math.max(daysBetween(input.check_in, input.check_out), 1),
+    nightlyRate: input.nightly_rate,
+    packageName: input.package_name,
+    packageTotal: input.package_total,
+  });
+}
+
 export const newReservationSchema = z
   .object({
     chalet_id: z.string({ required_error: "Escolha o bangalô" }).uuid("Escolha o bangalô"),
@@ -41,7 +91,7 @@ export const newReservationSchema = z
     new_guest_phone: phone,
     new_guest_document: document,
     companions: companionsField,
-    nightly_rate: money("Diária"),
+    ...lodgingPricingFields,
     discount: z
       .string()
       .optional()
@@ -55,6 +105,7 @@ export const newReservationSchema = z
       .transform((value) => (value && isUuid(value) ? value : undefined)),
   })
   .superRefine((data, ctx) => {
+    checkLodgingPricing(data, ctx);
     if (data.adults + data.children > MAX_CHALET_GUESTS) {
       ctx.addIssue({
         code: "custom",
@@ -85,7 +136,7 @@ export function toCreateReservationPayload(input: NewReservationInput): Json {
     children: input.children,
     source: input.source,
     status: input.status,
-    nightly_rate: input.nightly_rate,
+    ...lodgingPricingOf(input),
     discount: input.discount,
     notes: input.notes,
     main_guest_id: input.guest_mode === "existing" ? (input.main_guest_id ?? null) : null,

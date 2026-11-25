@@ -1,11 +1,17 @@
 "use client";
 
 import { Field } from "@/components/ui/field";
-import { FieldRow, FormSection } from "@/components/ui/form-layout";
+import { FormSection } from "@/components/ui/form-layout";
 import { SwitchField } from "@/components/ui/switch-field";
 import { TextareaField } from "@/components/ui/textarea-field";
+import type { PackageOption } from "@/features/packages/domain";
+
+import { LodgingPricingFields, type LodgingPricingState } from "./lodging-pricing";
 
 interface PricingStepProps {
+  pricing: LodgingPricingState;
+  packages: PackageOption[];
+  nights: number;
   rateText: string;
   rateHint?: string;
   onRateChange: (value: string) => void;
@@ -18,8 +24,11 @@ interface PricingStepProps {
   error: (name: string) => string | undefined;
 }
 
-/** Etapa 3 da nova reserva: diária, desconto, observações e confirmação. */
+/** Etapa 3 da nova reserva: diária ou pacote, desconto, observações e confirmação. */
 export function PricingStep({
+  pricing,
+  packages,
+  nights,
   rateText,
   rateHint,
   onRateChange,
@@ -33,28 +42,27 @@ export function PricingStep({
 }: PricingStepProps) {
   return (
     <FormSection title="Valores">
-      <FieldRow>
-        <Field
-          label="Diária (R$)"
-          name="nightly_rate"
-          inputMode="decimal"
-          mask="money"
-          value={rateText}
-          onChange={(event) => onRateChange(event.target.value)}
-          hint={rateHint}
-          error={error("nightly_rate")}
-        />
-        <Field
-          label="Desconto total (R$)"
-          name="discount"
-          inputMode="decimal"
-          mask="money"
-          placeholder="0,00"
-          value={discount}
-          onChange={(event) => onDiscountChange(event.target.value)}
-          error={error("discount")}
-        />
-      </FieldRow>
+      <LodgingPricingFields
+        pricing={pricing}
+        packages={packages}
+        nights={nights}
+        rateText={rateText}
+        rateHint={rateHint}
+        onRateChange={onRateChange}
+        error={error}
+        discountField={
+          <Field
+            label="Desconto total (R$)"
+            name="discount"
+            inputMode="decimal"
+            mask="money"
+            placeholder="0,00"
+            value={discount}
+            onChange={(event) => onDiscountChange(event.target.value)}
+            error={error("discount")}
+          />
+        }
+      />
       <TextareaField
         label="Observações"
         name="notes"

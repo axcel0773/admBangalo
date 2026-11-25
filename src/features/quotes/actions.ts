@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { paths, routes } from "@/components/layout/navigation";
 import { getNewReservationContext, nightsOf, quoteDraft, validateDraft } from "@/features/reservations";
+import { lodgingPricingOf } from "@/features/reservations/schemas";
 import { suggestedDeposit, normalizeDepositPercent } from "@/features/billing/domain/deposit";
 import { getMyProfile } from "@/features/profile/services";
 import { attempt } from "@/lib/actions";
@@ -28,14 +29,16 @@ export async function createQuote(_prev: FormState, formData: FormData): Promise
   const chalet = context.chalets.find((candidate) => candidate.id === input.chalet_id);
   if (!chalet) return errorFormState("Bangalô não encontrado.", formData);
 
+  const pricing = lodgingPricingOf(input);
   const draft = {
     chalet,
     checkIn: input.check_in,
     checkOut: input.check_out,
     adults: input.adults,
     children: input.children,
-    nightlyRate: input.nightly_rate,
+    nightlyRate: pricing.nightly_rate,
     discount: input.discount,
+    packageTotal: pricing.package_total,
   };
   const issues = validateDraft(draft);
   if (issues.capacity) return errorFormState(issues.capacity, formData);
@@ -55,11 +58,12 @@ export async function createQuote(_prev: FormState, formData: FormData): Promise
       check_out: input.check_out,
       adults: input.adults,
       children: input.children,
-      nightly_rate: input.nightly_rate,
+      ...pricing,
       discount: input.discount,
       lines: buildQuoteLines({
         nights: nightsOf(input.check_in, input.check_out),
-        nightlyRate: input.nightly_rate,
+        nightlyRate: pricing.nightly_rate,
+        packageName: pricing.package_name,
         discount: input.discount,
         lodging: quote.lodging,
         charges: quote.charges,

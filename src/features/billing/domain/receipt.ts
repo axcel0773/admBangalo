@@ -1,3 +1,4 @@
+import { lodgingLine } from "@/features/reservations/domain/lodging";
 import { formatShortDate, type IsoDate } from "@/lib/dates";
 import { formatCurrency, formatDecimal, pluralize } from "@/lib/format";
 
@@ -34,6 +35,8 @@ export interface ReceiptInput {
     nights: number;
     nightly_rate: number;
     discount: number;
+    /** Pacote (valor fechado); ausente ou nulo = por diária. */
+    package_name?: string | null;
     lodging_total: number;
     adults: number;
     children: number;
@@ -64,9 +67,12 @@ export function chargeLabel(charge: ReceiptInput["charges"][number]): string {
 
 export function buildReceiptData(input: ReceiptInput): ReceiptData {
   const { reservation, chalet } = input;
-  const lodging =
-    `Hospedagem: ${pluralize(reservation.nights, "noite", "noites")} × ${formatCurrency(reservation.nightly_rate)}` +
-    (reservation.discount > 0 ? ` − desconto ${formatCurrency(reservation.discount)}` : "");
+  const lodging = lodgingLine({
+    nights: reservation.nights,
+    nightlyRate: reservation.nightly_rate,
+    discount: reservation.discount,
+    packageName: reservation.package_name,
+  });
 
   return {
     number: input.reservationId.slice(0, 8).toUpperCase(),

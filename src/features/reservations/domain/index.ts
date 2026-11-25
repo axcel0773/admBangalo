@@ -1,3 +1,4 @@
+export * from "./lodging";
 export * from "./messages";
 export * from "./payments";
 export * from "./pricing";

@@ -3,7 +3,8 @@ import { X, Zap } from "lucide-react";
 import { ActionForm } from "@/components/ui/action-form";
 import { CardSection } from "@/components/ui/card";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
-import { formatCurrency, formatDecimal, pluralize } from "@/lib/format";
+import { lodgingBasis } from "@/features/reservations/domain/lodging";
+import { formatCurrency, formatDecimal } from "@/lib/format";
 import type { Tables } from "@/types/database";
 
 import { addExtraCharge, removeCharge } from "../actions";
@@ -14,7 +15,7 @@ type Charge = Tables<"reservation_charges">;
 interface ChargesCardProps {
   reservation: Pick<
     Tables<"reservations">,
-    "id" | "status" | "nights" | "nightly_rate" | "discount" | "lodging_total"
+    "id" | "status" | "nights" | "nightly_rate" | "discount" | "package_name" | "lodging_total"
   >;
   charges: Charge[];
   grandTotal: number;
@@ -38,7 +39,11 @@ export function ChargesCard({ reservation, charges, grandTotal }: ChargesCardPro
           <dt>
             <span className="font-semibold">Hospedagem</span>
             <span className="block text-xs text-ink-muted">
-              {pluralize(reservation.nights, "noite", "noites")} × {formatCurrency(reservation.nightly_rate)}
+              {lodgingBasis({
+                nights: reservation.nights,
+                nightlyRate: reservation.nightly_rate,
+                packageName: reservation.package_name,
+              })}
               {reservation.discount > 0 ? ` − ${formatCurrency(reservation.discount)}` : ""}
             </span>
           </dt>

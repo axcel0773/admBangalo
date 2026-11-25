@@ -5,6 +5,7 @@ import { routes } from "@/components/layout/navigation";
 import { PageBody, PageHeader } from "@/components/layout/page-header";
 import { ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { getQuote } from "@/features/quotes";
 import { getNewReservationContext, NewReservationForm } from "@/features/reservations";
 import { isIsoDate, todayIso } from "@/lib/dates";
 import { isUuid } from "@/lib/ids";
@@ -28,6 +29,14 @@ interface NewReservationPageProps {
 
 export default async function NewReservationPage({ searchParams }: NewReservationPageProps) {
   const [{ chale, entrada, saida, adultos, criancas, hospede, nome, telefone, orcamento }, context] = await Promise.all([searchParams, getNewReservationContext()]);
+  const quoteId = orcamento && isUuid(orcamento) ? orcamento : undefined;
+  // A reserva nascida de um orçamento cobra o mesmo valor que foi enviado ao hóspede.
+  const quote = quoteId ? await getQuote(quoteId) : null;
+  const pricing = quote
+    ? quote.package_total !== null
+      ? { mode: "package" as const, packageName: quote.package_name, packageTotal: quote.package_total, discount: quote.discount }
+      : { mode: "nightly" as const, nightlyRate: quote.nightly_rate, discount: quote.discount }
+    : undefined;
 
   return (
     <>
@@ -47,6 +56,7 @@ export default async function NewReservationPage({ searchParams }: NewReservatio
             guests={context.guests}
             seasons={context.seasons}
             blocks={context.blocks}
+            packages={context.packages}
             today={todayIso()}
             prefill={{
               chaletId: chale,
@@ -57,7 +67,8 @@ export default async function NewReservationPage({ searchParams }: NewReservatio
               guestId: hospede,
               guestName: nome?.slice(0, 120),
               guestPhone: telefone?.slice(0, 20),
-              quoteId: orcamento && isUuid(orcamento) ? orcamento : undefined,
+              quoteId,
+              pricing,
             }}
           />
         )}

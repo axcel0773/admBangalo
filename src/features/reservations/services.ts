@@ -5,6 +5,8 @@ import { listBlocksBetween } from "@/features/availability/services";
 import { listChalets, listCurrentSeasonRates } from "@/features/chalets/services";
 import { listFees } from "@/features/fees/services";
 import { guestsRepository } from "@/features/guests/services";
+import type { PackageOption } from "@/features/packages/domain";
+import { listPackages } from "@/features/packages/services";
 import { addDays, todayIso, type IsoDate } from "@/lib/dates";
 import { PAGE_STEP, paginate } from "@/lib/search-params";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -78,16 +80,19 @@ export interface NewReservationContext {
   seasons: SeasonRate[];
   /** Datas bloqueadas do próximo ano (manuais e de outras plataformas). */
   blocks: ChaletBlock[];
+  /** Pacotes salvos (valor fechado), atalhos na etapa de valores. */
+  packages: PackageOption[];
 }
 
 export async function getNewReservationContext(): Promise<NewReservationContext> {
   const today = todayIso();
-  const [chalets, fees, guests, seasons, blocks] = await Promise.all([
+  const [chalets, fees, guests, seasons, blocks, packages] = await Promise.all([
     listChalets({ onlyActive: true }),
     listFees({ onlyActive: true }),
     guestsRepository().then((repo) => repo.search(undefined, 200)),
     listCurrentSeasonRates(),
     listBlocksBetween(today, addDays(today, 400)),
+    listPackages(),
   ]);
 
   return {
@@ -113,6 +118,7 @@ export async function getNewReservationContext(): Promise<NewReservationContext>
       .sort((a, b) => a.full_name.localeCompare(b.full_name, "pt-BR")),
     seasons,
     blocks,
+    packages: packages.map(({ id, name, nights, total }) => ({ id, name, nights, total })),
   };
 }
 

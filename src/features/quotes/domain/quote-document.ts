@@ -1,4 +1,5 @@
 import { addDays, daysBetween, formatDate, formatShortDate, type IsoDate } from "@/lib/dates";
+import { lodgingLine } from "@/features/reservations/domain/lodging";
 import { formatCurrency, formatDecimal, pluralize } from "@/lib/format";
 
 /** Dias de validade oferecidos ao criar o orçamento (o primeiro é o padrão). */
@@ -30,15 +31,14 @@ export function chargeLineLabel(charge: QuoteChargeInput): string {
 export function buildQuoteLines(input: {
   nights: number;
   nightlyRate: number;
+  /** Pacote (valor fechado): a linha mostra o pacote, sem a diária. */
+  packageName?: string | null;
   discount: number;
   lodging: number;
   charges: QuoteChargeInput[];
 }): QuoteLine[] {
-  const lodgingLabel =
-    `Hospedagem: ${pluralize(input.nights, "noite", "noites")} × ${formatCurrency(input.nightlyRate)}` +
-    (input.discount > 0 ? ` − desconto ${formatCurrency(input.discount)}` : "");
   return [
-    { description: lodgingLabel, amount: input.lodging },
+    { description: lodgingLine(input), amount: input.lodging },
     // Taxa medida (energia) ainda não tem valor: não entra no total, só aparece como aviso.
     ...input.charges.map((charge) => ({
       description: chargeLineLabel(charge),
