@@ -2,7 +2,7 @@
 
 **Última atualização:** 15/11/2026 (offline, notificações e revisão geral) · Complementa `docs/etapas.md` (o que já foi feito), `docs/padroes.md` e `docs/arquitetura.md`.
 
-**Já feitas:** 1 a 8, 10 a 14 e 17 (✅). A 9 (tarifas sazonais com mínimo de noites) **já existia desde a etapa 4** e estava listada aqui por engano. **Falta só a 15** (histórico de alterações e exportação de dados). A sugestão 16 (acesso de equipe) foi retirada do backlog a pedido do dono. Migrações deste backlog: `0013` (sinal), `0014` (despesas), `0015` (status do orçamento), `0016` (limpeza), `0017` (push).
+**Já feitas:** 1 a 8, 10 a 14 e 17 (✅). A 9 (tarifas sazonais com mínimo de noites) **já existia desde a etapa 4** e estava listada aqui por engano. **Falta só a 15** (histórico de alterações e exportação de dados). A sugestão 16 (acesso de equipe) foi retirada do backlog a pedido do dono. Migrações deste backlog: `0013` (sinal), `0014` (despesas), `0015` (status do orçamento), `0016` (limpeza), `0017` (push), `0019` (pacotes).
 
 **Esforço:** **P** = até meio dia · **M** = 1 a 2 dias · **G** = 3 dias ou mais. Considera código, testes, migração e documentação.
 **Restrição fixa:** tudo precisa continuar rodando no plano **gratuito** da Vercel e do Supabase.
@@ -29,6 +29,7 @@
 | 14 | Modo offline (leitura) ✅ | G | não | Baixa |
 | 15 | Histórico de alterações e exportação de dados | G | sim | Média |
 | 17 | Refinos de interface (contagem nos atalhos, busca global ao vivo, modo escuro com escolha manual) ✅ | P–M | não | Baixa |
+| 18 | Pacotes (valor fechado) e parcelas sem centavos quebrados ✅ | M | sim (`0019`) | Alta |
 
 **Ordem recomendada:** 1 → 2 → 3 → 7 → 8 → 4 → 5 → 6 → 10 → 9 → demais. (Tudo feito, menos a 15.)
 
