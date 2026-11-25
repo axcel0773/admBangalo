@@ -1,19 +1,19 @@
-import { CalendarClock, X } from "lucide-react";
+import { X } from "lucide-react";
 
 import { ActionForm } from "@/components/ui/action-form";
 import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { CardSection } from "@/components/ui/card";
 import { InlineEdit } from "@/components/ui/inline-edit";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
-import { SubmitButton } from "@/components/ui/submit-button";
 import { formatShortDate, type IsoDate } from "@/lib/dates";
 import { formatCurrency } from "@/lib/format";
 
-import { addDepositPlan, addInstallment, editInstallment, removeInstallment } from "../actions";
+import { addInstallment, addSplitPlan, editInstallment, removeInstallment } from "../actions";
 import { unscheduledAmount, type InstallmentProgress, type InstallmentStatus } from "../domain/schedule";
 import type { PixCharge } from "../services";
 import { InstallmentEditForm } from "./installment-edit-form";
 import { InstallmentForm } from "./installment-form";
+import { SplitPlanForm } from "./split-plan-form";
 import { PixCopy } from "./pix-copy";
 
 const STATUS: Record<InstallmentStatus, { label: string; tone: BadgeTone }> = {
@@ -46,12 +46,7 @@ export function ScheduleCard({ reservationId, schedule, total, checkIn, today, c
             Sem parcelas, o saldo vence no check-in. Combine sinal e saldo para o Painel avisar na data certa.
           </p>
           {!cancelled && total > 0 ? (
-            <ActionForm action={addDepositPlan.bind(null, reservationId)}>
-              <SubmitButton variant="soft" block pendingLabel="Criando…">
-                <CalendarClock aria-hidden="true" />
-                Sinal 50% hoje + saldo no check-in
-              </SubmitButton>
-            </ActionForm>
+            <SplitPlanForm action={addSplitPlan.bind(null, reservationId)} total={total} checkIn={checkIn} today={today} />
           ) : null}
         </div>
       ) : (

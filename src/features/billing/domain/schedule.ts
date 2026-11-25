@@ -1,5 +1,5 @@
 import { roundMoney } from "@/features/reservations/domain";
-import type { IsoDate } from "@/lib/dates";
+import { addDays, daysBetween, type IsoDate } from "@/lib/dates";
 
 /**
  * Parcelas previstas (tabela payment_schedule). O total pago é distribuído
@@ -52,22 +52,45 @@ export function unscheduledAmount(items: Installment[], total: number): number {
   return roundMoney(total - items.reduce((sum, item) => sum + item.amount, 0));
 }
 
-/** Sugestão rápida: sinal (padrão 50%) hoje e o resto no check-in. */
-export function depositAndBalance(input: {
+/** Em quantas vezes o total pode ser dividido de uma vez (sinal + parcelas + saldo). */
+export const SPLIT_COUNTS = [2, 3, 4] as const;
+export type SplitCount = (typeof SPLIT_COUNTS)[number];
+
+export function isSplitCount(value: number): value is SplitCount {
+  return (SPLIT_COUNTS as readonly number[]).includes(value);
+}
+
+/**
+ * Divide o total em parcelas iguais: sinal hoje, saldo no check-in e as do meio espaçadas entre as duas datas.
+ * - `wholeReais`: parcelas em reais inteiros (R$ 1.250 em 3x = 418 + 416 + 416); a sobra fica no sinal.
+ * - sem `wholeReais`: divide até o centavo; os centavos que sobram vão um a um para as primeiras (416,67 + 416,67 + 416,66).
+ * Nos dois casos a soma é exatamente o total.
+ */
+export function splitPlan(input: {
   total: number;
+  count: SplitCount;
   checkIn: IsoDate;
   today: IsoDate;
-  depositPercent?: number;
+  wholeReais: boolean;
 }): Omit<Installment, "id">[] {
-  const percent = input.depositPercent ?? 50;
-  const total = roundMoney(input.total);
-  const deposit = roundMoney((total * percent) / 100);
-  const balanceDue = input.checkIn > input.today ? input.checkIn : input.today;
+  const { count, today } = input;
+  const cents = Math.max(Math.round(roundMoney(input.total) * 100), 0);
+  const lastDue = input.checkIn > today ? input.checkIn : today;
+  const span = daysBetween(today, lastDue);
 
-  return [
-    { description: `Sinal ${percent}%`, amount: deposit, due_date: input.today },
-    { description: "Saldo no check-in", amount: roundMoney(total - deposit), due_date: balanceDue },
-  ].filter((item) => item.amount > 0);
+  const base = input.wholeReais ? Math.floor(cents / 100 / count) * 100 : Math.floor(cents / count);
+  const leftover = cents - base * count;
+
+  return Array.from({ length: count }, (_, index) => {
+    const extra = input.wholeReais ? (index === 0 ? leftover : 0) : index < leftover ? 1 : 0;
+    const amountCents = base + extra;
+    const description = index === 0 ? "Sinal" : index === count - 1 ? "Saldo no check-in" : `Parcela ${index + 1}`;
+    return {
+      description,
+      amount: amountCents / 100,
+      due_date: addDays(today, Math.round((span * index) / (count - 1))),
+    };
+  }).filter((item) => item.amount > 0);
 }
 
 /** Data em que o saldo vence: a próxima parcela em aberto, ou o check-in se não houver parcelas. */
