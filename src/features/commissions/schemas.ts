@@ -66,11 +66,11 @@ export function resolveNewReservationCommission(
   if (!input.has_commission) return null;
 
   const name = brokerName.safeParse(input.broker_name ?? "");
-  if (!name.success) ctx?.addIssue({ code: "custom", path: ["broker_name"], message: name.error.issues[0].message });
+  if (!name.success) ctx?.addIssue({ code: "custom", path: ["broker_name"], message: name.error.issues[0]?.message ?? "Informe o nome do corretor" });
 
   const value = amount.safeParse(input.commission_amount ?? "");
   if (!value.success) {
-    ctx?.addIssue({ code: "custom", path: ["commission_amount"], message: value.error.issues[0].message });
+    ctx?.addIssue({ code: "custom", path: ["commission_amount"], message: value.error.issues[0]?.message ?? "Informe o valor da comissão" });
   }
 
   let paidOn: string | null = null;
