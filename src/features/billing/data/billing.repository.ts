@@ -5,7 +5,7 @@ import { unwrapList } from "@/lib/supabase/result";
 import type { DbClient } from "@/lib/supabase/server";
 import type { Tables } from "@/types/database";
 
-import type { ExtraChargeInput, InstallmentInput, MeterReadingInput, PaymentInput } from "../schemas";
+import type { ExtraChargeInput, InstallmentInput, MeterReadingInput, PaymentEditInput, PaymentInput } from "../schemas";
 
 export type Payment = Tables<"payments">;
 export type ScheduledInstallment = Pick<Tables<"payment_schedule">, "id" | "description" | "amount" | "due_date">;
@@ -128,6 +128,23 @@ export function createBillingRepository(db: DbClient) {
       if (error) throw new MutationError(friendlyDbMessage(error, "Não foi possível registrar o pagamento."));
     },
 
+    async findPayment(reservationId: string, paymentId: string): Promise<Pick<Payment, "id" | "kind" | "amount"> | null> {
+      const { data } = await db
+        .from("payments")
+        .select("id, kind, amount")
+        .eq("id", paymentId)
+        .eq("reservation_id", reservationId)
+        .maybeSingle();
+      return data;
+    },
+
+    async updatePayment(reservationId: string, paymentId: string, input: PaymentEditInput): Promise<void> {
+      assertMutation(
+        await db.from("payments").update(input).eq("id", paymentId).eq("reservation_id", reservationId),
+        "Não foi possível salvar o pagamento.",
+      );
+    },
+
     /** Remove o lançamento e devolve o caminho do comprovante (para apagar o arquivo). */
     async deletePayment(reservationId: string, paymentId: string): Promise<string | null> {
       const { data, error } = await db
@@ -173,6 +190,13 @@ export function createBillingRepository(db: DbClient) {
     async createInstallments(reservationId: string, items: InstallmentInput[]): Promise<void> {
       assertMutation(
         await db.from("payment_schedule").insert(items.map((item) => ({ reservation_id: reservationId, ...item }))),
+        "Não foi possível salvar a parcela.",
+      );
+    },
+
+    async updateInstallment(reservationId: string, id: string, input: InstallmentInput): Promise<void> {
+      assertMutation(
+        await db.from("payment_schedule").update(input).eq("id", id).eq("reservation_id", reservationId),
         "Não foi possível salvar a parcela.",
       );
     },

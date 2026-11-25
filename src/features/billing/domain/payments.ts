@@ -90,3 +90,15 @@ export function suggestedPaymentAmount(context: PaymentContext): number {
 export function signedAmount(payment: { kind: PaymentKind; amount: number }): number {
   return payment.kind === "refund" ? -payment.amount : payment.amount;
 }
+
+/**
+ * Situação da reserva como se o lançamento não existisse: base para validar a edição dele
+ * (corrigir R$ 3.500,00 para R$ 3.500,01 não pode esbarrar no próprio valor já lançado).
+ */
+export function contextWithout(
+  context: PaymentContext,
+  payment: { kind: PaymentKind; amount: number },
+): PaymentContext {
+  const previous = signedAmount(payment);
+  return { ...context, paid: roundMoney(context.paid - previous), balance: roundMoney(context.balance + previous) };
+}

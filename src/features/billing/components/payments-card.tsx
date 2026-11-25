@@ -3,11 +3,12 @@ import { Paperclip, Trash2 } from "lucide-react";
 import { ActionForm } from "@/components/ui/action-form";
 import { CardSection } from "@/components/ui/card";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
+import { InlineEdit } from "@/components/ui/inline-edit";
 import { Money } from "@/components/ui/money";
 import { formatShortDate, todayIso } from "@/lib/dates";
 import { formatCurrency } from "@/lib/format";
 
-import { registerPayment, removePayment } from "../actions";
+import { editPayment, registerPayment, removePayment } from "../actions";
 import {
   PAYMENT_KIND_LABELS,
   PAYMENT_METHOD_LABELS,
@@ -17,6 +18,7 @@ import {
   type PaymentContext,
 } from "../domain/payments";
 import type { PaymentWithReceipt } from "../services";
+import { PaymentEditForm } from "./payment-edit-form";
 import { PaymentForm } from "./payment-form";
 
 interface PaymentsCardProps {
@@ -40,7 +42,39 @@ export function PaymentsCard({ reservationId, ownerId, payments, context }: Paym
           {payments.map((payment) => {
             const refund = payment.kind === "refund";
             return (
-              <li key={payment.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 py-3">
+              <li key={payment.id} className="flex flex-col py-3">
+                <InlineEdit
+                  label={`lançamento de ${formatCurrency(payment.amount)}`}
+                  rowClassName="flex flex-wrap items-center gap-x-2 gap-y-2"
+                  editor={
+                    <PaymentEditForm
+                      action={editPayment.bind(null, reservationId, payment.id)}
+                      initial={{
+                        kind: payment.kind,
+                        method: payment.method,
+                        amount: payment.amount,
+                        paid_at: payment.paid_at,
+                        notes: payment.notes,
+                      }}
+                      today={todayIso()}
+                    />
+                  }
+                  trailing={
+                    <ActionForm action={removePayment.bind(null, reservationId, payment.id)} className="contents">
+                      <ConfirmSubmit
+                        message={`Remover o lançamento de ${formatCurrency(payment.amount)}?`}
+                        confirmLabel="Remover"
+                        pendingLabel="Removendo…"
+                        triggerSize="icon"
+                        triggerLabel="Remover lançamento"
+                        block={false}
+                        className="size-11 text-ink-muted md:size-9"
+                      >
+                        <Trash2 aria-hidden="true" />
+                      </ConfirmSubmit>
+                    </ActionForm>
+                  }
+                >
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-semibold">
                     {PAYMENT_KIND_LABELS[payment.kind]} · {PAYMENT_METHOD_LABELS[payment.method]}
@@ -66,19 +100,7 @@ export function PaymentsCard({ reservationId, ownerId, payments, context }: Paym
                   tone={refund ? "pending" : "positive"}
                   className="text-[15px] font-bold"
                 />
-                <ActionForm action={removePayment.bind(null, reservationId, payment.id)} className="contents">
-                  <ConfirmSubmit
-                    message={`Remover o lançamento de ${formatCurrency(payment.amount)}?`}
-                    confirmLabel="Remover"
-                    pendingLabel="Removendo…"
-                    triggerSize="icon"
-                    triggerLabel="Remover lançamento"
-                    block={false}
-                    className="size-11 text-ink-muted md:size-9"
-                  >
-                    <Trash2 aria-hidden="true" />
-                  </ConfirmSubmit>
-                </ActionForm>
+                </InlineEdit>
               </li>
             );
           })}

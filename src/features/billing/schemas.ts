@@ -60,6 +60,11 @@ export const paymentSchema = z.object({
 
 export type PaymentInput = z.infer<typeof paymentSchema>;
 
+/** Edição de um lançamento: os mesmos campos, sem trocar o comprovante. */
+export const paymentEditSchema = paymentSchema.omit({ receipt_path: true });
+
+export type PaymentEditInput = z.infer<typeof paymentEditSchema>;
+
 export const installmentSchema = z.object({
   description: requiredText("Descrição", 60),
   amount: money("Valor").refine((value) => value > 0, "Informe um valor maior que zero"),
