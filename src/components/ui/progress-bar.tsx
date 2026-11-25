@@ -20,7 +20,7 @@ export function ProgressBar({ value, label, className, trackClassName, barClassN
       aria-valuenow={percent}
       className={cn("h-2 overflow-hidden rounded-full bg-line", trackClassName, className)}
     >
-      <div className={cn("h-full rounded-full bg-primary", barClassName)} style={{ width: `${percent}%` }} />
+      <div className={cn("animate-fill h-full origin-left rounded-full bg-primary", barClassName)} style={{ width: `${percent}%` }} />
     </div>
   );
 }

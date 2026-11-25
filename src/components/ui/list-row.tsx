@@ -19,7 +19,13 @@ interface ListRowProps {
 export function ListRow({ href, leading, title, subtitle, trailing, className, itemClassName }: ListRowProps) {
   return (
     <li className={itemClassName}>
-      <Link href={href} className={cn("flex min-h-16 items-center gap-3 py-3 text-ink", className)}>
+      <Link
+        href={href}
+        className={cn(
+          "-mx-2 flex min-h-16 items-center gap-3 rounded-xl px-2 py-3 text-ink transition-colors duration-150 active:bg-subtle",
+          className,
+        )}
+      >
         {leading}
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[15px] font-semibold">{title}</span>
@@ -36,7 +42,7 @@ export function ListRow({ href, leading, title, subtitle, trailing, className, i
 /** Contêiner de linhas com divisórias. */
 export function ListCard({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <ul className={cn("divide-y divide-line rounded-card bg-surface px-4 shadow-card md:px-5", className)}>
+    <ul className={cn("stagger divide-y divide-line rounded-card bg-surface px-4 shadow-card md:px-5", className)}>
       {children}
     </ul>
   );

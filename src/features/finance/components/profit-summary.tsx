@@ -13,7 +13,7 @@ import type { MonthReport } from "../domain";
 export function ProfitSummary({ report }: { report: MonthReport }) {
   const negative = report.profit < 0;
   return (
-    <section aria-label="Despesas e lucro do mês" className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
+    <section aria-label="Despesas e lucro do mês" className="stagger grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
       <StatCard
         label="Despesas"
         icon={<Receipt />}

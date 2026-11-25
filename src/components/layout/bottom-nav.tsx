@@ -16,11 +16,15 @@ function BottomNavLink({ item, pathname }: { item: NavItem; pathname: string }) 
       href={href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "flex min-h-12 flex-col items-center justify-center gap-1 text-[11px] text-ink-muted",
+        "flex min-h-12 flex-col items-center justify-center gap-1 text-[11px] text-ink-muted transition-colors duration-200 active:scale-95",
         active && "font-bold text-primary-ink",
       )}
     >
-      <Icon className="size-[22px]" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
+      <Icon
+        className={cn("size-[22px] transition-transform duration-300 ease-out", active && "-translate-y-0.5 scale-110")}
+        strokeWidth={active ? 2.2 : 1.8}
+        aria-hidden="true"
+      />
       {label}
     </Link>
   );

@@ -11,7 +11,7 @@ import type { DashboardSummary } from "../domain/types";
 /** Indicadores do mês. Celular: 2 colunas, os dois de dinheiro primeiro. */
 export function SummaryCards({ summary }: { summary: DashboardSummary }) {
   return (
-    <section aria-label="Indicadores do mês" className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
+    <section aria-label="Indicadores do mês" className="stagger grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
       <StatCard
         label="A receber"
         href={routes.receivables}

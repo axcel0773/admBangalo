@@ -12,7 +12,7 @@ export function FormAlert({ state, className }: { state: FormState; className?: 
     <p
       role={isError ? "alert" : "status"}
       className={cn(
-        "flex items-start gap-2 rounded-xl px-4 py-3 text-sm font-semibold",
+        "animate-pop flex items-start gap-2 rounded-xl px-4 py-3 text-sm font-semibold",
         isError ? "bg-danger-soft text-danger-ink" : "bg-primary-soft text-primary-ink",
         className,
       )}

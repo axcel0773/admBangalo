@@ -32,7 +32,7 @@ export function CleaningList({ tasks, today }: { tasks: CleaningTask[]; today: I
   }
 
   return (
-    <ul className="flex flex-col gap-3">
+    <ul className="stagger flex flex-col gap-3">
       {tasks.map((task) => {
         const urgency = cleaningUrgency(task, today);
         const info = URGENCY[urgency];
