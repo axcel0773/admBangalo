@@ -19,13 +19,13 @@ export function YearReportView({ report }: { report: YearReport }) {
           <div>
             <dt className="text-xs text-ink-muted">Diária média</dt>
             <dd className="font-display text-lg font-semibold tabular-nums md:text-xl">
-              <Money value={totals.averageRate} rounded />
+              <Money value={totals.averageRate} whole />
             </dd>
           </div>
           <div>
             <dt className="text-xs text-ink-muted">Hospedagem</dt>
             <dd className="font-display text-lg font-semibold tabular-nums md:text-xl">
-              <Money value={totals.revenue} rounded />
+              <Money value={totals.revenue} whole />
             </dd>
           </div>
         </dl>
