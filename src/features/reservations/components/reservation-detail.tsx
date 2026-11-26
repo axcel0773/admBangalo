@@ -7,6 +7,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink, buttonVariants } from "@/components/ui/button";
 import { Card, CardSection } from "@/components/ui/card";
+import { MoreOptions } from "@/components/ui/more-options";
 import { whatsappUrl } from "@/features/guests/domain";
 import { formatLongDate } from "@/lib/dates";
 import { pluralize } from "@/lib/format";
@@ -57,10 +58,12 @@ export function ReservationDetail({ detail, billing, aside, businessName }: Rese
   const whatsapp = reservation.status === "cancelled" ? null : whatsappUrl(mainGuest.phone, confirmation);
 
   return (
-    <div className="grid gap-4 md:gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
-      <div className="flex flex-col gap-4 md:gap-6">
+    // Celular: a coluna principal "se desfaz" (contents) para o saldo e os pagamentos virem logo
+    // depois do resumo; no computador, duas colunas lado a lado.
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+      <div className="contents lg:flex lg:flex-col lg:gap-6">
         {/* Resumo */}
-        <Card className="flex flex-col gap-4 p-4 md:p-6">
+        <Card className="order-first flex flex-col gap-4 p-4 md:p-6 lg:order-none">
           <div className="flex flex-wrap gap-2">
             <ReservationStatusBadge status={reservation.status} />
             {reservation.status !== "cancelled" ? <PaymentStatusBadge status={financials.payment_status} /> : null}
@@ -90,48 +93,19 @@ export function ReservationDetail({ detail, billing, aside, businessName }: Rese
             </div>
           </div>
 
-          <StatusActions reservationId={reservation.id} status={reservation.status} />
+          {/* À mostra só o próximo passo e a confirmação; o resto fica em "Mais opções". */}
+          <StatusActions reservationId={reservation.id} status={reservation.status} show="steps" />
 
-          <div className="grid grid-cols-2 gap-2.5">
-            {whatsapp ? (
-              <a
-                href={whatsapp}
-                target="_blank"
-                rel="noreferrer"
-                className={buttonVariants({ variant: "soft", className: "col-span-2 sm:col-span-1" })}
-              >
-                <MessageCircle aria-hidden="true" />
-                Enviar confirmação
-              </a>
-            ) : null}
-            {mainGuest.phone ? (
-              <a href={`tel:${mainGuest.phone.replace(/\D/g, "")}`} className={buttonVariants({ variant: "secondary" })}>
-                <Phone aria-hidden="true" />
-                Ligar
-              </a>
-            ) : null}
-            <ButtonLink href={paths.receipt(reservation.id)} variant="secondary">
-              <FileText aria-hidden="true" />
-              Recibo
-            </ButtonLink>
-            <ButtonLink
-              href={paths.newReservation({
-                chalet: reservation.chalet_id,
-                adults: reservation.adults,
-                children: reservation.children,
-                guest: mainGuest.id,
-              })}
-              variant="secondary"
-            >
-              <Repeat aria-hidden="true" />
-              Reservar de novo
-            </ButtonLink>
-          </div>
+          {whatsapp ? (
+            <a href={whatsapp} target="_blank" rel="noreferrer" className={buttonVariants({ variant: "soft", block: true })}>
+              <MessageCircle aria-hidden="true" />
+              Enviar confirmação
+            </a>
+          ) : null}
 
-          {reminders.some((reminder) => reminder.href) ? (
-            <div>
-              <p className="mb-2 text-xs font-semibold tracking-wide text-ink-muted uppercase">Lembretes no WhatsApp</p>
-              <div className="flex flex-wrap gap-2">
+          <MoreOptions>
+            {reminders.some((reminder) => reminder.href) ? (
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                 {reminders.map((reminder) =>
                   reminder.href ? (
                     <a
@@ -139,16 +113,42 @@ export function ReservationDetail({ detail, billing, aside, businessName }: Rese
                       href={reminder.href}
                       target="_blank"
                       rel="noreferrer"
-                      className={buttonVariants({ variant: "secondary", size: "sm" })}
+                      className={buttonVariants({ variant: "secondary" })}
                     >
                       <MessageCircle aria-hidden="true" />
-                      {reminder.label}
+                      {reminder.label} no WhatsApp
                     </a>
                   ) : null,
                 )}
               </div>
+            ) : null}
+            <div className="grid grid-cols-2 gap-2.5">
+              {mainGuest.phone ? (
+                <a href={`tel:${mainGuest.phone.replace(/\D/g, "")}`} className={buttonVariants({ variant: "secondary" })}>
+                  <Phone aria-hidden="true" />
+                  Ligar
+                </a>
+              ) : null}
+              <ButtonLink href={paths.receipt(reservation.id)} variant="secondary">
+                <FileText aria-hidden="true" />
+                Recibo
+              </ButtonLink>
+              <ButtonLink
+                href={paths.newReservation({
+                  chalet: reservation.chalet_id,
+                  adults: reservation.adults,
+                  children: reservation.children,
+                  guest: mainGuest.id,
+                })}
+                variant="secondary"
+                className="col-span-2"
+              >
+                <Repeat aria-hidden="true" />
+                Reservar de novo
+              </ButtonLink>
             </div>
-          ) : null}
+            <StatusActions reservationId={reservation.id} status={reservation.status} show="cancel" />
+          </MoreOptions>
         </Card>
 
         {/* Pessoas */}
@@ -186,7 +186,7 @@ export function ReservationDetail({ detail, billing, aside, businessName }: Rese
 
       {/* Saldo e pagamentos */}
       {aside ? (
-        <aside aria-label="Pagamento" className="flex flex-col gap-4 lg:sticky lg:top-6">
+        <aside aria-label="Pagamento" className="-order-1 flex flex-col gap-4 md:gap-6 lg:sticky lg:top-6 lg:order-none lg:col-start-2 lg:row-start-1 lg:gap-4">
           {aside}
         </aside>
       ) : null}

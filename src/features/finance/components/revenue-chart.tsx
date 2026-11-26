@@ -16,10 +16,10 @@ export function RevenueChart({ points, currentMonth }: { points: TrendPoint[]; c
       action={
         <div className="flex items-center gap-3 text-xs text-ink-muted" aria-hidden="true">
           <span className="flex items-center gap-1.5">
-            <span className="size-2.5 rounded-sm bg-muted" /> Previsto
+            <span className="size-2.5 rounded-sm bg-muted" /> Total das reservas
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="size-2.5 rounded-sm bg-primary" /> Recebido
+            <span className="size-2.5 rounded-sm bg-primary" /> Já pago
           </span>
         </div>
       }
@@ -47,12 +47,12 @@ export function RevenueChart({ points, currentMonth }: { points: TrendPoint[]; c
       </div>
 
       <table className="sr-only">
-        <caption>Previsto e recebido por mês</caption>
+        <caption>Total das reservas e já pago, por mês de entrada</caption>
         <thead>
           <tr>
             <th scope="col">Mês</th>
-            <th scope="col">Previsto</th>
-            <th scope="col">Recebido</th>
+            <th scope="col">Total das reservas</th>
+            <th scope="col">Já pago</th>
           </tr>
         </thead>
         <tbody>

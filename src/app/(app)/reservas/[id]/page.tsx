@@ -73,7 +73,10 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
                 grandTotal={financials.grand_total}
                 taxDefaults={taxDefaults(fees, reservation.chalet_id)}
               />
-              <DeleteReservationCard reservationId={id} paid={financials.paid_total} />
+              {/* No celular, excluir fica por último, depois de tudo. */}
+              <div className="order-last lg:order-none">
+                <DeleteReservationCard reservationId={id} paid={financials.paid_total} />
+              </div>
             </>
           }
           aside={
@@ -87,14 +90,6 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
                 hasPixKey={billing.hasPixKey}
                 guestName={mainGuest.full_name}
                 guestPhone={mainGuest.phone}
-              />
-              <CommissionCard
-                reservationId={id}
-                commission={commissionOf(reservation)}
-                total={financials.grand_total}
-                cancelled={cancelled}
-                brokers={brokers}
-                today={todayIso()}
               />
               <ScheduleCard
                 reservationId={id}
@@ -112,6 +107,14 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
                 ownerId={billing.ownerId}
                 payments={billing.payments}
                 context={paymentContext}
+              />
+              <CommissionCard
+                reservationId={id}
+                commission={commissionOf(reservation)}
+                total={financials.grand_total}
+                cancelled={cancelled}
+                brokers={brokers}
+                today={todayIso()}
               />
             </>
           }

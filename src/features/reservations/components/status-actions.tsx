@@ -7,9 +7,21 @@ import { changeReservationStatus } from "../actions";
 import { availableTransitions } from "../domain/status";
 import type { ReservationStatus } from "../domain/types";
 
+interface StatusActionsProps {
+  reservationId: string;
+  status: ReservationStatus;
+  /**
+   * "steps": só os próximos passos (confirmar, check-in, check-out), à mostra.
+   * "cancel": só o cancelar, guardado em "Mais opções" para não ser tocado por engano.
+   */
+  show?: "all" | "steps" | "cancel";
+}
+
 /** Botões das próximas etapas da reserva (confirmar, check-in, check-out, cancelar). */
-export function StatusActions({ reservationId, status }: { reservationId: string; status: ReservationStatus }) {
-  const transitions = availableTransitions(status);
+export function StatusActions({ reservationId, status, show = "all" }: StatusActionsProps) {
+  const transitions = availableTransitions(status).filter((transition) =>
+    show === "all" ? true : show === "cancel" ? transition.destructive : !transition.destructive,
+  );
   if (transitions.length === 0) return null;
 
   return (

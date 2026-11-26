@@ -73,6 +73,13 @@ export function formatMonth(month: IsoDate): string {
   return monthFormatter.format(new Date(`${month}T00:00:00Z`));
 }
 
+const monthNameFormatter = new Intl.DateTimeFormat("pt-BR", { month: "long", timeZone: "UTC" });
+
+/** "novembro" */
+export function formatMonthName(month: IsoDate): string {
+  return monthNameFormatter.format(new Date(`${month}T00:00:00Z`));
+}
+
 /** "nov" */
 export function formatShortMonth(month: IsoDate): string {
   return shortMonthFormatter.format(new Date(`${month}T00:00:00Z`)).replace(".", "");
