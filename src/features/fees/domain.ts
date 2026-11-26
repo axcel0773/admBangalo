@@ -11,6 +11,7 @@ export const FEE_KIND_LABELS: Record<FeeKind, string> = {
   extra_guest: "Pessoa extra (desativada)",
   pet: "Pet",
   other: "Outra",
+  item: "Item quebrado ou consumo",
 };
 
 export const CHARGE_MODE_LABELS: Record<ChargeMode, string> = {

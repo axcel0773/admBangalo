@@ -37,10 +37,10 @@ export const meterReadingSchema = z
 
 export type MeterReadingInput = z.infer<typeof meterReadingSchema>;
 
-/** Taxa avulsa lançada direto na reserva (energia tem formulário próprio). */
+/** Taxa (limpeza, pet, outra) ou item quebrado/consumo lançado na reserva (energia tem formulário próprio). */
 export const extraChargeSchema = z.object({
   description: requiredText("Descrição", 80),
-  kind: z.enum(["cleaning", "pet", "other"], { message: "Escolha o tipo" }),
+  kind: z.enum(["cleaning", "pet", "other", "item"], { message: "Escolha o tipo" }),
   unit_amount: money("Valor").refine((value) => value > 0, "Informe um valor maior que zero"),
   quantity: integer("Quantidade", 1, 99),
 });

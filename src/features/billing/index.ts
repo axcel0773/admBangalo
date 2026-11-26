@@ -5,6 +5,7 @@ export { EnergyCard } from "./components/energy-card";
 export { PaymentsCard } from "./components/payments-card";
 export { ReceiptShare } from "./components/receipt-share";
 export { ScheduleCard } from "./components/schedule-card";
+export { taxDefaults } from "./domain/charges";
 export { findEnergyCharge } from "./domain/meter";
 export { buildReceiptData, type ReceiptData } from "./domain/receipt";
 export { PAYMENT_KIND_LABELS, PAYMENT_METHOD_LABELS } from "./domain/payments";

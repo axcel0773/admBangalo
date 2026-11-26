@@ -9,9 +9,9 @@ import { errorFormState, formDataToObject, invalidFormState, submittedValues, ty
 import { assertIds, INVALID_ID_MESSAGE, isUuid } from "@/lib/ids";
 import { MutationError } from "@/lib/supabase/errors";
 
-import { contextWithout, validatePayment } from "./domain/payments";
 import { isOwnReceiptPath } from "./domain/receipts";
-import { isSplitCount, splitPlan } from "./domain/schedule";
+import { contextWithout, firstPaymentDate, validatePayment } from "./domain/payments";
+import { isSplitCount, scheduleGapFixes, splitPlan, type ScheduleGapFix } from "./domain/schedule";
 import {
   extraChargeSchema,
   installmentSchema,
@@ -74,7 +74,7 @@ export async function addExtraCharge(reservationId: string, _prev: FormState, fo
   return run(
     formData,
     async () => (await billingRepository()).createExtraCharge(reservationId, parsed.data),
-    "Taxa adicionada.",
+    parsed.data.kind === "item" ? "Item adicionado." : "Taxa adicionada.",
   );
 }
 
@@ -198,12 +198,26 @@ export async function addSplitPlan(reservationId: string, _prev: FormState, form
     formData,
     async () => {
       const repo = await billingRepository();
-      const [context, existing] = await Promise.all([repo.findContext(reservationId), repo.listSchedule(reservationId)]);
+      const [context, existing, payments] = await Promise.all([
+        repo.findContext(reservationId),
+        repo.listSchedule(reservationId),
+        repo.listPayments(reservationId),
+      ]);
       if (!context || context.status === "cancelled") throw new MutationError("Reserva não encontrada ou cancelada.");
       if (existing.length > 0) throw new MutationError("Esta reserva já tem parcelas.");
+      if (context.paid >= context.total) throw new MutationError("Esta reserva já está paga.");
+      // O que já entrou vira "Sinal (pago)"; só o resto é dividido.
       await repo.createInstallments(
         reservationId,
-        splitPlan({ total: context.total, count, checkIn: context.checkIn, today: todayIso(), wholeReais }),
+        splitPlan({
+          total: context.total,
+          count,
+          checkIn: context.checkIn,
+          today: todayIso(),
+          wholeReais,
+          paid: Math.max(context.paid, 0),
+          paidOn: firstPaymentDate(payments) ?? undefined,
+        }),
       );
     },
     "Parcelas criadas.",
@@ -235,4 +249,52 @@ export async function removeInstallment(reservationId: string, installmentId: st
     await (await billingRepository()).deleteInstallment(reservationId, installmentId);
     refresh();
   });
+}
+
+const GAP_FIX_MESSAGES: Record<ScheduleGapFix["kind"], string> = {
+  paid_deposit: "Sinal pago virou parcela.",
+  adjust_last: "Última parcela ajustada.",
+  new_installment: "Parcela criada.",
+};
+
+/**
+ * Conserta parcelas que não somam o total. Recalcula tudo no servidor e aplica o conserto
+ * escolhido. Use com `.bind(null, reservationId, kind)`.
+ */
+export async function fixScheduleGap(reservationId: string, kind: ScheduleGapFix["kind"]): Promise<FormState> {
+  let done: ScheduleGapFix["kind"] = kind;
+  const result = await attempt(async () => {
+    assertIds(reservationId);
+    const repo = await billingRepository();
+    const [context, items, payments] = await Promise.all([
+      repo.findContext(reservationId),
+      repo.listSchedule(reservationId),
+      repo.listPayments(reservationId),
+    ]);
+    if (!context || context.status === "cancelled") throw new MutationError("Reserva não encontrada ou cancelada.");
+    const fix = scheduleGapFixes({ items, total: context.total, paid: context.paid }).find((option) => option.kind === kind);
+    if (!fix) throw new MutationError("As parcelas já batem com o total.");
+
+    const today = todayIso();
+    if (fix.kind === "paid_deposit") {
+      await repo.createInstallments(reservationId, [
+        { description: "Sinal (pago)", amount: fix.amount, due_date: firstPaymentDate(payments) ?? today },
+      ]);
+    } else if (fix.kind === "adjust_last") {
+      const last = items.find((item) => item.id === fix.installmentId);
+      if (!last) throw new MutationError("Parcela não encontrada.");
+      await repo.updateInstallment(reservationId, last.id, {
+        description: last.description,
+        amount: fix.newAmount,
+        due_date: last.due_date,
+      });
+    } else {
+      await repo.createInstallments(reservationId, [
+        { description: "Parcela", amount: fix.amount, due_date: context.checkIn > today ? context.checkIn : today },
+      ]);
+    }
+    done = fix.kind;
+    refresh();
+  });
+  return result.status === "success" ? { status: "success", message: GAP_FIX_MESSAGES[done] } : result;
 }

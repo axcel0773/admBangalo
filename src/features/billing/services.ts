@@ -6,6 +6,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { createBillingRepository, type MeteredFee, type Payment, type PixProfile } from "./data/billing.repository";
 import { buildPixPayload } from "./domain/pix";
+import { firstPaymentDate } from "./domain/payments";
 import { allocatePayments, nextInstallment, type InstallmentProgress } from "./domain/schedule";
 
 export async function billingRepository() {
@@ -37,6 +38,8 @@ export interface ReservationBilling {
   schedule: InstallmentProgress[];
   /** Pix da próxima parcela em aberto (quando ela é menor que o saldo). */
   nextInstallmentPix: (PixCharge & { installmentId: string }) | null;
+  /** Data do primeiro pagamento (vira o vencimento do "Sinal (pago)"). */
+  firstPaidOn: string | null;
 }
 
 function pixFor(
@@ -96,6 +99,7 @@ export async function getReservationBilling(input: {
     hasPixKey: Boolean(profile?.pix_key?.trim()),
     schedule,
     nextInstallmentPix: next && nextPix ? { ...nextPix, installmentId: next.id } : null,
+    firstPaidOn: firstPaymentDate(payments),
   };
 }
 

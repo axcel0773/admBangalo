@@ -102,3 +102,12 @@ export function contextWithout(
   const previous = signedAmount(payment);
   return { ...context, paid: roundMoney(context.paid - previous), balance: roundMoney(context.balance + previous) };
 }
+
+/** Data do primeiro pagamento recebido (estornos não contam). */
+export function firstPaymentDate(payments: { kind: PaymentKind; paid_at: string }[]): string | null {
+  const dates = payments
+    .filter((payment) => payment.kind !== "refund")
+    .map((payment) => payment.paid_at)
+    .sort();
+  return dates[0] ?? null;
+}

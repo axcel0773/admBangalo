@@ -1,7 +1,15 @@
 import { describe, expect, it } from "vitest";
 
 import { isOwnReceiptPath, receiptPath, receiptProblem } from "./receipts";
-import { allocatePayments, balanceDueDate, isSplitCount, nextInstallment, splitPlan, unscheduledAmount } from "./schedule";
+import {
+  allocatePayments,
+  balanceDueDate,
+  isSplitCount,
+  nextInstallment,
+  scheduleGapFixes,
+  splitPlan,
+  unscheduledAmount,
+} from "./schedule";
 
 const TODAY = "2026-11-10";
 
@@ -114,5 +122,56 @@ describe("comprovantes", () => {
     expect(receiptProblem({ type: "application/pdf", size: 1000 })).toBeNull();
     expect(receiptProblem({ type: "text/plain", size: 10 })).toMatch(/foto/);
     expect(receiptProblem({ type: "image/png", size: 6 * 1024 * 1024 })).toMatch(/5 MB/);
+  });
+});
+
+describe("parcelas: centavos, sinal já pago e consertos", () => {
+  it("diferença de centavos não deixa a parcela vencida", () => {
+    const reveillon = [
+      { id: "s", description: "Sinal 50%", amount: 3500.01, due_date: "2026-11-05" },
+      { id: "f", description: "Saldo no check-in", amount: 3500.01, due_date: "2026-12-27" },
+    ];
+    const progress = allocatePayments(reveillon, 3500, TODAY);
+    expect(progress[0]?.status).toBe("paid");
+    expect(nextInstallment(progress)?.id).toBe("f");
+  });
+
+  it("parcela sem nenhum pagamento continua vencida, mesmo pequena", () => {
+    const tiny = [{ id: "t", description: "Taxa", amount: 0.5, due_date: "2026-11-01" }];
+    expect(allocatePayments(tiny, 0, TODAY)[0]?.status).toBe("overdue");
+  });
+
+  it("divide só o que falta quando já houve pagamento", () => {
+    const plan = splitPlan({
+      total: 5500,
+      count: 2,
+      checkIn: "2027-02-04",
+      today: TODAY,
+      wholeReais: true,
+      paid: 1500,
+      paidOn: "2026-11-09",
+    });
+    expect(plan.map((item) => [item.description, item.amount])).toEqual([
+      ["Sinal (pago)", 1500],
+      ["Parcela 2", 2000],
+      ["Saldo no check-in", 2000],
+    ]);
+    expect(plan[0]?.due_date).toBe("2026-11-09");
+    expect(plan[2]?.due_date).toBe("2027-02-04");
+    expect((plan[1]?.due_date ?? "") > TODAY).toBe(true);
+  });
+
+  it("sugere transformar o sinal pago em parcela quando faltam parcelas", () => {
+    const carnaval = [{ id: "p2", description: "2", amount: 4000, due_date: "2027-02-04" }];
+    const fixes = scheduleGapFixes({ items: carnaval, total: 5500, paid: 1500 });
+    expect(fixes.map((fix) => fix.kind)).toEqual(["paid_deposit", "adjust_last", "new_installment"]);
+    expect(fixes[1]).toMatchObject({ installmentId: "p2", newAmount: 5500 });
+  });
+
+  it("parcelas acima do total: só oferece tirar da última", () => {
+    expect(scheduleGapFixes({ items, total: 1300, paid: 0 })).toEqual([
+      { kind: "adjust_last", amount: -100, installmentId: "b", newAmount: 600 },
+    ]);
+    expect(scheduleGapFixes({ items, total: 1400, paid: 0 })).toEqual([]);
   });
 });
