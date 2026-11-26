@@ -58,7 +58,7 @@ test.describe("fluxo principal", () => {
     await charges.getByRole("button", { name: "Adicionar", exact: true }).click();
     await expect(page.getByText(/Item “Copo quebrado” de R\$\s30,00 somado ao total\./)).toBeVisible();
     await expect(charges.getByRole("heading", { name: "Itens quebrados e consumo" })).toBeVisible();
-    await expect(charges.getByText("Copo quebrado")).toBeVisible();
+    await expect(charges.getByText("Copo quebrado", { exact: true })).toBeVisible();
 
     // Pagamento do saldo inteiro (valor sugerido)
     await page.getByRole("button", { name: "Registrar pagamento" }).click();
