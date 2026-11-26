@@ -35,7 +35,7 @@ export default async function FinancePage({ searchParams }: FinancePageProps) {
     <>
       <PageHeader
         title="Financeiro"
-        description="Receita pelo mês de entrada do hóspede; caixa pela data do pagamento."
+        description="O dinheiro que entrou no mês e as reservas que começam nele."
         actions={
           <>
             <Link href={routes.reports} className={buttonVariants({ variant: "secondary" })}>
@@ -56,8 +56,9 @@ export default async function FinancePage({ searchParams }: FinancePageProps) {
       />
       <PageBody className="flex flex-col gap-4 md:gap-6">
         <MonthNav month={month} className="self-start" />
-        <FinanceSummary report={report} previous={previousTrendPoint(trend)} />
+        {/* Primeiro o dinheiro que passou pela mão no mês; depois as reservas que começam nele. */}
         <ProfitSummary report={report} />
+        <FinanceSummary report={report} previous={previousTrendPoint(trend)} />
         <div className="grid gap-4 md:gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
           <div className="flex flex-col gap-4 md:gap-6">
             <RevenueChart points={trend} currentMonth={month} />
