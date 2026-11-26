@@ -26,7 +26,7 @@ export function UpcomingArrivals({ arrivals }: { arrivals: UpcomingArrival[] }) 
               >
                 <Avatar name={arrival.guestName} size="sm" />
                 <span className="min-w-0">
-                  <span className="block truncate text-sm font-semibold">{arrival.guestName}</span>
+                  <span className="block text-sm font-semibold break-words">{arrival.guestName}</span>
                   <span className="block text-xs text-ink-muted lg:hidden">
                     {arrival.chaletName} · {formatStayRange(arrival.checkIn, arrival.checkOut)}
                   </span>

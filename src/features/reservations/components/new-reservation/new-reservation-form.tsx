@@ -18,6 +18,7 @@ import {
   type CommissionDraft,
 } from "@/features/commissions/client";
 import type { PackageOption } from "@/features/packages/domain";
+import { cn } from "@/lib/cn";
 import { addDays, type IsoDate } from "@/lib/dates";
 import { fieldError, idleFormState } from "@/lib/forms";
 import { formatCurrency, formatMoneyInput, pluralize } from "@/lib/format";
@@ -400,23 +401,32 @@ export function NewReservationForm({
       </div>
 
       {/* Barra de ações: fixa acima da navegação no celular */}
-      <div className="keyboard-static sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-3 border-t border-line bg-surface/95 px-4 pt-3 pb-8 backdrop-blur md:pb-0 md:static md:mx-0 md:justify-end md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
-        <div className="min-w-0 flex-1 md:hidden">
+      {/* Celular: no 1º passo, valor ao lado do botão; depois, o valor vai para uma linha própria
+          em cima, para "Voltar" e o botão principal caberem lado a lado sem cobrir o valor. */}
+      <div className="keyboard-static sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 -mx-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-line bg-surface/95 px-4 pt-3 pb-8 backdrop-blur md:static md:mx-0 md:flex-nowrap md:justify-end md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
+        <div
+          className={cn(
+            "min-w-0 md:hidden",
+            step > 0 ? "flex basis-full items-baseline justify-between gap-3" : "flex-1",
+          )}
+        >
           <p className="text-xs text-ink-muted">Previsto{nights > 0 ? ` · ${pluralize(nights, "noite", "noites")}` : ""}</p>
-          <p className="font-display text-xl leading-tight font-semibold">{quote ? formatCurrency(quote.total) : "—"}</p>
+          <p className="font-display text-xl leading-tight font-semibold whitespace-nowrap">
+            {quote ? formatCurrency(quote.total) : "—"}
+          </p>
         </div>
         {step > 0 ? (
-          <Button variant="secondary" size="lg" onClick={goBack} className="shrink-0 px-3 md:px-5">
+          <Button variant="secondary" size="lg" onClick={goBack} className="flex-1 px-3 md:flex-none md:px-5">
             <ChevronLeft aria-hidden="true" />
             Voltar
           </Button>
         ) : null}
         {isLastStep ? (
-          <SubmitButton size="lg" pendingLabel="Criando…">
+          <SubmitButton size="lg" pendingLabel="Criando…" className="flex-[2] md:flex-none">
             Criar reserva
           </SubmitButton>
         ) : (
-          <Button size="lg" onClick={goNext}>
+          <Button size="lg" onClick={goNext} className={cn(step > 0 && "flex-[2] md:flex-none")}>
             Continuar
           </Button>
         )}
