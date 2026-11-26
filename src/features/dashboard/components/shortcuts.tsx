@@ -30,8 +30,8 @@ function Shortcut({ href, icon, title, description, className }: ShortcutProps) 
         {icon}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[15px] font-semibold">{title}</span>
-        <span className="block truncate text-xs text-ink-muted">{description}</span>
+        <span className="block text-[15px] font-semibold">{title}</span>
+        <span className="block text-sm text-ink-muted">{description}</span>
       </span>
       <ChevronRight aria-hidden="true" className="size-4 shrink-0 text-ink-muted" />
     </Link>
@@ -45,7 +45,8 @@ export function Shortcuts({ chaletCount, guestCount }: { chaletCount: number; gu
       <h2 id="shortcuts-title" className="mb-3 font-display text-xl font-semibold md:text-2xl">
         Atalhos
       </h2>
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+      {/* Celular: um por linha, para o nome e a descrição aparecerem inteiros. */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
         <Shortcut
           href={routes.chalets}
           icon={<House />}
