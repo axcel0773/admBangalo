@@ -19,13 +19,13 @@ export function YearReportView({ report }: { report: YearReport }) {
           <div>
             <dt className="text-xs text-ink-muted">Diária média</dt>
             <dd className="font-display text-lg font-semibold tabular-nums md:text-xl">
-              <Money value={totals.averageRate} rounded />
+              <Money value={totals.averageRate} whole />
             </dd>
           </div>
           <div>
             <dt className="text-xs text-ink-muted">Hospedagem</dt>
             <dd className="font-display text-lg font-semibold tabular-nums md:text-xl">
-              <Money value={totals.revenue} rounded />
+              <Money value={totals.revenue} whole />
             </dd>
           </div>
         </dl>
@@ -60,7 +60,12 @@ export function YearReportView({ report }: { report: YearReport }) {
               <li key={row.source} className="flex items-center justify-between gap-3 py-2.5 text-sm">
                 <span>
                   <span className="font-semibold">{row.label}</span>
-                  <span className="text-ink-muted"> · {pluralize(row.reservations, "reserva", "reservas")}</span>
+                  <span className="text-ink-muted">
+                    {" · "}
+                    {row.reservations > 0
+                      ? pluralize(row.reservations, "reserva", "reservas")
+                      : "noites de reservas do ano anterior"}
+                  </span>
                 </span>
                 <Money value={row.revenue} className="font-semibold" />
               </li>

@@ -101,18 +101,22 @@ export function buildYearReport(input: { year: number; stays: ReportStay[]; chal
 
   const sourceMap = new Map<ReservationSource, ReportSourceRow>();
   for (const stay of stays) {
-    // Origem conta pela entrada: a reserva pertence ao ano do check-in.
-    if (stay.check_in < yearStart || stay.check_in >= nextYear) continue;
+    // A reserva conta no ano do check-in; o valor, como no resumo e por bangalô, só pelas noites
+    // dentro do ano. Assim a soma das origens fecha com a hospedagem do ano.
+    const nightsInYear = overlapNights(stay, yearStart, nextYear);
+    const startsInYear = stay.check_in >= yearStart && stay.check_in < nextYear;
+    if (!startsInYear && nightsInYear === 0) continue;
     const row = sourceMap.get(stay.source) ?? {
       source: stay.source,
       label: SOURCE_LABELS[stay.source],
       reservations: 0,
       revenue: 0,
     };
-    row.reservations += 1;
-    row.revenue = round2(row.revenue + stay.lodging_total);
+    if (startsInYear) row.reservations += 1;
+    row.revenue += stay.nights > 0 ? (stay.lodging_total * nightsInYear) / stay.nights : 0;
     sourceMap.set(stay.source, row);
   }
+  for (const row of sourceMap.values()) row.revenue = round2(row.revenue);
 
   const daysInYear = daysBetween(yearStart, nextYear);
   const chalets = input.chaletNames.map((name): ReportChaletRow => {

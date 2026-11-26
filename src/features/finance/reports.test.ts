@@ -50,6 +50,15 @@ describe("relatório anual", () => {
     expect(report.chalets[1]!.nightsSold).toBe(4);
   });
 
+  it("origem soma só as noites do ano, fechando com a hospedagem do ano", () => {
+    const reveillon = stay({ check_in: "2026-12-27", check_out: "2027-01-02", nights: 6, lodging_total: 7000.02, source: "whatsapp" });
+    const in2026 = buildYearReport({ year: 2026, stays: [reveillon], chaletNames: ["A"] });
+    expect(in2026.sources).toEqual([{ source: "whatsapp", label: expect.any(String), reservations: 1, revenue: 5833.35 }]);
+    expect(in2026.sources[0]!.revenue).toBe(in2026.totals.revenue);
+    const in2027 = buildYearReport({ year: 2027, stays: [reveillon], chaletNames: ["A"] });
+    expect(in2027.sources[0]).toMatchObject({ reservations: 0, revenue: 1166.67 });
+  });
+
   it("sem bangalôs não divide por zero", () => {
     const report = buildYearReport({ year: 2026, stays: [], chaletNames: [] });
     expect(report.totals.occupancy).toBe(0);

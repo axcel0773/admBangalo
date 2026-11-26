@@ -9,7 +9,7 @@ import { PaymentStatusBadge } from "@/features/reservations/components/payment-s
 import { formatShortDate, formatStayRange } from "@/lib/dates";
 import { formatCurrency, pluralize } from "@/lib/format";
 
-import { formatCityState, whatsappUrl, type Guest, type GuestStay } from "../domain";
+import { activeStays, formatCityState, whatsappUrl, type Guest, type GuestStay } from "../domain";
 import { GuestRemoveCard } from "./guest-remove-card";
 
 function InfoItem({ label, value }: { label: string; value: string | null }) {
@@ -24,8 +24,9 @@ function InfoItem({ label, value }: { label: string; value: string | null }) {
 
 export function GuestProfile({ guest, stays }: { guest: Guest; stays: GuestStay[] }) {
   const whatsapp = whatsappUrl(guest.phone, `Olá, ${guest.full_name.split(" ")[0]}!`);
-  const lastStay = stays.find((stay) => stay.status !== "cancelled");
-  const totalSpent = stays.filter((s) => s.status !== "cancelled").reduce((sum, s) => sum + s.grand_total, 0);
+  const active = activeStays(stays);
+  const lastStay = active[0];
+  const totalSpent = active.reduce((sum, s) => sum + s.grand_total, 0);
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
@@ -37,7 +38,10 @@ export function GuestProfile({ guest, stays }: { guest: Guest; stays: GuestStay[
             <div className="min-w-0">
               <p className="font-display text-2xl font-semibold break-words">{guest.full_name}</p>
               <p className="text-sm text-ink-muted">
-                {pluralize(stays.length, "estadia", "estadias")} · {formatCurrency(totalSpent)} em reservas
+                {pluralize(active.length, "estadia", "estadias")} · {formatCurrency(totalSpent)} em reservas
+                {stays.length > active.length
+                  ? ` · ${pluralize(stays.length - active.length, "cancelada", "canceladas")}`
+                  : ""}
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2 [&>*:only-child]:col-span-2">

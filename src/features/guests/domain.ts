@@ -42,9 +42,14 @@ export function isGuestFilter(value: string | undefined): value is GuestFilter {
   return value !== undefined && Object.hasOwn(GUEST_FILTERS, value);
 }
 
+/** Estadias que contam: reservas canceladas ficam no histórico, mas não são estadias. */
+export function activeStays<T extends Pick<GuestStay, "status">>(stays: T[]): T[] {
+  return stays.filter((stay) => stay.status !== "cancelled");
+}
+
 /** Cliente recorrente: estadias canceladas não contam. */
 export function isRecurringGuest(stays: Pick<GuestStay, "status">[]): boolean {
-  return stays.filter((stay) => stay.status !== "cancelled").length >= RECURRING_MIN_STAYS;
+  return activeStays(stays).length >= RECURRING_MIN_STAYS;
 }
 
 /** Aniversário no mesmo mês de `today` (datas ISO "AAAA-MM-DD"). */
@@ -114,4 +119,26 @@ export function guestsCsv(guests: Guest[]): string {
       csvDate(guest.created_at.slice(0, 10)),
     ]),
   );
+}
+
+export type GuestContact = Pick<Guest, "id" | "full_name" | "phone">;
+
+/** Dígitos do telefone sem o código do país (55), para comparar cadastros. */
+export function phoneKey(phone: string | null | undefined): string {
+  const digits = (phone ?? "").replace(/\D/g, "");
+  return digits.length > 11 && digits.startsWith("55") ? digits.slice(2) : digits;
+}
+
+/**
+ * Hóspede já cadastrado com o mesmo telefone (para avisar antes de duplicar).
+ * Precisa de pelo menos 10 dígitos (DDD + número) para não acusar número incompleto.
+ */
+export function findGuestByPhone<T extends { id: string; phone: string | null }>(
+  guests: T[],
+  phone: string,
+  exceptId?: string,
+): T | null {
+  const key = phoneKey(phone);
+  if (key.length < 10) return null;
+  return guests.find((guest) => guest.id !== exceptId && phoneKey(guest.phone) === key) ?? null;
 }

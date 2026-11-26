@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { Field } from "@/components/ui/field";
 import { inputClassName } from "@/components/ui/input-styles";
+import { DuplicatePhoneHint } from "@/features/guests/components/duplicate-phone-hint";
 import { cn } from "@/lib/cn";
 import { documentProblem, phoneProblem } from "@/lib/masks";
 
@@ -156,6 +157,14 @@ export function GuestPicker({
             mask="phone"
             validate={phoneProblem}
             error={errors.new_guest_phone}
+          />
+          <DuplicatePhoneHint
+            contacts={guests}
+            phone={newGuest.phone}
+            onUseExisting={(id) => {
+              onSelect(id);
+              onModeChange("existing");
+            }}
           />
           <Field
             label="CPF ou documento (opcional)"

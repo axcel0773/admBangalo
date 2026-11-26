@@ -41,6 +41,7 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
   });
 
   const energy = findEnergyCharge(charges);
+  const energyTariff = energy?.unit_amount ?? billing.meteredFee?.amount ?? null;
   const cancelled = reservation.status === "cancelled";
   const paymentContext = {
     reservationStatus: reservation.status,
@@ -57,12 +58,13 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
           businessName={owner.businessName}
           billing={
             <>
-              {!cancelled ? (
+              {/* Sem taxa de energia cadastrada não há leitura a fazer: o cartão nem aparece. */}
+              {!cancelled && energyTariff !== null ? (
                 <EnergyCard
                   action={saveMeterReading.bind(null, id)}
                   status={reservation.status}
                   reading={{ start: energy?.meter_start ?? null, end: energy?.meter_end ?? null }}
-                  tariff={energy?.unit_amount ?? billing.meteredFee?.amount ?? null}
+                  tariff={energyTariff}
                 />
               ) : null}
               <ChargesCard
