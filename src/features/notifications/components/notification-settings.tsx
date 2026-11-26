@@ -75,9 +75,15 @@ export function NotificationSettings({ settings }: { settings: Settings }) {
         return;
       }
       const registration = await readyRegistration();
-      const subscription =
-        (await registration.pushManager.getSubscription()) ??
-        (await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToBytes(settings.publicKey) }));
+      const key = urlBase64ToBytes(settings.publicKey);
+      let subscription = await registration.pushManager.getSubscription();
+      // Inscrição feita com uma chave antiga (as chaves VAPID foram trocadas): refaz com a atual,
+      // senão o serviço de push recusa os avisos.
+      if (subscription && !sameKey(subscription.options.applicationServerKey, key)) {
+        await subscription.unsubscribe();
+        subscription = null;
+      }
+      subscription ??= await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
       const result = await saveSubscription(subscription.toJSON() as Parameters<typeof saveSubscription>[0]);
       setSubscribed(result.status === "success");
       setMessage({ tone: result.status === "success" ? "ok" : "error", text: result.status === "idle" ? "" : result.message });
@@ -167,4 +173,11 @@ export function NotificationSettings({ settings }: { settings: Settings }) {
       </p>
     </div>
   );
+}
+
+/** Compara a chave usada na inscrição com a chave pública atual do servidor. */
+function sameKey(current: ArrayBuffer | null, expected: Uint8Array): boolean {
+  if (!current) return false;
+  const bytes = new Uint8Array(current);
+  return bytes.length === expected.length && bytes.every((byte, index) => byte === expected[index]);
 }

@@ -41,8 +41,12 @@ Não há dependência npm: VAPID e a criptografia estão em `src/features/notifi
 3. Fazer um novo deploy e, em Configurações, ativar e tocar em *Enviar teste*.
 
 Para trocar o segredo: `update push_cron_secret set secret_hash = encode(extensions.digest('NOVO', 'sha256'), 'hex');`
-e atualizar `CRON_SECRET`. Para trocar as chaves VAPID, gere outro par, atualize as variáveis e peça para ativar
-as notificações de novo em cada aparelho (inscrições antigas deixam de valer).
+e atualizar `CRON_SECRET`. Para trocar as chaves VAPID, gere outro par, atualize as variáveis e faça um novo deploy.
+Ao tocar em *Ativar* de novo, o app percebe a inscrição feita com a chave antiga e refaz com a atual
+(`notification-settings.tsx`, `sameKey`); quem não tocar fica sem avisos até ativar de novo.
+
+**Última troca:** 26/11/2026 — `CRON_SECRET`, `VAPID_PRIVATE_KEY` e `VAPID_PUBLIC_KEY` trocadas (o segredo antigo
+apareceu numa conversa) e o hash em `push_cron_secret` atualizado. Nenhum aparelho estava inscrito.
 
 ## Regra de "cobrança vencida"
 
