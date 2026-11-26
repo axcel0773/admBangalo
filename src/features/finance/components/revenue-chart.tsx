@@ -16,7 +16,7 @@ export function RevenueChart({ points, currentMonth }: { points: TrendPoint[]; c
       action={
         <div className="flex items-center gap-3 text-xs text-ink-muted" aria-hidden="true">
           <span className="flex items-center gap-1.5">
-            <span className="size-2.5 rounded-sm bg-muted" /> Total das reservas
+            <span className="size-2.5 rounded-sm bg-muted" /> Reservas
           </span>
           <span className="flex items-center gap-1.5">
             <span className="size-2.5 rounded-sm bg-primary" /> Já pago
@@ -46,7 +46,9 @@ export function RevenueChart({ points, currentMonth }: { points: TrendPoint[]; c
         ))}
       </div>
 
-      <table className="sr-only">
+      {/* Tabela não obedece a largura de 1px do sr-only: o invólucro é que some. */}
+      <div className="sr-only">
+      <table>
         <caption>Total das reservas e já pago, por mês de entrada</caption>
         <thead>
           <tr>
@@ -65,6 +67,7 @@ export function RevenueChart({ points, currentMonth }: { points: TrendPoint[]; c
           ))}
         </tbody>
       </table>
+      </div>
     </CardSection>
   );
 }
