@@ -1,15 +1,23 @@
-import { X } from "lucide-react";
+import { Wrench, X } from "lucide-react";
 
 import { ActionForm } from "@/components/ui/action-form";
 import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { CardSection } from "@/components/ui/card";
 import { InlineEdit } from "@/components/ui/inline-edit";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
+import { SubmitButton } from "@/components/ui/submit-button";
+import { roundMoney } from "@/features/reservations/domain";
 import { formatShortDate, type IsoDate } from "@/lib/dates";
 import { formatCurrency } from "@/lib/format";
 
-import { addInstallment, addSplitPlan, editInstallment, removeInstallment } from "../actions";
-import { unscheduledAmount, type InstallmentProgress, type InstallmentStatus } from "../domain/schedule";
+import { addInstallment, addSplitPlan, editInstallment, fixScheduleGap, removeInstallment } from "../actions";
+import {
+  scheduleGapFixes,
+  unscheduledAmount,
+  type InstallmentProgress,
+  type InstallmentStatus,
+  type ScheduleGapFix,
+} from "../domain/schedule";
 import type { PixCharge } from "../services";
 import { InstallmentEditForm } from "./installment-edit-form";
 import { InstallmentForm } from "./installment-form";
@@ -32,11 +40,31 @@ interface ScheduleCardProps {
   today: IsoDate;
   cancelled: boolean;
   nextPix: (PixCharge & { installmentId: string }) | null;
+  /** Total já recebido (o "Sinal (pago)" ao dividir e nos consertos). */
+  paid: number;
+  firstPaidOn: string | null;
+}
+
+function fixLabel(fix: ScheduleGapFix): string {
+  if (fix.kind === "paid_deposit") return `Transformar o pago (${formatCurrency(fix.amount)}) em sinal`;
+  if (fix.kind === "new_installment") return `Criar parcela de ${formatCurrency(fix.amount)}`;
+  return `Ajustar a última parcela para ${formatCurrency(fix.newAmount)}`;
 }
 
 /** Parcelas previstas (sinal, parcelas, saldo) com vencimento e situação. */
-export function ScheduleCard({ reservationId, schedule, total, checkIn, today, cancelled, nextPix }: ScheduleCardProps) {
+export function ScheduleCard({
+  reservationId,
+  schedule,
+  total,
+  checkIn,
+  today,
+  cancelled,
+  nextPix,
+  paid,
+  firstPaidOn,
+}: ScheduleCardProps) {
   const gap = unscheduledAmount(schedule, total);
+  const fixes = cancelled ? [] : scheduleGapFixes({ items: schedule, total, paid });
 
   return (
     <CardSection title="Parcelas" titleId="reservation-schedule">
@@ -45,8 +73,15 @@ export function ScheduleCard({ reservationId, schedule, total, checkIn, today, c
           <p className="text-sm text-ink-muted">
             Sem parcelas, o saldo vence no check-in. Combine sinal e saldo para o Painel avisar na data certa.
           </p>
-          {!cancelled && total > 0 ? (
-            <SplitPlanForm action={addSplitPlan.bind(null, reservationId)} total={total} checkIn={checkIn} today={today} />
+          {!cancelled && total > 0 && paid < total ? (
+            <SplitPlanForm
+              action={addSplitPlan.bind(null, reservationId)}
+              total={total}
+              paid={Math.max(paid, 0)}
+              paidOn={firstPaidOn ?? undefined}
+              checkIn={checkIn}
+              today={today}
+            />
           ) : null}
         </div>
       ) : (
@@ -94,7 +129,7 @@ export function ScheduleCard({ reservationId, schedule, total, checkIn, today, c
                   </span>
                   <span className="block text-xs text-ink-muted">
                     vence {formatShortDate(item.due_date)}
-                    {item.status === "partial" || (item.covered > 0 && item.remaining > 0)
+                    {item.status !== "paid" && item.covered > 0 && item.remaining > 0
                       ? ` · falta ${formatCurrency(item.remaining)}`
                       : ""}
                   </span>
@@ -107,11 +142,23 @@ export function ScheduleCard({ reservationId, schedule, total, checkIn, today, c
       )}
 
       {schedule.length > 0 && gap !== 0 ? (
-        <p className="mb-3 rounded-xl bg-accent-soft px-3 py-2 text-xs font-semibold text-accent-ink">
-          {gap > 0
-            ? `${formatCurrency(gap)} do total ainda sem parcela.`
-            : `As parcelas passam do total em ${formatCurrency(-gap)}.`}
-        </p>
+        <div className="mb-3 flex flex-col gap-2">
+          <p role="status" className="rounded-xl bg-accent-soft px-3 py-2.5 text-sm text-accent-ink">
+            <span className="block font-semibold">
+              As parcelas somam {formatCurrency(roundMoney(total - gap))}
+            </span>
+            O total da reserva é {formatCurrency(total)}.{" "}
+            {gap > 0 ? `Faltam ${formatCurrency(gap)} sem parcela.` : `Passam ${formatCurrency(-gap)} do total.`}
+          </p>
+          {fixes.map((fix, index) => (
+            <ActionForm key={fix.kind} action={fixScheduleGap.bind(null, reservationId, fix.kind)}>
+              <SubmitButton variant={index === 0 ? "primary" : "secondary"} block pendingLabel="Ajustando…">
+                {index === 0 ? <Wrench aria-hidden="true" /> : null}
+                {fixLabel(fix)}
+              </SubmitButton>
+            </ActionForm>
+          ))}
+        </div>
       ) : null}
 
       {!cancelled && schedule.length > 0 ? (

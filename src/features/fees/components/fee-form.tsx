@@ -30,6 +30,15 @@ const AMOUNT_LABEL: Record<ChargeMode, string> = {
   metered: "Tarifa por kWh (R$)",
 };
 
+/** Exemplo do cálculo, para ficar claro por que o valor muda de uma reserva para outra. */
+const AMOUNT_HINT: Record<ChargeMode, string> = {
+  per_stay: "Mesmo valor em toda reserva, não importa noites nem pessoas.",
+  per_night: "Muda com as noites. Ex.: R$ 50 × 3 noites = R$ 150.",
+  per_guest: "Muda com as pessoas. Ex.: R$ 20 × 4 pessoas = R$ 80.",
+  per_guest_night: "Muda com pessoas e noites. Ex.: R$ 10 × 4 pessoas × 3 noites = R$ 120.",
+  metered: "Calculado no check-out: (leitura final − inicial) × tarifa.",
+};
+
 export function FeeForm({ action, chaletOptions, fee }: FeeFormProps) {
   const [state, formAction] = useActionState(action, idleFormState);
   const [mode, setMode] = useState<ChargeMode>(fee?.mode ?? "per_stay");
@@ -46,8 +55,8 @@ export function FeeForm({ action, chaletOptions, fee }: FeeFormProps) {
           <SelectField
             label="Tipo"
             name="kind"
-            // Pessoa extra não existe mais: todos estão inclusos na diária (máx. 6 por bangalô).
-            options={toOptions(FEE_KIND_LABELS).filter((option) => option.value !== "extra_guest")}
+            // Pessoa extra não existe mais (todos inclusos na diária); item quebrado só existe na reserva.
+            options={toOptions(FEE_KIND_LABELS).filter((option) => option.value !== "extra_guest" && option.value !== "item")}
             defaultValue={v("kind", fee?.kind ?? "cleaning")}
             error={error("kind")}
           />
@@ -67,13 +76,7 @@ export function FeeForm({ action, chaletOptions, fee }: FeeFormProps) {
           validate={(value) => moneyProblem(value, { required: true })}
           defaultValue={v("amount", formatMoneyInput(fee?.amount))}
           placeholder={mode === "metered" ? "1,00" : "150,00"}
-          hint={
-            mode === "metered"
-              ? "O valor é calculado no check-out: (leitura final − inicial) × tarifa."
-              : mode === "per_guest" || mode === "per_guest_night"
-                ? "Para o tipo “Pessoa extra”, conta só quem passa dos hóspedes inclusos."
-                : undefined
-          }
+          hint={AMOUNT_HINT[mode]}
           required
           error={error("amount")}
         />

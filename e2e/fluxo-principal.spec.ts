@@ -44,6 +44,22 @@ test.describe("fluxo principal", () => {
     await expect(page).toHaveURL(/\/reservas\/[0-9a-f-]{36}$/);
     await expect(page.getByText("Hóspede E2E").first()).toBeVisible();
 
+    // Taxa (só tipo e valor) e item quebrado (quantidade × valor), em grupos separados
+    const charges = page.getByRole("region", { name: "Hospedagem e taxas" });
+    await charges.getByRole("button", { name: "Taxa", exact: true }).click();
+    await charges.getByRole("button", { name: "Limpeza" }).click();
+    await charges.getByLabel("Valor (R$)").fill("150,00");
+    await charges.getByRole("button", { name: "Adicionar", exact: true }).click();
+    await expect(page.getByText("Taxa adicionada.")).toBeVisible();
+    await charges.getByRole("button", { name: "Item quebrado" }).click();
+    await charges.getByLabel("O que foi?").fill("Copo quebrado");
+    await charges.getByLabel("Quantidade").fill("2");
+    await charges.getByLabel("Valor de cada (R$)").fill("15,00");
+    await charges.getByRole("button", { name: "Adicionar", exact: true }).click();
+    await expect(page.getByText("Item adicionado.")).toBeVisible();
+    await expect(charges.getByRole("heading", { name: "Itens quebrados e consumo" })).toBeVisible();
+    await expect(charges.getByText("Copo quebrado")).toBeVisible();
+
     // Pagamento do saldo inteiro (valor sugerido)
     await page.getByRole("button", { name: "Registrar pagamento" }).click();
     await page.getByRole("button", { name: "Registrar", exact: true }).click();

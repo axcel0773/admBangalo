@@ -12,9 +12,11 @@ import {
   PaymentsCard,
   saveMeterReading,
   ScheduleCard,
+  taxDefaults,
 } from "@/features/billing";
 import { requireOwner } from "@/features/auth/session";
 import { CommissionCard, commissionOf, listBrokerNames } from "@/features/commissions";
+import { listFees } from "@/features/fees";
 import { DeleteReservationCard, getReservationDetail, ReservationDetail } from "@/features/reservations";
 import { todayIso } from "@/lib/dates";
 
@@ -22,7 +24,12 @@ export const metadata: Metadata = { title: "Reserva" };
 
 export default async function ReservationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [detail, owner, brokers] = await Promise.all([getReservationDetail(id), requireOwner(), listBrokerNames()]);
+  const [detail, owner, brokers, fees] = await Promise.all([
+    getReservationDetail(id),
+    requireOwner(),
+    listBrokerNames(),
+    listFees(),
+  ]);
   if (!detail) notFound();
 
   const { reservation, financials, charges, mainGuest } = detail;
@@ -58,7 +65,12 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
                   tariff={energy?.unit_amount ?? billing.meteredFee?.amount ?? null}
                 />
               ) : null}
-              <ChargesCard reservation={reservation} charges={charges} grandTotal={financials.grand_total} />
+              <ChargesCard
+                reservation={reservation}
+                charges={charges}
+                grandTotal={financials.grand_total}
+                taxDefaults={taxDefaults(fees, reservation.chalet_id)}
+              />
               <DeleteReservationCard reservationId={id} paid={financials.paid_total} />
             </>
           }
@@ -90,6 +102,8 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
                 today={todayIso()}
                 cancelled={cancelled}
                 nextPix={billing.nextInstallmentPix}
+                paid={financials.paid_total}
+                firstPaidOn={billing.firstPaidOn}
               />
               <PaymentsCard
                 reservationId={id}

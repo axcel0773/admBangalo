@@ -18,27 +18,36 @@ const COUNT_OPTIONS = SPLIT_COUNTS.map((count) => ({ value: String(count) as `${
 interface SplitPlanFormProps {
   action: (state: FormState, formData: FormData) => Promise<FormState>;
   total: number;
+  /** Já recebido: entra como "Sinal (pago)" e só o resto é dividido. */
+  paid?: number;
+  paidOn?: IsoDate;
   checkIn: IsoDate;
   today: IsoDate;
 }
 
 /** Divide o total em 2–4 parcelas, com prévia. Com "só valores redondos" não sobra centavo quebrado. */
-export function SplitPlanForm({ action, total, checkIn, today }: SplitPlanFormProps) {
+export function SplitPlanForm({ action, total, paid = 0, paidOn, checkIn, today }: SplitPlanFormProps) {
   const [state, formAction] = useActionState(action, idleFormState);
   const [count, setCount] = useState<`${SplitCount}`>("2");
   const [wholeReais, setWholeReais] = useState(true);
 
   // Prévia com a mesma regra do servidor (que recalcula a partir do total do banco).
-  const plan = splitPlan({ total, count: Number(count) as SplitCount, checkIn, today, wholeReais });
+  const plan = splitPlan({ total, count: Number(count) as SplitCount, checkIn, today, wholeReais, paid, paidOn });
 
   return (
     <form action={formAction} className="flex flex-col gap-3" noValidate>
       <FormAlert state={state} />
-      <SegmentedControl label="Dividir em" name="count" options={COUNT_OPTIONS} value={count} onChange={setCount} />
+      {paid > 0 ? (
+        <p className="text-sm text-ink-muted">
+          Já pago: {formatCurrency(paid)} · falta {formatCurrency(Math.round((total - paid) * 100) / 100)}. O pago vira o
+          sinal e só o que falta é dividido.
+        </p>
+      ) : null}
+      <SegmentedControl label={paid > 0 ? "Dividir o que falta em" : "Dividir em"} name="count" options={COUNT_OPTIONS} value={count} onChange={setCount} />
       <SwitchField
         name="whole_reais"
         label="Só valores redondos"
-        description="Sem centavos quebrados. A diferença fica no sinal."
+        description={paid > 0 ? "Sem centavos quebrados. A diferença fica na primeira parcela." : "Sem centavos quebrados. A diferença fica no sinal."}
         checked={wholeReais}
         onChange={(event) => setWholeReais(event.target.checked)}
       />
@@ -48,7 +57,13 @@ export function SplitPlanForm({ action, total, checkIn, today }: SplitPlanFormPr
           <li key={item.description} className="flex items-center justify-between gap-3 py-2.5 text-sm">
             <span className="min-w-0">
               <span className="block font-semibold">{item.description}</span>
-              <span className="block text-xs text-ink-muted">{item.due_date === today ? "Hoje" : formatShortDate(item.due_date)}</span>
+              <span className="block text-xs text-ink-muted">
+                {item.description === "Sinal (pago)"
+                  ? `pago em ${formatShortDate(item.due_date)}`
+                  : item.due_date === today
+                    ? "Hoje"
+                    : formatShortDate(item.due_date)}
+              </span>
             </span>
             <span className="font-semibold tabular-nums">{formatCurrency(item.amount)}</span>
           </li>

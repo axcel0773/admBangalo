@@ -1,4 +1,5 @@
 import { X, Zap } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { ActionForm } from "@/components/ui/action-form";
 import { CardSection } from "@/components/ui/card";
@@ -8,6 +9,7 @@ import { formatCurrency, formatDecimal } from "@/lib/format";
 import type { Tables } from "@/types/database";
 
 import { addExtraCharge, removeCharge } from "../actions";
+import { groupCharges, type TaxKind } from "../domain/charges";
 import { ExtraChargeForm } from "./extra-charge-form";
 
 type Charge = Tables<"reservation_charges">;
@@ -19,6 +21,8 @@ interface ChargesCardProps {
   >;
   charges: Charge[];
   grandTotal: number;
+  /** Valor sugerido por tipo de taxa (das taxas cadastradas em Configurações). */
+  taxDefaults?: Partial<Record<TaxKind, number>>;
 }
 
 function chargeDetail(charge: Charge): string {
@@ -29,8 +33,41 @@ function chargeDetail(charge: Charge): string {
 }
 
 /** Hospedagem + taxas (automáticas, energia e avulsas), com remoção e inclusão. */
-export function ChargesCard({ reservation, charges, grandTotal }: ChargesCardProps) {
+export function ChargesCard({ reservation, charges, grandTotal, taxDefaults = {} }: ChargesCardProps) {
   const editable = reservation.status !== "cancelled";
+  const { taxes, items } = groupCharges(charges);
+
+  const renderCharge = (charge: Charge) => (
+    <div key={charge.id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3">
+      <dt className="min-w-0 flex-1">
+        <span className="flex items-center gap-1.5 font-semibold">
+          {charge.kind === "energy" ? <Zap className="size-4 text-energy-ink" aria-hidden="true" /> : null}
+          {charge.description}
+        </span>
+        {charge.mode === "metered" || charge.quantity !== 1 ? (
+          <span className="block text-xs text-ink-muted">{chargeDetail(charge)}</span>
+        ) : null}
+      </dt>
+      <dd className="flex items-center gap-1 font-semibold">
+        {formatCurrency(charge.total)}
+        {editable && charge.mode !== "metered" ? (
+          <ActionForm action={removeCharge.bind(null, reservation.id, charge.id)} className="contents">
+            <ConfirmSubmit
+              message={`Remover “${charge.description}” desta reserva?`}
+              confirmLabel="Remover"
+              pendingLabel="Removendo…"
+              triggerSize="icon"
+              triggerLabel={`Remover ${charge.description}`}
+              block={false}
+              className="size-11 text-ink-muted md:size-9"
+            >
+              <X aria-hidden="true" />
+            </ConfirmSubmit>
+          </ActionForm>
+        ) : null}
+      </dd>
+    </div>
+  );
 
   return (
     <CardSection title="Hospedagem e taxas" titleId="reservation-charges">
@@ -50,43 +87,27 @@ export function ChargesCard({ reservation, charges, grandTotal }: ChargesCardPro
           <dd className="font-semibold">{formatCurrency(reservation.lodging_total)}</dd>
         </div>
 
-        {charges.map((charge) => (
-          <div key={charge.id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3">
-            <dt className="min-w-0 flex-1">
-              <span className="flex items-center gap-1.5 font-semibold">
-                {charge.kind === "energy" ? <Zap className="size-4 text-energy-ink" aria-hidden="true" /> : null}
-                {charge.description}
-              </span>
-              <span className="block text-xs text-ink-muted">{chargeDetail(charge)}</span>
-            </dt>
-            <dd className="flex items-center gap-1 font-semibold">
-              {formatCurrency(charge.total)}
-              {editable && charge.mode !== "metered" ? (
-                <ActionForm action={removeCharge.bind(null, reservation.id, charge.id)} className="contents">
-                  <ConfirmSubmit
-                    message={`Remover “${charge.description}” desta reserva?`}
-                    confirmLabel="Remover"
-                    pendingLabel="Removendo…"
-                    triggerSize="icon"
-                    triggerLabel={`Remover ${charge.description}`}
-                    block={false}
-                    className="size-11 text-ink-muted md:size-9"
-                  >
-                    <X aria-hidden="true" />
-                  </ConfirmSubmit>
-                </ActionForm>
-              ) : null}
-            </dd>
-          </div>
-        ))}
       </dl>
+      <ChargeGroup title="Taxas">{taxes.map(renderCharge)}</ChargeGroup>
+      <ChargeGroup title="Itens quebrados e consumo">{items.map(renderCharge)}</ChargeGroup>
 
       <div className="mt-1 mb-3 flex items-baseline justify-between border-t-2 border-ink pt-3">
         <span className="font-display text-lg font-semibold">Total</span>
         <span className="font-display text-2xl font-semibold">{formatCurrency(grandTotal)}</span>
       </div>
 
-      {editable ? <ExtraChargeForm action={addExtraCharge.bind(null, reservation.id)} /> : null}
+      {editable ? <ExtraChargeForm action={addExtraCharge.bind(null, reservation.id)} defaults={taxDefaults} /> : null}
     </CardSection>
+  );
+}
+
+/** Grupo da lista (taxas ou itens), com título; some quando está vazio. */
+function ChargeGroup({ title, children }: { title: string; children: ReactNode[] }) {
+  if (children.length === 0) return null;
+  return (
+    <div className="border-t border-line pt-3">
+      <h3 className="text-xs font-semibold tracking-wide text-ink-muted uppercase">{title}</h3>
+      <dl className="divide-y divide-line text-sm">{children}</dl>
+    </div>
   );
 }

@@ -18,6 +18,7 @@ const KIND_ICON: Record<FeeKind, { icon: ReactNode; tone: "primary" | "energy" |
   extra_guest: { icon: <UserPlus />, tone: "neutral" },
   pet: { icon: <Receipt />, tone: "primary" },
   other: { icon: <Receipt />, tone: "primary" },
+  item: { icon: <Receipt />, tone: "neutral" },
 };
 
 interface FeeListProps {

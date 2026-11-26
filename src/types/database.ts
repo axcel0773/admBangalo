@@ -555,7 +555,7 @@ export type Database = {
     Enums: {
       reservation_status: "pending" | "confirmed" | "checked_in" | "checked_out" | "cancelled";
       reservation_source: "direct" | "whatsapp" | "airbnb" | "booking" | "other";
-      fee_kind: "energy" | "cleaning" | "extra_guest" | "pet" | "other";
+      fee_kind: "energy" | "cleaning" | "extra_guest" | "pet" | "other" | "item";
       block_source: "manual" | "ical";
       charge_mode: "per_stay" | "per_night" | "per_guest" | "per_guest_night" | "metered";
       payment_method:

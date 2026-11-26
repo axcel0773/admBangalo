@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { estimateEnergy, findEnergyCharge, parseReading, pendingReading } from "./meter";
 import {
+  firstPaymentDate,
   signedAmount,
   suggestedPaymentAmount,
   suggestedPaymentKind,
@@ -124,5 +125,18 @@ describe("Pix copia e cola", () => {
 
   it("limpa acentos e corta no tamanho máximo", () => {
     expect(pixText("José da Conceição & Filhos Ltda.", 25)).toBe("Jose da Conceicao Filhos");
+  });
+});
+
+describe("primeiro pagamento", () => {
+  it("ignora estornos e pega a data mais antiga", () => {
+    expect(
+      firstPaymentDate([
+        { kind: "balance", paid_at: "2026-12-01" },
+        { kind: "refund", paid_at: "2026-10-01" },
+        { kind: "deposit", paid_at: "2026-11-24" },
+      ]),
+    ).toBe("2026-11-24");
+    expect(firstPaymentDate([])).toBeNull();
   });
 });
