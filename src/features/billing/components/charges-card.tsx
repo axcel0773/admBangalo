@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { ActionForm } from "@/components/ui/action-form";
 import { CardSection } from "@/components/ui/card";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
+import { Tip } from "@/components/ui/tip";
 import { lodgingBasis } from "@/features/reservations/domain/lodging";
 import { formatCurrency, formatDecimal } from "@/lib/format";
 import type { Tables } from "@/types/database";
@@ -71,6 +72,11 @@ export function ChargesCard({ reservation, charges, grandTotal, taxDefaults = {}
 
   return (
     <CardSection title="Hospedagem e taxas" titleId="reservation-charges">
+      {editable ? (
+        <Tip id="taxas" className="mb-3">
+          “Taxa” é cobrança combinada, como limpeza ou pet. “Item quebrado” é o que o hóspede estragou ou consumiu.
+        </Tip>
+      ) : null}
       <dl className="divide-y divide-line text-sm">
         <div className="flex justify-between gap-4 py-3">
           <dt>

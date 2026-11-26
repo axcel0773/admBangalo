@@ -72,7 +72,7 @@ function EntryCard({ entry, day }: { entry: ChaletDayEntry; day: IsoDate }) {
         <House className="size-6" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[11px] font-bold tracking-wide uppercase" style={{ color: chalet.color }}>
+        <span className="block text-xs font-bold tracking-wide uppercase" style={{ color: chalet.color }}>
           {chalet.name} · {label}
         </span>
         <span className="block truncate text-[15px] font-bold">{stay.main_guest_name}</span>

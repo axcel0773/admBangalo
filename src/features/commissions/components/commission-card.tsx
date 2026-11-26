@@ -7,6 +7,7 @@ import { CardSection } from "@/components/ui/card";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
 import { InlineEdit } from "@/components/ui/inline-edit";
 import { Money } from "@/components/ui/money";
+import { Tip } from "@/components/ui/tip";
 import { PAYMENT_METHOD_LABELS } from "@/features/billing/domain/payments";
 import { formatShortDate } from "@/lib/dates";
 import { formatCurrency } from "@/lib/format";
@@ -32,6 +33,9 @@ export function CommissionCard({ reservationId, commission, total, cancelled, br
   if (!commission) {
     return (
       <CardSection title="Comissão do corretor" titleId="reservation-commission">
+        <Tip id="corretor" className="mb-3">
+          Se um corretor trouxe o hóspede, registre a comissão. Quando você pagar, ela entra nas despesas do mês.
+        </Tip>
         <p className="pb-3 text-sm text-ink-muted">Sem corretor nesta reserva.</p>
         <AddCommission action={save} brokers={brokers} total={total} />
       </CardSection>

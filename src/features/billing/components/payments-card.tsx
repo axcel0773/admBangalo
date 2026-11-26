@@ -5,6 +5,7 @@ import { CardSection } from "@/components/ui/card";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
 import { InlineEdit } from "@/components/ui/inline-edit";
 import { Money } from "@/components/ui/money";
+import { Tip } from "@/components/ui/tip";
 import { formatShortDate, todayIso } from "@/lib/dates";
 import { formatCurrency } from "@/lib/format";
 
@@ -35,6 +36,9 @@ export function PaymentsCard({ reservationId, ownerId, payments, context }: Paym
 
   return (
     <CardSection title="Pagamentos" titleId="reservation-payments">
+      <Tip id="pagamentos" className="mb-3">
+        Toda vez que o hóspede pagar (Pix, dinheiro, cartão), registre aqui. O saldo e as parcelas se atualizam sozinhos.
+      </Tip>
       {payments.length === 0 ? (
         <p className="pb-3 text-sm text-ink-muted">Nenhum pagamento registrado.</p>
       ) : (

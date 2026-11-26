@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildDashboard, nightsInMonth, occupiesNight } from "./build-dashboard";
+import { buildDashboard, dueSoon, nightsInMonth, occupiesNight } from "./build-dashboard";
 import type { ChaletRow, StayRow } from "./types";
 
 const TODAY = "2026-11-03";
@@ -152,5 +152,15 @@ describe("buildDashboard", () => {
 
   it("conta hóspedes que dormem hoje", () => {
     expect(data.summary.guestsToday).toBe(3);
+  });
+});
+
+describe("cobrar esta semana", () => {
+  const item = (dueDate: string) =>
+    ({ reservationId: dueDate, guestName: "A", chaletName: "B", amount: 100, dueDate, dueStatus: "upcoming" }) as never;
+
+  it("fica só com atrasados, hoje e até 7 dias", () => {
+    const list = dueSoon([item("2026-11-01"), item("2026-11-10"), item("2026-11-17"), item("2026-11-18")], "2026-11-10");
+    expect(list.map((r: { dueDate: string }) => r.dueDate)).toEqual(["2026-11-01", "2026-11-10", "2026-11-17"]);
   });
 });

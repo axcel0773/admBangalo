@@ -12,7 +12,7 @@ export function StepIndicator({ steps, current, className }: StepIndicatorProps)
   return (
     <ol
       aria-label={`Etapa ${current + 1} de ${steps.length}`}
-      className={cn("grid gap-1.5 text-[11px] font-semibold", className)}
+      className={cn("grid gap-1.5 text-[13px] font-semibold", className)}
       style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
     >
       {steps.map((label, index) => (

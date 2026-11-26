@@ -4,7 +4,9 @@ import { revalidatePath } from "next/cache";
 
 import { requireOwner } from "@/features/auth/session";
 import { attempt } from "@/lib/actions";
-import { todayIso } from "@/lib/dates";
+import { roundMoney } from "@/features/reservations/domain";
+import { formatShortDate, todayIso } from "@/lib/dates";
+import { formatCurrency } from "@/lib/format";
 import { errorFormState, formDataToObject, invalidFormState, submittedValues, type FormState } from "@/lib/forms";
 import { assertIds, INVALID_ID_MESSAGE, isUuid } from "@/lib/ids";
 import { MutationError } from "@/lib/supabase/errors";
@@ -74,7 +76,10 @@ export async function addExtraCharge(reservationId: string, _prev: FormState, fo
   return run(
     formData,
     async () => (await billingRepository()).createExtraCharge(reservationId, parsed.data),
-    parsed.data.kind === "item" ? "Item adicionado." : "Taxa adicionada.",
+    // Diz o quê e quanto, para a pessoa saber que entrou certo.
+    `${parsed.data.kind === "item" ? "Item" : "Taxa"} “${parsed.data.description}” de ${formatCurrency(
+      roundMoney(parsed.data.unit_amount * parsed.data.quantity),
+    )} ${parsed.data.kind === "item" ? "somado" : "somada"} ao total.`,
   );
 }
 
@@ -116,10 +121,17 @@ export async function registerPayment(reservationId: string, _prev: FormState, f
     };
   }
 
+  // Saldo depois deste lançamento, para o aviso já dizer quanto falta.
+  const after = roundMoney(context.balance + (parsed.data.kind === "refund" ? parsed.data.amount : -parsed.data.amount));
+  const amount = formatCurrency(parsed.data.amount);
   return run(
     formData,
     () => repo.createPayment(reservationId, parsed.data),
-    parsed.data.kind === "refund" ? "Estorno registrado." : "Pagamento registrado.",
+    parsed.data.kind === "refund"
+      ? `Devolução de ${amount} registrada. Saldo a receber: ${formatCurrency(Math.max(after, 0))}.`
+      : after > 0.005
+        ? `Pagamento de ${amount} registrado. Falta ${formatCurrency(after)}.`
+        : `Pagamento de ${amount} registrado. Não falta mais nada.`,
   );
 }
 
@@ -178,7 +190,7 @@ export async function addInstallment(reservationId: string, _prev: FormState, fo
   return run(
     formData,
     async () => (await billingRepository()).createInstallments(reservationId, [parsed.data]),
-    "Parcela adicionada.",
+    `Parcela de ${formatCurrency(parsed.data.amount)} adicionada. O Painel avisa no dia ${formatShortDate(parsed.data.due_date)}.`,
   );
 }
 
@@ -220,7 +232,7 @@ export async function addSplitPlan(reservationId: string, _prev: FormState, form
         }),
       );
     },
-    "Parcelas criadas.",
+    "Parcelas criadas. O Painel avisa no dia de cobrar cada uma.",
   );
 }
 

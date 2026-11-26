@@ -49,7 +49,7 @@ export default async function DashboardPage() {
         <TodayAgenda events={dashboard.agenda} />
         <ChaletList chalets={dashboard.chalets} />
         <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:gap-5 lg:grid-cols-2">
-          <ReceivablesCard receivables={dashboard.receivables} />
+          <ReceivablesCard receivables={dashboard.receivables} totalCount={dashboard.summary.receivableCount} />
           <UpcomingArrivals arrivals={dashboard.upcoming} />
         </div>
         <Shortcuts chaletCount={dashboard.chalets.length} guestCount={dashboard.guestCount} />

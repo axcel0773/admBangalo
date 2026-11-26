@@ -6,6 +6,7 @@ import { CardSection } from "@/components/ui/card";
 import { InlineEdit } from "@/components/ui/inline-edit";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { Tip } from "@/components/ui/tip";
 import { roundMoney } from "@/features/reservations/domain";
 import { formatShortDate, type IsoDate } from "@/lib/dates";
 import { formatCurrency } from "@/lib/format";
@@ -68,6 +69,11 @@ export function ScheduleCard({
 
   return (
     <CardSection title="Parcelas" titleId="reservation-schedule">
+      {!cancelled ? (
+        <Tip id="parcelas" className="mb-3">
+          Combine aqui o sinal e o resto. O Painel avisa no dia de cobrar cada parcela.
+        </Tip>
+      ) : null}
       {schedule.length === 0 ? (
         <div className="flex flex-col gap-3">
           <p className="text-sm text-ink-muted">

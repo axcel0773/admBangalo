@@ -34,7 +34,7 @@ export function ReceivablesTotal({ summary }: { summary: ReceivablesSummary }) {
       <dl className="grid grid-cols-3 gap-2">
         {parts.map((part) => (
           <div key={part.status} className="min-w-0 rounded-xl bg-white/12 px-2.5 py-2">
-            <dt className="truncate text-[11px] text-on-primary/75">{part.label}</dt>
+            <dt className="truncate text-xs text-on-primary/80">{part.label}</dt>
             <dd className={part.status === "overdue" && summary.byStatus.overdue.count > 0 ? "text-sm font-bold text-accent" : "text-sm font-bold"}>
               <Money value={summary.byStatus[part.status].total} rounded />
             </dd>

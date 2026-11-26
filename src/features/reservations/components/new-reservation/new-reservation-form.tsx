@@ -29,6 +29,7 @@ import { nightsOf, quoteDraft, validateDraft, type FeeForQuote } from "../../dom
 import { nightlyBreakdown, type SeasonRate } from "../../domain/seasons";
 import { QuoteSummary } from "../quote-summary";
 import type { ChaletOption } from "./chalet-picker";
+import { ReviewCard } from "./review-card";
 import { CompanionsFields, type CompanionDraft } from "./companions-fields";
 import { PricingStep } from "./pricing-step";
 import { StayStep } from "./stay-step";
@@ -360,6 +361,21 @@ export function NewReservationForm({
                 />
               </Card>
             ) : null}
+            <ReviewCard
+              chaletName={chalet?.name ?? null}
+              checkIn={checkIn}
+              checkOut={checkOut}
+              nights={nights}
+              guestName={
+                guestMode === "existing"
+                  ? (guests.find((guest) => guest.id === guestId)?.full_name ?? "")
+                  : newGuest.full_name
+              }
+              adults={adults}
+              childrenCount={children}
+              total={quote ? quote.total : null}
+              brokerName={commission.enabled ? commission.brokerName.trim() || null : null}
+            />
           </div>
         </div>
 
@@ -386,13 +402,13 @@ export function NewReservationForm({
       {/* Barra de ações: fixa acima da navegação no celular */}
       <div className="keyboard-static sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-3 border-t border-line bg-surface/95 px-4 pt-3 pb-8 backdrop-blur md:pb-0 md:static md:mx-0 md:justify-end md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <div className="min-w-0 flex-1 md:hidden">
-          <p className="text-[11px] text-ink-muted">Previsto{nights > 0 ? ` · ${pluralize(nights, "noite", "noites")}` : ""}</p>
+          <p className="text-xs text-ink-muted">Previsto{nights > 0 ? ` · ${pluralize(nights, "noite", "noites")}` : ""}</p>
           <p className="font-display text-xl leading-tight font-semibold">{quote ? formatCurrency(quote.total) : "—"}</p>
         </div>
         {step > 0 ? (
-          <Button variant="secondary" size="icon" onClick={goBack} aria-label="Etapa anterior" className="md:w-auto md:px-5">
+          <Button variant="secondary" size="lg" onClick={goBack} className="shrink-0 px-3 md:px-5">
             <ChevronLeft aria-hidden="true" />
-            <span className="hidden md:inline">Voltar</span>
+            Voltar
           </Button>
         ) : null}
         {isLastStep ? (

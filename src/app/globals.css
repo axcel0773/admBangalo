@@ -20,7 +20,7 @@
   /* texto */
   --color-ink: #2b2620;
   --color-ink-soft: #4d453c;
-  --color-ink-muted: #6b6157;
+  --color-ink-muted: #5c534a;
 
   /* ação principal: azul-mar */
   --color-primary: #1f6fb2;
@@ -48,6 +48,11 @@
   --color-chalet-moss: #1f6fb2;
   --color-chalet-slate: #5e7c8c;
   --color-chalet-plum: #8b5a6b;
+
+  /* Letra mínima mais confortável para leitura (a usuária principal tem mais de 60 anos):
+     text-xs passa de 12 para 13 px. */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.15rem;
 
   --radius-card: 1.375rem;
   --radius-control: 0.875rem;
@@ -116,7 +121,7 @@
 
     --color-ink: #eceae5;
     --color-ink-soft: #cfcbc3;
-    --color-ink-muted: #9aa3ab;
+    --color-ink-muted: #b0b8bf;
 
     --color-primary: #2b78bd;
     --color-primary-strong: #1d5a93;
@@ -155,7 +160,7 @@
 
   --color-ink: #eceae5;
   --color-ink-soft: #cfcbc3;
-  --color-ink-muted: #9aa3ab;
+  --color-ink-muted: #b0b8bf;
 
   --color-primary: #2b78bd;
   --color-primary-strong: #1d5a93;
@@ -309,7 +314,7 @@
     --color-line-strong: #d6c8ae;
     --color-ink: #2b2620;
     --color-ink-soft: #4d453c;
-    --color-ink-muted: #6b6157;
+    --color-ink-muted: #5c534a;
     --color-primary: #1f6fb2;
     --color-primary-strong: #14508a;
     --color-primary-soft: #dcebf8;

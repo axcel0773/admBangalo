@@ -52,7 +52,7 @@ export function ChaletPicker({ chalets, value, onChange, error }: ChaletPickerPr
                 <House className="size-5" />
               </span>
               <span className="text-[13px] leading-tight font-bold">{chalet.name.replace(/^(Chalé|Bangalô)\s+/i, "")}</span>
-              <span className="text-[11px] text-ink-muted">
+              <span className="text-xs text-ink-muted">
                 até {chalet.max_guests} · {formatCurrencyRounded(chalet.base_nightly_rate)}
               </span>
             </label>
