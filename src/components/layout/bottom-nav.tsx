@@ -16,7 +16,7 @@ function BottomNavLink({ item, pathname }: { item: NavItem; pathname: string }) 
       href={href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "flex min-h-12 flex-col items-center justify-center gap-1 text-[11px] text-ink-muted transition-colors duration-200 active:scale-95",
+        "flex min-h-12 flex-col items-center justify-center gap-1 text-xs text-ink-muted transition-colors duration-200 active:scale-95",
         active && "font-bold text-primary-ink",
       )}
     >

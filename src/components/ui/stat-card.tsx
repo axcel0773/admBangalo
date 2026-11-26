@@ -38,7 +38,7 @@ export function StatCard({
       <p className="text-xs font-medium text-ink-muted md:text-[13px]">{label}</p>
       <p className="font-display text-2xl leading-none font-semibold md:text-[34px]">{value}</p>
       {children}
-      {footer ? <div className="text-[11px] text-ink-muted md:text-[13px]">{footer}</div> : null}
+      {footer ? <div className="text-[13px] leading-snug text-ink-muted">{footer}</div> : null}
     </>
   );
   const base = "flex flex-col gap-2 rounded-card bg-surface p-4 shadow-card md:gap-2.5 md:p-5.5";

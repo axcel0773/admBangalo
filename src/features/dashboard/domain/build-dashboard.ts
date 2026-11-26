@@ -107,6 +107,15 @@ export function buildChaletOverview(
 /** Parcelas previstas por reserva (tabela payment_schedule). */
 export type SchedulesByReservation = Map<string, Installment[]>;
 
+/** Dias à frente que o Painel considera "cobrar esta semana". */
+export const DUE_SOON_DAYS = 7;
+
+/** Saldos atrasados, de hoje ou que vencem nos próximos 7 dias. */
+export function dueSoon(receivables: Receivable[], today: IsoDate): Receivable[] {
+  const limit = addDays(today, DUE_SOON_DAYS);
+  return receivables.filter((item) => item.dueDate <= limit);
+}
+
 export function buildReceivables(
   open: StayRow[],
   today: IsoDate,
@@ -207,7 +216,9 @@ export function buildDashboard(input: {
       stays: [...monthStays, ...upcoming],
       quotes: input.quotes ?? [],
     }),
-    receivables: buildReceivables(openBalances, today, schedules).slice(0, input.receivablesLimit ?? 4),
+    // No Painel, só o que precisa ser cobrado logo (atrasado ou vence em até 7 dias);
+    // o total de tudo fica no cartão "A receber" e na tela própria.
+    receivables: dueSoon(buildReceivables(openBalances, today, schedules), today).slice(0, input.receivablesLimit ?? 4),
     upcoming: buildUpcoming(upcoming),
   };
 }

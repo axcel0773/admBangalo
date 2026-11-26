@@ -256,7 +256,7 @@ export function NewQuoteForm({ chalets, fees, seasons, blocks, packages, today, 
 
       <div className="keyboard-static sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-3 border-t border-line bg-surface/95 px-4 pt-3 pb-8 backdrop-blur md:pb-0 md:static md:mx-0 md:justify-end md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <div className="min-w-0 flex-1 md:hidden">
-          <p className="text-[11px] text-ink-muted">Total{nights > 0 ? ` · ${pluralize(nights, "noite", "noites")}` : ""}</p>
+          <p className="text-xs text-ink-muted">Total{nights > 0 ? ` · ${pluralize(nights, "noite", "noites")}` : ""}</p>
           <p className="font-display text-xl leading-tight font-semibold">{quote ? formatCurrency(quote.total) : "—"}</p>
         </div>
         <SubmitButton size="lg" pendingLabel="Criando…">

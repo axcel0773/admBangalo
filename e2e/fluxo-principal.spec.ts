@@ -50,20 +50,20 @@ test.describe("fluxo principal", () => {
     await charges.getByRole("button", { name: "Limpeza" }).click();
     await charges.getByLabel("Valor (R$)").fill("150,00");
     await charges.getByRole("button", { name: "Adicionar", exact: true }).click();
-    await expect(page.getByText("Taxa adicionada.")).toBeVisible();
+    await expect(page.getByText(/Taxa “Limpeza” de R\$\s150,00 somada ao total\./)).toBeVisible();
     await charges.getByRole("button", { name: "Item quebrado" }).click();
     await charges.getByLabel("O que foi?").fill("Copo quebrado");
     await charges.getByLabel("Quantidade").fill("2");
     await charges.getByLabel("Valor de cada (R$)").fill("15,00");
     await charges.getByRole("button", { name: "Adicionar", exact: true }).click();
-    await expect(page.getByText("Item adicionado.")).toBeVisible();
+    await expect(page.getByText(/Item “Copo quebrado” de R\$\s30,00 somado ao total\./)).toBeVisible();
     await expect(charges.getByRole("heading", { name: "Itens quebrados e consumo" })).toBeVisible();
-    await expect(charges.getByText("Copo quebrado")).toBeVisible();
+    await expect(charges.getByText("Copo quebrado", { exact: true })).toBeVisible();
 
     // Pagamento do saldo inteiro (valor sugerido)
     await page.getByRole("button", { name: "Registrar pagamento" }).click();
     await page.getByRole("button", { name: "Registrar", exact: true }).click();
-    await expect(page.getByText("Pagamento registrado.")).toBeVisible();
+    await expect(page.getByText(/Pagamento de R\$\s[\d.,]+ registrado\. Não falta mais nada\./)).toBeVisible();
     await expect(page.getByText("Reserva quitada.")).toBeVisible();
   });
 

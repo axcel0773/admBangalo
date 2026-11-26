@@ -36,7 +36,7 @@ export function WeekStrip({ days, start, selected, chalets, stays }: WeekStripPr
           >
             <span
               className={cn(
-                "text-[10px] tracking-wide uppercase",
+                "text-[11px] tracking-wide uppercase",
                 active ? "text-on-primary/80" : day.isWeekend ? "text-accent-ink" : "text-ink-muted",
               )}
             >
