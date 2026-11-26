@@ -46,7 +46,7 @@ interface ScheduleCardProps {
 }
 
 function fixLabel(fix: ScheduleGapFix): string {
-  if (fix.kind === "paid_deposit") return `Transformar o pago (${formatCurrency(fix.amount)}) em sinal`;
+  if (fix.kind === "paid_deposit") return `Usar o pago (${formatCurrency(fix.amount)}) como sinal`;
   if (fix.kind === "new_installment") return `Criar parcela de ${formatCurrency(fix.amount)}`;
   return `Ajustar a última parcela para ${formatCurrency(fix.newAmount)}`;
 }
@@ -152,7 +152,13 @@ export function ScheduleCard({
           </p>
           {fixes.map((fix, index) => (
             <ActionForm key={fix.kind} action={fixScheduleGap.bind(null, reservationId, fix.kind)}>
-              <SubmitButton variant={index === 0 ? "primary" : "secondary"} block pendingLabel="Ajustando…">
+              <SubmitButton
+                variant={index === 0 ? "primary" : "secondary"}
+                block
+                pendingLabel="Ajustando…"
+                // Rótulos com valor podem passar da largura do celular: quebram em duas linhas.
+                className="h-auto min-h-12 py-2.5 text-center leading-snug whitespace-normal"
+              >
                 {index === 0 ? <Wrench aria-hidden="true" /> : null}
                 {fixLabel(fix)}
               </SubmitButton>
