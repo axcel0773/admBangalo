@@ -60,7 +60,12 @@ export function YearReportView({ report }: { report: YearReport }) {
               <li key={row.source} className="flex items-center justify-between gap-3 py-2.5 text-sm">
                 <span>
                   <span className="font-semibold">{row.label}</span>
-                  <span className="text-ink-muted"> · {pluralize(row.reservations, "reserva", "reservas")}</span>
+                  <span className="text-ink-muted">
+                    {" · "}
+                    {row.reservations > 0
+                      ? pluralize(row.reservations, "reserva", "reservas")
+                      : "noites de reservas do ano anterior"}
+                  </span>
                 </span>
                 <Money value={row.revenue} className="font-semibold" />
               </li>

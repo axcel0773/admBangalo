@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  activeStays,
   encodeForUrl,
   filterGuests,
+  findGuestByPhone,
   formatCityState,
   guestsCsv,
   isBirthdayMonth,
@@ -99,5 +101,28 @@ describe("hóspedes recorrentes e aniversariantes", () => {
     expect(isGuestFilter("x")).toBe(false);
     expect(isGuestFilter("toString")).toBe(false);
     expect(isGuestFilter(undefined)).toBe(false);
+  });
+});
+
+describe("estadias que contam", () => {
+  it("canceladas ficam de fora", () => {
+    expect(activeStays([{ status: "confirmed" }, { status: "cancelled" }, { status: "checked_out" }])).toHaveLength(2);
+  });
+});
+
+describe("telefone repetido", () => {
+  const guests = [
+    { id: "a", full_name: "Patrícia Bertges", phone: "(31) 98830-7104" },
+    { id: "b", full_name: "Sem telefone", phone: null },
+  ];
+
+  it("acha o mesmo número escrito de outro jeito, com ou sem +55", () => {
+    expect(findGuestByPhone(guests, "31988307104")?.id).toBe("a");
+    expect(findGuestByPhone(guests, "+55 31 98830-7104")?.id).toBe("a");
+  });
+
+  it("ignora o próprio cadastro e números incompletos", () => {
+    expect(findGuestByPhone(guests, "(31) 98830-7104", "a")).toBeNull();
+    expect(findGuestByPhone(guests, "98830")).toBeNull();
   });
 });

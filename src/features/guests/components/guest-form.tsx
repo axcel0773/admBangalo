@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { ButtonLink } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
@@ -12,18 +12,22 @@ import { fieldError, idleFormState, valueOf, type FormState } from "@/lib/forms"
 import { documentProblem, emailProblem, phoneProblem, ufProblem } from "@/lib/masks";
 import { todayIso } from "@/lib/dates";
 
-import type { Guest } from "../domain";
+import type { Guest, GuestContact } from "../domain";
+import { DuplicatePhoneHint } from "./duplicate-phone-hint";
 
 interface GuestFormProps {
   action: (state: FormState, formData: FormData) => Promise<FormState>;
   cancelHref: string;
   guest?: Guest;
+  /** Hóspedes já cadastrados, para avisar quando o telefone se repete. */
+  contacts?: GuestContact[];
 }
 
-export function GuestForm({ action, cancelHref, guest }: GuestFormProps) {
+export function GuestForm({ action, cancelHref, guest, contacts = [] }: GuestFormProps) {
   const [state, formAction] = useActionState(action, idleFormState);
   const error = (name: string) => fieldError(state, name);
   const v = (name: string, saved?: string | number | null) => valueOf(state, name, saved);
+  const [phone, setPhone] = useState(() => v("phone", guest?.phone));
 
   return (
     <form action={formAction} className="flex flex-col gap-4 md:gap-6" noValidate>
@@ -48,6 +52,7 @@ export function GuestForm({ action, cancelHref, guest }: GuestFormProps) {
       </FormSection>
 
       <FormSection title="Contato">
+        <DuplicatePhoneHint contacts={contacts} phone={phone} exceptId={guest?.id} />
         <FieldRow>
           <Field
             label="Telefone / WhatsApp"
@@ -55,6 +60,7 @@ export function GuestForm({ action, cancelHref, guest }: GuestFormProps) {
             type="tel"
             inputMode="tel"
             defaultValue={v("phone", guest?.phone)}
+            onChange={(event) => setPhone(event.target.value)}
             placeholder="(11) 98765-4321"
             mask="phone"
             validate={phoneProblem}

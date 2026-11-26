@@ -6,7 +6,7 @@ import { BackLink } from "./back-link";
 
 interface PageHeaderProps {
   title: string;
-  eyebrow?: string;
+  eyebrow?: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
   /** Link "voltar" acima do título (telas de detalhe e formulários). */

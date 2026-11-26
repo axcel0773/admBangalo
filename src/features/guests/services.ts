@@ -7,7 +7,13 @@ import { PAGE_MAX, paginate } from "@/lib/search-params";
 
 import { createGuestsRepository } from "./data/guests.repository";
 
-import { guestsCsv, isBirthdayMonth, isRecurringGuest, type Guest, type GuestStay, type GuestSummary } from "./domain";
+import {
+  activeStays,
+  guestsCsv,
+  isBirthdayMonth,
+  isRecurringGuest,
+  type Guest,
+  type GuestContact, type GuestStay, type GuestSummary } from "./domain";
 
 export async function guestsRepository() {
   return createGuestsRepository(await createSupabaseServerClient());
@@ -36,10 +42,12 @@ export async function searchGuests(term?: string, size = PAGE_MAX): Promise<Gues
 
   const summaries = guests.map((guest) => {
     const own = staysByGuest.get(guest.id) ?? [];
+    // Canceladas não contam como estadia nem como "última".
+    const active = activeStays(own);
     return {
       ...guest,
-      staysCount: own.length,
-      lastStay: own[0] ?? null,
+      staysCount: active.length,
+      lastStay: active[0] ?? null,
       recurring: isRecurringGuest(own),
       birthdayThisMonth: isBirthdayMonth(guest.birth_date, today),
     };
@@ -62,4 +70,9 @@ export async function getGuest(id: string): Promise<Guest | null> {
 
 export async function getGuestsCsv(): Promise<string> {
   return guestsCsv(await (await guestsRepository()).listAll());
+}
+
+/** Nome e telefone de todos os hóspedes (para avisar de telefone repetido no cadastro). */
+export async function listGuestContacts(): Promise<GuestContact[]> {
+  return (await (await guestsRepository()).listAll()).map(({ id, full_name, phone }) => ({ id, full_name, phone }));
 }

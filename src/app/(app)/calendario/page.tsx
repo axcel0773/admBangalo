@@ -52,7 +52,12 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
   return (
     <>
       <PageHeader
-        eyebrow={`${formatDayMonth(start)} – ${formatDayMonth(addDays(start, GRID_DAYS - 1))}`}
+        // O período da grade (2 semanas) só vale no computador; no celular o seletor abaixo mostra a semana.
+        eyebrow={
+          <span className="hidden md:inline">
+            {formatDayMonth(start)} – {formatDayMonth(addDays(start, GRID_DAYS - 1))}
+          </span>
+        }
         title={monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1)}
         actions={
           <>
