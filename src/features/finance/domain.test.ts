@@ -204,4 +204,11 @@ describe("despesas e lucro no relatório do mês", () => {
     expect(buildMonthReport({ ...input, expenses: 250.25 }).profit).toBe(499.75);
     expect(buildMonthReport({ ...input, expenses: 900 }).profit).toBe(-150);
   });
+
+  it("comissões pagas no mês somam nas despesas e descontam do lucro", () => {
+    const report = buildMonthReport({ ...input, expenses: 200, commissions: 120 });
+    expect(report.commissions).toBe(120);
+    expect(report.expenses).toBe(320);
+    expect(report.profit).toBe(430);
+  });
 });

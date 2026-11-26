@@ -11,6 +11,12 @@ import { StepIndicator } from "@/components/ui/step-indicator";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { blockWarning, overlappingBlocks, type ChaletBlock } from "@/features/availability/domain/blocks";
 import { MAX_CHALET_GUESTS } from "@/features/chalets/domain";
+import {
+  commissionDraftProblem,
+  emptyCommissionDraft,
+  NewReservationCommission,
+  type CommissionDraft,
+} from "@/features/commissions/client";
 import type { PackageOption } from "@/features/packages/domain";
 import { addDays, type IsoDate } from "@/lib/dates";
 import { fieldError, idleFormState } from "@/lib/forms";
@@ -44,6 +50,10 @@ const FIELD_STEP: Record<string, number> = {
   new_guest_phone: 1,
   new_guest_document: 1,
   companions: 1,
+  broker_name: 1,
+  commission_amount: 1,
+  commission_paid_on: 1,
+  commission_method: 1,
   pricing_mode: 2,
   nightly_rate: 2,
   package_total: 2,
@@ -60,6 +70,8 @@ interface NewReservationFormProps {
   seasons: SeasonRate[];
   blocks: ChaletBlock[];
   packages: PackageOption[];
+  /** Corretores já usados, sugeridos no passo Hóspedes. */
+  brokers: string[];
   today: IsoDate;
   prefill: {
     chaletId?: string;
@@ -78,7 +90,17 @@ interface NewReservationFormProps {
   };
 }
 
-export function NewReservationForm({ chalets, fees, guests, seasons, blocks, packages, today, prefill }: NewReservationFormProps) {
+export function NewReservationForm({
+  chalets,
+  fees,
+  guests,
+  seasons,
+  blocks,
+  packages,
+  brokers,
+  today,
+  prefill,
+}: NewReservationFormProps) {
   const [state, formAction] = useActionState(createReservation, idleFormState);
   const topRef = useRef<HTMLDivElement>(null);
 
@@ -104,6 +126,7 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, pac
     document: "",
   });
   const [companions, setCompanions] = useState<CompanionDraft[]>([]);
+  const [commission, setCommission] = useState<CommissionDraft>(() => emptyCommissionDraft(today));
   // Diária: segue a sugestão (base ou média da temporada) até o dono digitar outra.
   // Vindo de um orçamento, a diária dele vale como se o dono tivesse digitado.
   const [nightlyRate, setNightlyRate] = useState(formatMoneyInput(prefill.pricing?.nightlyRate ?? null));
@@ -200,6 +223,7 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, pac
     if (index === 1) {
       if (guestMode === "existing" && !guestId) return "Escolha o hóspede responsável.";
       if (guestMode === "new" && !newGuest.full_name.trim()) return "Informe o nome do responsável.";
+      return commissionDraftProblem(commission);
     }
     return null;
   }
@@ -292,6 +316,16 @@ export function NewReservationForm({ chalets, fees, guests, seasons, blocks, pac
                 <CompanionsFields companions={visibleCompanions} onChange={setCompanions} />
               </FormSection>
             ) : null}
+            <FormSection title="Corretor">
+              <NewReservationCommission
+                draft={commission}
+                onChange={setCommission}
+                brokers={brokers}
+                total={quote?.total ?? 0}
+                today={today}
+                error={error}
+              />
+            </FormSection>
           </div>
 
           {/* Etapa 3 — Valores */}

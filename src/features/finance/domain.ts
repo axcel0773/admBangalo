@@ -105,8 +105,10 @@ export interface MonthReport {
   /** Entradas de caixa no mês (pagamentos − estornos), por data de pagamento. */
   cashIn: number;
   cashByMethod: Partial<Record<Enums<"payment_method">, number>>;
-  /** Despesas lançadas no mês (por data da despesa). */
+  /** Despesas do mês: as lançadas (por data da despesa) mais as comissões pagas no mês. */
   expenses: number;
+  /** Parte das despesas que é comissão de corretor paga no mês. */
+  commissions: number;
   /** Lucro de caixa: entradas do mês menos despesas; pode ser negativo. */
   profit: number;
 }
@@ -119,8 +121,10 @@ export function buildMonthReport(input: {
   stays: FinanceStay[];
   payments: CashPayment[];
   activeChalets: number;
-  /** Total de despesas do mês (padrão: 0). */
+  /** Total de despesas lançadas no mês (padrão: 0). */
   expenses?: number;
+  /** Comissões de corretor pagas no mês (padrão: 0); somam nas despesas. */
+  commissions?: number;
 }): MonthReport {
   const { month } = input;
   const active = input.stays.filter((stay) => stay.status !== "cancelled");
@@ -143,7 +147,8 @@ export function buildMonthReport(input: {
   }
 
   const cashIn = sum(input.payments, (payment) => (payment.kind === "refund" ? -payment.amount : payment.amount));
-  const expenses = roundMoney(input.expenses ?? 0);
+  const commissions = roundMoney(input.commissions ?? 0);
+  const expenses = roundMoney((input.expenses ?? 0) + commissions);
 
   return {
     month,
@@ -160,6 +165,7 @@ export function buildMonthReport(input: {
     cashIn,
     cashByMethod,
     expenses,
+    commissions,
     profit: roundMoney(cashIn - expenses),
   };
 }

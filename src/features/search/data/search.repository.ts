@@ -26,23 +26,41 @@ export function createSearchRepository(db: DbClient) {
 
     async reservations(term: string): Promise<SearchReservationHit[]> {
       const clean = sanitizeSearch(term);
-      const rows = unwrapList(
-        await db
+      const columns = "reservation_id, main_guest_name, chalet_name, check_in, check_out, status";
+      // Pelo hóspede ou bangalô (na view) e pelo nome do corretor (na própria reserva).
+      const [byGuest, byBroker] = await Promise.all([
+        db
           .from("reservation_financials")
-          .select("reservation_id, main_guest_name, chalet_name, check_in, check_out, status")
+          .select(columns)
           .or(`main_guest_name.ilike.%${clean}%,chalet_name.ilike.%${clean}%`)
           .order("check_in", { ascending: false })
           .limit(SEARCH_LIMIT),
-        "Buscar reservas",
-      );
-      return rows.map((row) => ({
-        id: row.reservation_id,
-        guestName: row.main_guest_name,
-        chaletName: row.chalet_name,
-        checkIn: row.check_in,
-        checkOut: row.check_out,
-        status: row.status,
-      }));
+        db.from("reservations").select("id").ilike("broker_name", `%${clean}%`).limit(SEARCH_LIMIT),
+      ]);
+      const rows = unwrapList(byGuest, "Buscar reservas");
+      const known = new Set(rows.map((row) => row.reservation_id));
+      const brokerIds = unwrapList(byBroker, "Buscar reservas por corretor")
+        .map((row) => row.id)
+        .filter((id) => !known.has(id));
+      if (brokerIds.length > 0) {
+        rows.push(
+          ...unwrapList(
+            await db.from("reservation_financials").select(columns).in("reservation_id", brokerIds),
+            "Buscar reservas por corretor",
+          ),
+        );
+      }
+      return rows
+        .sort((a, b) => b.check_in.localeCompare(a.check_in))
+        .slice(0, SEARCH_LIMIT)
+        .map((row) => ({
+          id: row.reservation_id,
+          guestName: row.main_guest_name,
+          chaletName: row.chalet_name,
+          checkIn: row.check_in,
+          checkOut: row.check_out,
+          status: row.status,
+        }));
     },
 
     async quotes(term: string): Promise<SearchQuoteHit[]> {

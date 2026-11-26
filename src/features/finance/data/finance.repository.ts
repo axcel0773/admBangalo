@@ -40,6 +40,16 @@ export function createFinanceRepository(db: DbClient) {
       return unwrapList(result, "Listar despesas do mês");
     },
 
+    /** Comissões de corretor pagas no período (por data do pagamento). */
+    async listCommissionAmounts(from: IsoDate, to: IsoDate): Promise<{ commission_amount: number | null }[]> {
+      const result = await db
+        .from("reservations")
+        .select("commission_amount")
+        .gte("commission_paid_on", from)
+        .lte("commission_paid_on", to);
+      return unwrapList(result, "Listar comissões do mês");
+    },
+
     /** Estadias do ano (sem canceladas) com a origem da reserva, para o relatório anual. */
     async listYearStays(from: IsoDate, to: IsoDate): Promise<ReportStay[]> {
       const result = await db

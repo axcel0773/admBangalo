@@ -3,6 +3,7 @@ import "server-only";
 import type { ChaletBlock } from "@/features/availability/domain/blocks";
 import { listBlocksBetween } from "@/features/availability/services";
 import { listChalets, listCurrentSeasonRates } from "@/features/chalets/services";
+import { listBrokerNames } from "@/features/commissions/services";
 import { listFees } from "@/features/fees/services";
 import { guestsRepository } from "@/features/guests/services";
 import type { PackageOption } from "@/features/packages/domain";
@@ -82,17 +83,20 @@ export interface NewReservationContext {
   blocks: ChaletBlock[];
   /** Pacotes salvos (valor fechado), atalhos na etapa de valores. */
   packages: PackageOption[];
+  /** Corretores já usados (sugestões no passo Hóspedes). */
+  brokers: string[];
 }
 
 export async function getNewReservationContext(): Promise<NewReservationContext> {
   const today = todayIso();
-  const [chalets, fees, guests, seasons, blocks, packages] = await Promise.all([
+  const [chalets, fees, guests, seasons, blocks, packages, brokers] = await Promise.all([
     listChalets({ onlyActive: true }),
     listFees({ onlyActive: true }),
     guestsRepository().then((repo) => repo.search(undefined, 200)),
     listCurrentSeasonRates(),
     listBlocksBetween(today, addDays(today, 400)),
     listPackages(),
+    listBrokerNames(),
   ]);
 
   return {
@@ -119,6 +123,7 @@ export async function getNewReservationContext(): Promise<NewReservationContext>
     seasons,
     blocks,
     packages: packages.map(({ id, name, nights, total }) => ({ id, name, nights, total })),
+    brokers,
   };
 }
 

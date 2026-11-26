@@ -26,15 +26,17 @@ async function financeRepository() {
 async function loadMonth(month: IsoDate): Promise<{ report: MonthReport; chalets: ChaletMonthRow[] }> {
   const repo = await financeRepository();
   const last = endOfMonth(month);
-  const [stays, payments, chalets, expenseRows] = await Promise.all([
+  const [stays, payments, chalets, expenseRows, commissionRows] = await Promise.all([
     repo.listStaysTouching(month, last),
     repo.listPaymentsBetween(month, last),
     repo.listActiveChalets(),
     repo.listExpenseAmounts(month, last),
+    repo.listCommissionAmounts(month, last),
   ]);
   const expenses = expenseRows.reduce((total, row) => total + row.amount, 0);
+  const commissions = commissionRows.reduce((total, row) => total + (row.commission_amount ?? 0), 0);
   return {
-    report: buildMonthReport({ month, stays, payments, activeChalets: chalets.length, expenses }),
+    report: buildMonthReport({ month, stays, payments, activeChalets: chalets.length, expenses, commissions }),
     chalets: buildChaletBreakdown({ month, stays, chalets }),
   };
 }
