@@ -82,3 +82,14 @@ Testadas em `supabase/tests/database/02_rules.test.sql`.
 
   Revise uma vez por ano. A automação dessa revisão está nos extras (etapa 6).
 - **Comprovantes:** ficam em um bucket privado e são apagados junto com o lançamento.
+
+## Pendências e trocas de segredos
+
+- **26/11/2026:** `CRON_SECRET` e o par VAPID foram trocados na Vercel (produção) e o hash do segredo atualizado no
+  banco, porque os valores antigos apareceram numa conversa. Os valores novos não foram exibidos em lugar nenhum.
+- **A fazer pelo dono (painéis, sem código):**
+  - Supabase › Authentication › Sign In / Providers: confirmar **"Allow new users to sign up" desligado**.
+  - GitHub (repositório público): ligar **secret scanning + push protection** e **Dependabot alerts**.
+  - GitHub › Branch protection da `main`: **incluir administradores** e exigir também a verificação
+    "Ponta a ponta (Playwright)".
+

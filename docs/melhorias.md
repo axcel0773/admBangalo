@@ -1,8 +1,8 @@
 # Melhorias sugeridas — backlog com esforço e guia de implementação
 
-**Última atualização:** 15/11/2026 (offline, notificações e revisão geral) · Complementa `docs/etapas.md` (o que já foi feito), `docs/padroes.md` e `docs/arquitetura.md`.
+**Última atualização:** 26/11/2026 (A receber, edição de parcelas, ícone, animações, comissão do corretor, taxas e itens quebrados, correções e revisão de clareza para a usuária) · Complementa `docs/etapas.md` (o que já foi feito), `docs/padroes.md` e `docs/arquitetura.md`.
 
-**Já feitas:** 1 a 8, 10 a 14 e 17 (✅). A 9 (tarifas sazonais com mínimo de noites) **já existia desde a etapa 4** e estava listada aqui por engano. **Falta só a 15** (histórico de alterações e exportação de dados). A sugestão 16 (acesso de equipe) foi retirada do backlog a pedido do dono. Migrações deste backlog: `0013` (sinal), `0014` (despesas), `0015` (status do orçamento), `0016` (limpeza), `0017` (push), `0019` (pacotes).
+**Já feitas:** 1 a 8, 10 a 14 e 17 a 24 (✅). A 9 (tarifas sazonais com mínimo de noites) **já existia desde a etapa 4** e estava listada aqui por engano. **Falta só a 15** (histórico de alterações e exportação de dados). A sugestão 16 (acesso de equipe) foi retirada do backlog a pedido do dono. Migrações deste backlog: `0013` (sinal), `0014` (despesas), `0015` (status do orçamento), `0016` (limpeza), `0017` (push), `0019` (pacotes), `0020` (comissão do corretor), `0021` (itens quebrados). A `0018` (consistência de dono) veio da revisão de segurança.
 
 **Esforço:** **P** = até meio dia · **M** = 1 a 2 dias · **G** = 3 dias ou mais. Considera código, testes, migração e documentação.
 **Restrição fixa:** tudo precisa continuar rodando no plano **gratuito** da Vercel e do Supabase.
@@ -30,8 +30,16 @@
 | 15 | Histórico de alterações e exportação de dados | G | sim | Média |
 | 17 | Refinos de interface (contagem nos atalhos, busca global ao vivo, modo escuro com escolha manual) ✅ | P–M | não | Baixa |
 | 18 | Pacotes (valor fechado) e parcelas sem centavos quebrados ✅ | M | sim (`0019`) | Alta |
+| 19 | Tela "A receber", editar parcelas e pagamentos, ícone próprio ✅ | M | não | Alta |
+| 20 | Responsividade no celular e animações ✅ | M | não | Média |
+| 21 | Comissão do corretor ✅ | M | sim (`0020`) | Alta |
+| 22 | Parcelas que batem com o total; taxas simples e item quebrado ✅ | M | sim (`0021`) | Alta |
+| 23 | Correções achadas navegando (estadias, energia, relatórios, telefone repetido) ✅ | P | não | Alta |
+| 24 | Revisão de clareza para a usuária (Financeiro, reserva, letras, dicas) ✅ | M | não | Alta |
 
 **Ordem recomendada:** 1 → 2 → 3 → 7 → 8 → 4 → 5 → 6 → 10 → 9 → demais. (Tudo feito, menos a 15.)
+
+**Usuária principal:** a mãe do dono, que usa o app no celular. Toda mudança visual passa por **prévia** antes de implementar e é conferida no celular (375 px, claro e escuro) depois de publicada.
 
 ---
 
@@ -221,6 +229,51 @@ Ordem de criação e de dependência (cada camada só importa as anteriores):
 - **Modo escuro (M) — ✅ feito (PRs #51, #53, #54 e #56):** tokens em `globals.css` para o aparelho escuro (`prefers-color-scheme`) **e** para a escolha manual (`data-theme="dark"|"light"` no `<html>`), contrastes conferidos (≥ 4,5:1), `themeColor` por esquema e impressão do recibo de volta ao claro. A escolha **Claro / Escuro / Automático** fica em **Configurações → Aparência** (`components/layout/theme-chooser.tsx`), guardada no aparelho (`localStorage`, chave `tema`) e aplicada por um script no `<head>` antes da primeira pintura (sem piscar); no automático segue o aparelho, inclusive se ele mudar com o app aberto. Regras em `lib/theme.ts` (testadas).
   - **Lição aprendida:** o botão de tema foi tentado primeiro no cabeçalho do Painel e no menu lateral (#53/#54) e **quebrou o layout do Painel** (para o menu abrir sem ser cortado, o cabeçalho precisou de `z-20` e cobriu os cartões que sobem sobre a faixa azul). Foi desfeito (#56) e a escolha foi para Configurações. Regra: **não mexer no empilhamento (`z-index`/`overflow`) do cabeçalho do Painel**; controles novos de preferência vão em Configurações.
   - Cores fixas no código devem virar token (ex.: `bg-tile-slate`, `bg-peach-soft`); evitar `dark:` do Tailwind, que só segue o aparelho e ignora a escolha manual.
+
+## 19. "A receber", editar parcelas e pagamentos, ícone — esforço **M** ✅
+
+> **Feito (PRs #64 a #74):**
+> - **Tela A receber** (`/financeiro/a-receber`, feature `dashboard`): saldos em aberto de todas as reservas, do mais atrasado ao mais distante, com filtros (Vencidas, Vencem hoje, Próximas) e botão "Cobrar" no WhatsApp. O cartão "A receber" do Painel leva para ela (`StatCard` ganhou `href`).
+> - **Editar parcela e pagamento no lugar** (lápis): `components/ui/inline-edit.tsx` (`InlineEdit` + `useCloseInlineEdit`), ações `editInstallment` e `editPayment`; a validação do pagamento editado desconsidera o próprio lançamento (`contextWithout`).
+> - **Ícone próprio** (letra "b" com onda), `BrandMark` em `brand.tsx` e ícones em `public/icons`.
+
+## 20. Responsividade no celular e animações — esforço **M** ✅
+
+> **Feito (PRs #75 e #76):** Painel sem rolagem para o lado (`grid-cols-[minmax(0,1fr)]`), barras fixas encostadas na navegação inferior, alvos de toque ≥ 40 px, "Novembro de 2026" sem "De" maiúsculo, rolagens laterais sem barra (`scrollbar-none`). Animações só com CSS (`animate-page-in`, `stagger`, `animate-expand`, `animate-pop`, `animate-fill`), 150–400 ms, desligadas para quem pede "reduzir movimento". Contagem animada de números foi descartada (pisca no primeiro carregamento).
+
+## 21. Comissão do corretor — esforço **M** ✅
+
+> **Feito (PR #77, migração `0020`):** até um corretor por reserva (colunas `broker_name`, `commission_amount`, `commission_paid_on`, `commission_method` em `reservations`, herdando RLS e checagem de dono). Feature `commissions/`.
+> - **Nova reserva → passo Hóspedes:** interruptor "Veio por corretor", nome (sugere os já usados), valor com atalhos de 5/10/15% do total (reais inteiros) e situação (a pagar / já paga com data e forma).
+> - **Tela da reserva:** cartão para adicionar depois, editar, remover, marcar como paga e desfazer; aviso se a reserva foi cancelada com comissão a pagar.
+> - **Financeiro:** comissão paga soma nas **despesas do mês do pagamento** e desconta do lucro; Despesas lista pagas no mês e a pagar. A busca acha reservas pelo nome do corretor.
+
+## 22. Parcelas que batem com o total; taxas simples e item quebrado — esforço **M** ✅
+
+> Origem: relato da usuária ("a taxa sai diferente", "sinal e prestação dão confusão", "o valor não bate", "R$ 3.500,02").
+> **Feito (PRs #78 e #79, migração `0021`):**
+> - **Centavos:** diferença de até R$ 1 entre o pago e a parcela não deixa a parcela "vencida" (`CENTS_TOLERANCE`).
+> - **Sinal pago antes das parcelas:** ao dividir, o que já entrou vira "Sinal (pago)" e só o resto é dividido.
+> - **Parcelas que não somam o total:** aviso com consertos em um toque (`scheduleGapFixes`): usar o pago como sinal, ajustar a última parcela ou criar parcela com a diferença.
+> - **Taxas na reserva:** dois botões — "+ Taxa" (Limpeza, Pet, Outra + valor, sugerido pelas taxas cadastradas por estadia) e "+ Item quebrado" (o que foi, quantidade, valor de cada). Grupos separados; taxas de R$ 0,00 escondidas. Novo `fee_kind` `item` (só na reserva).
+> - **Taxas** saíram da barra inferior (entrou **Reservas**) e ficam em Configurações; o cadastro de taxa explica com exemplo quando o valor muda por noite ou por pessoa.
+> - Dados corrigidos com autorização: taxas "Taxa" de R$ 0,00 apagadas. A reserva do Réveillon (diária de R$ 1.166,67) **ficou como está** por decisão do dono.
+
+## 23. Correções achadas navegando — esforço **P** ✅
+
+> **Feito (PR #80):** reservas canceladas não contam como estadia do hóspede; cartão de Energia só com taxa de energia cadastrada; calendário sem dois períodos diferentes no celular; "De onde vêm as reservas" soma só as noites do ano (fecha com a hospedagem do ano); cartões de resumo mostram centavos (letra menor) quando existem; **aviso de telefone repetido** no cadastro de hóspede e na nova reserva ("Usar esse cadastro"). Cadastro duplicado da Patrícia Bertges unido com autorização.
+
+## 24. Revisão de clareza para a usuária — esforço **M** ✅
+
+> **Feito (PRs #81 a #84):**
+> - **Financeiro em dois blocos:** "Dinheiro de novembro" (entrou, despesas, sobrou/faltou) e "Reservas de novembro" (total, já pago, falta receber, ocupação), cada um com uma frase do que mostra.
+> - **Tela da reserva no celular:** resumo → saldo, parcelas, pagamentos, comissão → quem vem, hospedagem → "Excluir reserva" fechado no fim (coluna principal com `contents` e `order`). No topo, só o próximo passo e "Enviar confirmação"; o resto (lembretes, ligar, recibo, reservar de novo, **cancelar**) em **"Mais opções"** (`components/ui/more-options.tsx`, `<details>`).
+> - **Nova reserva:** quadro "Confira antes de criar" no último passo; botão "Voltar" com texto; valor previsto numa linha própria a partir do 2º passo.
+> - **Leitura:** `text-xs` = 13 px, legendas maiores, cinza secundário mais escuro (claro e escuro).
+> - **Painel:** "Cobrar esta semana" (atrasados e até 7 dias, nome inteiro, valor embaixo); atalhos um por linha no celular.
+> - **Dicas de primeira vez** (`components/ui/tip.tsx`, guardadas no aparelho) em Parcelas, Pagamentos, Hospedagem e taxas e Corretor.
+> - **Avisos com valores:** "Pagamento de R$ 1.500,00 registrado. Falta R$ 4.000,00.", "Taxa “Limpeza” de R$ 150,00 somada ao total.", parcela com a data do aviso.
+> - **Não feito, por decisão do dono:** trocar termos ("check-in", "Parcial", "Exportar CSV" etc.).
 
 ---
 
