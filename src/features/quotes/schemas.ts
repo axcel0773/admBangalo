@@ -9,7 +9,7 @@ import { VALIDITY_OPTIONS } from "./domain/quote-document";
 
 export const newQuoteSchema = z
   .object({
-    chalet_id: z.string({ required_error: "Escolha o bangalô" }).uuid("Escolha o bangalô"),
+    chalet_id: z.string({ error: "Escolha o bangalô" }).uuid("Escolha o bangalô"),
     check_in: isoDate("Data de entrada"),
     check_out: isoDate("Data de saída"),
     adults: integer("Adultos", 1, MAX_CHALET_GUESTS),
@@ -25,7 +25,10 @@ export const newQuoteSchema = z
     validity_days: z.coerce
       .number()
       .int()
-      .refine((days) => (VALIDITY_OPTIONS as readonly number[]).includes(days), "Escolha a validade"),
+      .refine(
+        (days) => (VALIDITY_OPTIONS as readonly number[]).includes(days),
+        "Escolha a validade",
+      ),
     notes: optionalText(1000),
   })
   .superRefine((data, ctx) => {
@@ -38,7 +41,11 @@ export const newQuoteSchema = z
       });
     }
     if (data.check_in && data.check_out && daysBetween(data.check_in, data.check_out) < 1) {
-      ctx.addIssue({ code: "custom", path: ["check_out"], message: "A saída precisa ser depois da entrada" });
+      ctx.addIssue({
+        code: "custom",
+        path: ["check_out"],
+        message: "A saída precisa ser depois da entrada",
+      });
     }
   });
 

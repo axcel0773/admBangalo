@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 import { MAX_CHALET_GUESTS } from "@/features/chalets/domain";
-import { newReservationCommissionFields, resolveNewReservationCommission } from "@/features/commissions/schemas";
+import {
+  newReservationCommissionFields,
+  resolveNewReservationCommission,
+} from "@/features/commissions/schemas";
 import { daysBetween } from "@/lib/dates";
 import { isUuid } from "@/lib/ids";
 import { document, integer, isoDate, money, optionalText, phone } from "@/lib/validation";
@@ -59,7 +62,10 @@ export function checkLodgingPricing(data: LodgingPricingInput, ctx: z.Refinement
   if (data.pricing_mode === "nightly" && data.nightly_rate === undefined) {
     ctx.addIssue({ code: "custom", path: ["nightly_rate"], message: "Diária é obrigatório" });
   }
-  if (data.pricing_mode === "package" && !(data.package_total !== undefined && data.package_total > 0)) {
+  if (
+    data.pricing_mode === "package" &&
+    !(data.package_total !== undefined && data.package_total > 0)
+  ) {
     ctx.addIssue({ code: "custom", path: ["package_total"], message: "Informe o valor do pacote" });
   }
 }
@@ -79,7 +85,7 @@ export function lodgingPricingOf(
 
 export const newReservationSchema = z
   .object({
-    chalet_id: z.string({ required_error: "Escolha o bangalô" }).uuid("Escolha o bangalô"),
+    chalet_id: z.string({ error: "Escolha o bangalô" }).uuid("Escolha o bangalô"),
     check_in: isoDate("Data de entrada"),
     check_out: isoDate("Data de saída"),
     adults: integer("Adultos", 1, MAX_CHALET_GUESTS),
@@ -118,13 +124,28 @@ export const newReservationSchema = z
       });
     }
     if (data.check_in && data.check_out && daysBetween(data.check_in, data.check_out) < 1) {
-      ctx.addIssue({ code: "custom", path: ["check_out"], message: "A saída precisa ser depois da entrada" });
+      ctx.addIssue({
+        code: "custom",
+        path: ["check_out"],
+        message: "A saída precisa ser depois da entrada",
+      });
     }
-    if (data.guest_mode === "existing" && !z.string().uuid().safeParse(data.main_guest_id).success) {
-      ctx.addIssue({ code: "custom", path: ["main_guest_id"], message: "Escolha o hóspede responsável" });
+    if (
+      data.guest_mode === "existing" &&
+      !z.string().uuid().safeParse(data.main_guest_id).success
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["main_guest_id"],
+        message: "Escolha o hóspede responsável",
+      });
     }
     if (data.guest_mode === "new" && !data.new_guest_name) {
-      ctx.addIssue({ code: "custom", path: ["new_guest_name"], message: "Informe o nome do responsável" });
+      ctx.addIssue({
+        code: "custom",
+        path: ["new_guest_name"],
+        message: "Informe o nome do responsável",
+      });
     }
   });
 
@@ -157,9 +178,20 @@ export function toCreateReservationPayload(input: NewReservationInput): Json {
       .filter((companion) => companion.full_name)
       .map((companion) => ({ full_name: companion.full_name, is_child: companion.is_child })),
     commission: commission
-      ? { broker_name: commission.broker_name, amount: commission.amount, paid_on: commission.paid_on, method: commission.method }
+      ? {
+          broker_name: commission.broker_name,
+          amount: commission.amount,
+          paid_on: commission.paid_on,
+          method: commission.method,
+        }
       : null,
   };
 }
 
-export const statusChangeSchema = z.enum(["pending", "confirmed", "checked_in", "checked_out", "cancelled"]);
+export const statusChangeSchema = z.enum([
+  "pending",
+  "confirmed",
+  "checked_in",
+  "checked_out",
+  "cancelled",
+]);

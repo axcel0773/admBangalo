@@ -28,10 +28,22 @@ export const meterReadingSchema = z
   })
   .superRefine((input, ctx) => {
     if (input.meter_end !== null && input.meter_start === null) {
-      ctx.addIssue({ code: "custom", path: ["meter_start"], message: "Anote a leitura de entrada primeiro" });
+      ctx.addIssue({
+        code: "custom",
+        path: ["meter_start"],
+        message: "Anote a leitura de entrada primeiro",
+      });
     }
-    if (input.meter_start !== null && input.meter_end !== null && input.meter_end < input.meter_start) {
-      ctx.addIssue({ code: "custom", path: ["meter_end"], message: "A leitura de saída é menor que a de entrada" });
+    if (
+      input.meter_start !== null &&
+      input.meter_end !== null &&
+      input.meter_end < input.meter_start
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["meter_end"],
+        message: "A leitura de saída é menor que a de entrada",
+      });
     }
   });
 
@@ -49,9 +61,12 @@ export type ExtraChargeInput = z.infer<typeof extraChargeSchema>;
 
 export const paymentSchema = z.object({
   kind: z.enum(["deposit", "installment", "balance", "refund"], { message: "Escolha o tipo" }),
-  method: z.enum(["pix", "cash", "credit_card", "debit_card", "bank_transfer", "platform", "other"], {
-    message: "Escolha a forma de pagamento",
-  }),
+  method: z.enum(
+    ["pix", "cash", "credit_card", "debit_card", "bank_transfer", "platform", "other"],
+    {
+      message: "Escolha a forma de pagamento",
+    },
+  ),
   amount: money("Valor"),
   paid_at: isoDate("Data"),
   notes: optionalText(200),
@@ -77,7 +92,7 @@ export type InstallmentInput = z.infer<typeof installmentSchema>;
 /** Dividir o total da reserva em 2, 3 ou 4 parcelas, com ou sem valores redondos. */
 export const splitPlanSchema = z.object({
   count: z.coerce
-    .number({ invalid_type_error: "Escolha em quantas vezes" })
+    .number({ error: "Escolha em quantas vezes" })
     .int()
     .refine(isSplitCount, "Escolha 2, 3 ou 4 vezes"),
   whole_reais: checkbox,
