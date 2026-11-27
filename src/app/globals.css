@@ -198,14 +198,14 @@
   }
 
   body {
-    @apply bg-canvas font-sans text-ink antialiased;
+    @apply bg-canvas text-ink font-sans antialiased;
     font-variant-numeric: tabular-nums;
     /* Nada deve empurrar a página para os lados no celular. */
     overflow-x: clip;
   }
 
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-primary;
+    @apply outline-primary outline-2 outline-offset-2;
   }
 }
 
@@ -270,7 +270,7 @@
    O app NÃO usa viewport-fit=cover (ver layout.tsx): o sistema já deixa a barra de status e o
    indicador de início fora da página, e estas classes valem 0 nesse caso. Ficam só como
    proteção caso o cover volte (ex.: tela cheia na horizontal).
-   ATENÇÃO: estas classes definem o padding do elemento; não combine com p-*/px-*/pt-* no mesmo
+   ATENÇÃO: estas classes definem o padding do elemento; não combine com p-*, px-*, pt-* no mesmo
    elemento (elas vencem). Ponha o padding da página num elemento interno. */
 @utility pt-safe {
   padding-top: env(safe-area-inset-top);

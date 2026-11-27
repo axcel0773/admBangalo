@@ -10,7 +10,7 @@ import { parseMoney } from "./money";
 /** Texto obrigatório, sem espaços nas pontas. */
 export const requiredText = (label: string, max = 120) =>
   z
-    .string({ required_error: `${label} é obrigatório` })
+    .string({ error: `${label} é obrigatório` })
     .trim()
     .min(1, `${label} é obrigatório`)
     .max(max, `${label} tem no máximo ${max} caracteres`);
@@ -27,33 +27,32 @@ export const optionalText = (max = 500) =>
 /** Aceita "1.234,56", "1234.56" ou "350". */
 export const money = (label: string) =>
   z
-    .string({ required_error: `${label} é obrigatório` })
+    .string({ error: `${label} é obrigatório` })
     .trim()
     .min(1, `${label} é obrigatório`)
     .transform((raw) => parseMoney(raw) ?? Number.NaN)
     .pipe(
       z
-        .number({ invalid_type_error: `${label} inválido` })
+        .number({ error: `${label} inválido` })
         .finite(`${label} inválido`)
         .min(0, `${label} não pode ser negativo`),
     );
 
 export const integer = (label: string, min: number, max: number) =>
   z.coerce
-    .number({ invalid_type_error: `${label} inválido` })
+    .number({ error: `${label} inválido` })
     .int(`${label} deve ser um número inteiro`)
     .min(min, `${label}: mínimo ${min}`)
     .max(max, `${label}: máximo ${max}`);
 
 /** Checkbox/switch: presente = true. */
 export const checkbox = z
-  .union([z.literal("on"), z.literal("true"), z.literal("false"), z.undefined()])
+  .union([z.literal("on"), z.literal("true"), z.literal("false")])
+  .optional()
   .transform((value) => value === "on" || value === "true");
 
 export const isoDate = (label: string) =>
-  z
-    .string({ required_error: `${label} é obrigatória` })
-    .regex(/^\d{4}-\d{2}-\d{2}$/, `${label} inválida`);
+  z.string({ error: `${label} é obrigatória` }).regex(/^\d{4}-\d{2}-\d{2}$/, `${label} inválida`);
 
 export const time = z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/, "Horário inválido");
 
@@ -64,7 +63,10 @@ export const phone = z
   .string()
   .trim()
   .optional()
-  .refine((value) => !value || /^\d{10,11}$/.test(value.replace(/\D/g, "")), "Telefone com DDD, ex.: (11) 98765-4321")
+  .refine(
+    (value) => !value || /^\d{10,11}$/.test(value.replace(/\D/g, "")),
+    "Telefone com DDD, ex.: (11) 98765-4321",
+  )
   .transform((value) => (value ? value : null));
 
 /** CPF opcional com dígitos verificadores; outros documentos (RG, passaporte) passam se não tiverem 11 dígitos. */
@@ -72,7 +74,10 @@ export const document = z
   .string()
   .trim()
   .optional()
-  .refine((value) => !value || value.replace(/\D/g, "").length !== 11 || isValidCpf(value), "CPF inválido")
+  .refine(
+    (value) => !value || value.replace(/\D/g, "").length !== 11 || isValidCpf(value),
+    "CPF inválido",
+  )
   .transform((value) => (value ? value : null));
 
 export function isValidCpf(value: string): boolean {

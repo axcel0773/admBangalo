@@ -12,7 +12,9 @@ import {
   type AuthFormState,
 } from "./schemas";
 
-function firstErrors(issues: { path: (string | number)[]; message: string }[]) {
+function firstErrors(
+  issues: readonly { readonly path: readonly PropertyKey[]; message: string }[],
+) {
   const fieldErrors: Partial<Record<"email" | "password", string>> = {};
   for (const issue of issues) {
     const field = issue.path[0];
@@ -54,10 +56,7 @@ async function signInWithPassword(
   redirect(safeRedirectPath(parsed.data.next));
 }
 
-async function sendMagicLink(
-  _prev: AuthFormState,
-  formData: FormData,
-): Promise<AuthFormState> {
+async function sendMagicLink(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
   const parsed = magicLinkSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     return {
@@ -78,7 +77,8 @@ async function sendMagicLink(
 
   // Mesma resposta para e-mail cadastrado ou não: a tela não revela quem tem conta.
   // Só o limite de envios aparece, porque aí a pessoa precisa esperar.
-  if (error?.status === 429) return { status: "error", message: "Muitas tentativas. Espere um minuto e tente de novo." };
+  if (error?.status === 429)
+    return { status: "error", message: "Muitas tentativas. Espere um minuto e tente de novo." };
 
   return { status: "link-sent", email: parsed.data.email };
 }
